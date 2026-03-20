@@ -171,9 +171,8 @@ export async function getEventBySlug(slug: string) {
 }
 
 export async function deleteEvent(formData: FormData) {
-  
   const eventId = parseInt(formData.get("eventId") as string)
-  
+
   if (!eventId) {
     throw new Error("Event ID is required")
   }
@@ -199,13 +198,12 @@ export async function deleteEvent(formData: FormData) {
 
   // Delete the event from the database
   await db.delete(events).where(eq(events.id, eventId))
-  
+
   revalidatePath("/admin")
   redirect("/admin")
 }
 
 export async function updateEvent(formData: FormData) {
-  
   const eventId = parseInt(formData.get("eventId") as string)
   const slug = formData.get("slug") as string
   const title = formData.get("title") as string
@@ -213,13 +211,11 @@ export async function updateEvent(formData: FormData) {
   const description = formData.get("description") as string
   const startTime = formData.get("startTime") as string
   const endTime = formData.get("endTime") as string
-  
+
   console.log('🔍 [UPDATE EVENT] Received from form:', {
-    eventId,
-    title,
-    startTime,
-    endTime,
+    eventId, title, startTime, endTime,
   })
+
   const image = formData.get("image") as string
   const imageKey = formData.get("imageKey") as string
   const ticketUrl = formData.get("ticketUrl") as string
@@ -230,14 +226,10 @@ export async function updateEvent(formData: FormData) {
 
   // Parse stops data from form (for tours) before validation so we can derive times
   const stopsData: {
-    city: string;
-    country: string;
-    venueId: number | null;
-    startTime: Date;
-    endTime: Date;
-    ticketUrl: string | null;
-    orderIndex: number;
+    city: string; country: string; venueId: number | null;
+    startTime: Date; endTime: Date; ticketUrl: string | null; orderIndex: number;
   }[] = []
+
   let stopIndex = 0
   while (formData.has(`stops[${stopIndex}][city]`)) {
     const city = (formData.get(`stops[${stopIndex}][city]`) as string) || ""
@@ -252,13 +244,9 @@ export async function updateEvent(formData: FormData) {
 
     if (city && country && stopStartTimeStr && stopEndTimeStr) {
       stopsData.push({
-        city,
-        country,
-        venueId: stopVenueId,
-        startTime: new Date(stopStartTimeStr),
-        endTime: new Date(stopEndTimeStr),
-        ticketUrl: stopTicketUrl,
-        orderIndex: stopOrderIndex,
+        city, country, venueId: stopVenueId,
+        startTime: new Date(stopStartTimeStr), endTime: new Date(stopEndTimeStr),
+        ticketUrl: stopTicketUrl, orderIndex: stopOrderIndex,
       })
     }
     stopIndex++
@@ -268,8 +256,15 @@ export async function updateEvent(formData: FormData) {
   if (!eventId || !slug || !title) {
     throw new Error("Required fields missing")
   }
+
   const hasTopLevelTimes = Boolean(startTime && endTime)
   if (!hasTopLevelTimes && !(isTour && stopsData.length > 0)) {
+    console.error('[updateEvent] Validation failed:', {
+      slug, title, startTime, endTime,
+      isTour, stopsDataLength: stopsData.length,
+      hasTopLevelTimes,
+      rawIsTour: formData.get("isTour"),
+    })
     throw new Error("Required fields missing")
   }
 
@@ -285,10 +280,7 @@ export async function updateEvent(formData: FormData) {
 
   // Get the current event to check if image is being replaced
   const currentEvent = await db
-    .select({ 
-      imageKey: events.imageKey,
-      image: events.image 
-    })
+    .select({ imageKey: events.imageKey, image: events.image })
     .from(events)
     .where(eq(events.id, eventId))
     .limit(1)
@@ -309,27 +301,24 @@ export async function updateEvent(formData: FormData) {
   const eventStartTime = startTime
     ? new Date(startTime)
     : (isTour && stopsData.length > 0
-        ? new Date(Math.min(...stopsData.map(s => s.startTime.getTime())))
-        : undefined)
+      ? new Date(Math.min(...stopsData.map(s => s.startTime.getTime())))
+      : undefined)
+
   const eventEndTime = endTime
     ? new Date(endTime)
     : (isTour && stopsData.length > 0
-        ? new Date(Math.max(...stopsData.map(s => s.endTime.getTime())))
-        : undefined)
-  
+      ? new Date(Math.max(...stopsData.map(s => s.endTime.getTime())))
+      : undefined)
+
   console.log('🔍 [UPDATE EVENT] Created Date objects:', {
-    startTimeString: startTime,
-    endTimeString: endTime,
-    eventStartTime,
-    eventEndTime,
+    startTimeString: startTime, endTimeString: endTime,
+    eventStartTime, eventEndTime,
     eventStartTimeISO: eventStartTime?.toISOString(),
     eventEndTimeISO: eventEndTime?.toISOString(),
   })
 
   console.log('🔍 [UPDATE EVENT] Saving to database:', {
-    eventId,
-    startTime: eventStartTime,
-    endTime: eventEndTime,
+    eventId, startTime: eventStartTime, endTime: eventEndTime,
     startTimeISO: eventStartTime?.toISOString(),
     endTimeISO: eventEndTime?.toISOString(),
   })
@@ -351,7 +340,7 @@ export async function updateEvent(formData: FormData) {
       venueId,
     })
     .where(eq(events.id, eventId))
-  
+
   console.log('🔍 [UPDATE EVENT] Successfully saved to database')
 
   // Delete existing artist relationships
@@ -397,13 +386,13 @@ export async function updateEvent(formData: FormData) {
   // Revalidate admin pages
   revalidatePath("/admin")
   revalidatePath(`/admin/events/${slug}`)
-  
   // Revalidate public pages to show updated event data
-  revalidatePath("/", "page") // Home page
+  revalidatePath("/", "page")             // Home page
   revalidatePath(`/event/${slug}`, "page") // Event detail page
-  
+
   redirect("/admin?success=event-updated")
 }
+
 
 export async function createEvent(formData: FormData) {
   const slug = formData.get("slug") as string
@@ -422,14 +411,10 @@ export async function createEvent(formData: FormData) {
 
   // Parse stops before validation so we can derive times for tours
   const stopsData: {
-    city: string;
-    country: string;
-    venueId: number | null;
-    startTime: Date;
-    endTime: Date;
-    ticketUrl: string | null;
-    orderIndex: number;
+    city: string; country: string; venueId: number | null;
+    startTime: Date; endTime: Date; ticketUrl: string | null; orderIndex: number;
   }[] = []
+
   let stopIndex = 0
   while (formData.has(`stops[${stopIndex}][city]`)) {
     const city = (formData.get(`stops[${stopIndex}][city]`) as string) || ""
@@ -444,23 +429,27 @@ export async function createEvent(formData: FormData) {
 
     if (city && country && stopStartTimeStr && stopEndTimeStr) {
       stopsData.push({
-        city,
-        country,
-        venueId: stopVenueId,
-        startTime: new Date(stopStartTimeStr),
-        endTime: new Date(stopEndTimeStr),
-        ticketUrl: stopTicketUrl,
-        orderIndex: stopOrderIndex,
+        city, country, venueId: stopVenueId,
+        startTime: new Date(stopStartTimeStr), endTime: new Date(stopEndTimeStr),
+        ticketUrl: stopTicketUrl, orderIndex: stopOrderIndex,
       })
     }
     stopIndex++
   }
 
   if (!slug || !title) {
+    console.error('[createEvent] Missing slug or title:', { slug, title })
     throw new Error("Required fields missing")
   }
+
   const hasTopLevelTimes = Boolean(startTime && endTime)
   if (!hasTopLevelTimes && !(isTour && stopsData.length > 0)) {
+    console.error('[createEvent] Validation failed:', {
+      slug, title, startTime, endTime,
+      isTour, stopsDataLength: stopsData.length,
+      hasTopLevelTimes,
+      rawIsTour: formData.get("isTour"),
+    })
     throw new Error("Required fields missing")
   }
 
@@ -478,13 +467,14 @@ export async function createEvent(formData: FormData) {
   const eventStartTime = startTime
     ? new Date(startTime)
     : (isTour && stopsData.length > 0
-        ? new Date(Math.min(...stopsData.map(s => s.startTime.getTime())))
-        : undefined)
+      ? new Date(Math.min(...stopsData.map(s => s.startTime.getTime())))
+      : undefined)
+
   const eventEndTime = endTime
     ? new Date(endTime)
     : (isTour && stopsData.length > 0
-        ? new Date(Math.max(...stopsData.map(s => s.endTime.getTime())))
-        : undefined)
+      ? new Date(Math.max(...stopsData.map(s => s.endTime.getTime())))
+      : undefined)
 
   // Insert event and get the ID
   const [newEvent] = await db
@@ -571,7 +561,7 @@ export async function createVenue(formData: FormData) {
   const addressUrl = formData.get("addressUrl") as string
   const city = formData.get("city") as string
   const country = formData.get("country") as string
-  
+
   // Handle multiple images
   const image1 = formData.get("image1") as string
   const image2 = formData.get("image2") as string
@@ -610,7 +600,7 @@ export async function updateVenue(formData: FormData) {
   const addressUrl = formData.get("addressUrl") as string
   const city = formData.get("city") as string
   const country = formData.get("country") as string
-  
+
   // Handle multiple images and their keys
   const image1 = formData.get("image1") as string
   const image2 = formData.get("image2") as string
@@ -618,7 +608,6 @@ export async function updateVenue(formData: FormData) {
   const image1Key = formData.get("image1Key") as string
   const image2Key = formData.get("image2Key") as string
   const image3Key = formData.get("image3Key") as string
-  
   const images = [image1, image2, image3].filter(Boolean)
   const imageKeys = [image1Key, image2Key, image3Key].filter(Boolean)
 
@@ -651,14 +640,14 @@ export async function updateVenue(formData: FormData) {
 
 export async function deleteVenue(formData: FormData) {
   const venueId = parseInt(formData.get("venueId") as string)
-  
+
   if (!venueId) {
     throw new Error("Venue ID is required")
   }
 
   // Delete venue - associated events will have their venueId set to null
   await db.delete(venues).where(eq(venues.id, venueId))
-  
+
   revalidatePath("/admin")
   redirect("/admin")
 }
@@ -753,14 +742,14 @@ export async function updateArtist(formData: FormData) {
 
 export async function deleteArtist(formData: FormData) {
   const artistId = parseInt(formData.get("artistId") as string)
-  
+
   if (!artistId) {
     throw new Error("Artist ID is required")
   }
 
   // Deleting artist will cascade delete from eventsArtists junction table
   await db.delete(artists).where(eq(artists.id, artistId))
-  
+
   revalidatePath("/admin")
   redirect("/admin")
 }
@@ -820,7 +809,7 @@ export async function createGallery(formData: FormData) {
   const title = formData.get("title") as string
   const description = formData.get("description") as string
   const dateStr = formData.get("date") as string
-  
+
   if (!title || !dateStr) {
     throw new Error("Required fields missing")
   }
@@ -876,10 +865,11 @@ export async function updateGallery(formData: FormData) {
   const slug = formData.get("slug") as string
   const description = formData.get("description") as string
   const dateStr = formData.get("date") as string
-  
+
   if (!galleryId || !title || !slug || !dateStr) {
     throw new Error("Required fields missing")
   }
+
   const date = new Date(dateStr)
 
   // Parse new image data from form
@@ -902,10 +892,9 @@ export async function updateGallery(formData: FormData) {
 
   const existingKeys = new Set(existingImages.map(img => img.key))
   const newKeys = new Set(imageData.map(img => img.key))
-  
+
   // Find keys to delete from UploadThing
   const keysToDelete = Array.from(existingKeys).filter(key => !newKeys.has(key))
-  
   if (keysToDelete.length > 0) {
     const utapi = getUTApi()
     await utapi.deleteFiles(keysToDelete)
@@ -950,7 +939,7 @@ export async function updateGallery(formData: FormData) {
 
 export async function deleteGallery(formData: FormData) {
   const galleryId = parseInt(formData.get("galleryId") as string)
-  
+
   if (!galleryId) {
     throw new Error("Gallery ID is required")
   }
@@ -968,7 +957,7 @@ export async function deleteGallery(formData: FormData) {
 
   // Delete gallery - images will be cascade deleted
   await db.delete(galleries).where(eq(galleries.id, galleryId))
-  
+
   revalidatePath("/admin")
   redirect("/admin?tab=galleries&success=gallery-deleted")
 }
@@ -1095,10 +1084,7 @@ export async function updateDJ(formData: FormData) {
 
   // Get the current DJ to check if image is being replaced
   const currentDJ = await db
-    .select({ 
-      imageKey: djs.imageKey,
-      image: djs.image 
-    })
+    .select({ imageKey: djs.imageKey, image: djs.image })
     .from(djs)
     .where(eq(djs.id, djId))
     .limit(1)
@@ -1143,7 +1129,7 @@ export async function updateDJ(formData: FormData) {
 
 export async function deleteDJ(formData: FormData) {
   const djId = parseInt(formData.get("djId") as string)
-  
+
   if (!djId) {
     throw new Error("DJ ID is required")
   }
@@ -1166,7 +1152,7 @@ export async function deleteDJ(formData: FormData) {
   }
 
   await db.delete(djs).where(eq(djs.id, djId))
-  
+
   revalidatePath("/admin")
   redirect("/admin")
 }
