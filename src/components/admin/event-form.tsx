@@ -38,16 +38,16 @@ function generateSlug(text: string): string {
     .toLowerCase()
     .trim()
     .replace(/[^\w\s-]/g, '') // Remove special characters
-    .replace(/[\s_]+/g, '-')   // Replace spaces and underscores with hyphens
-    .replace(/^-+|-+$/g, '')   // Remove leading/trailing hyphens
+    .replace(/[\s_]+/g, '-')  // Replace spaces and underscores with hyphens
+    .replace(/^-+|-+$/g, '')  // Remove leading/trailing hyphens
 }
 
 function SubmitButton() {
   const { pending } = useFormStatus()
-  
+
   return (
-    <Button 
-      type="submit" 
+    <Button
+      type="submit"
       disabled={pending}
       className="bg-[--gold] text-[--maroon-red] hover:bg-[--gold]/90 font-semibold px-6 py-2.5 shadow-lg hover:shadow-xl border border-[--gold] hover:border-[--dark-gold] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
     >
@@ -85,7 +85,7 @@ export function EventForm({ venues, artists }: EventFormProps) {
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let newSlug = e.target.value
-    
+
     // If it looks like a URL, extract just the path slug
     if (newSlug.includes('://') || newSlug.includes('http')) {
       try {
@@ -100,9 +100,8 @@ export function EventForm({ venues, artists }: EventFormProps) {
         newSlug = generateSlug(newSlug)
       }
     }
-    
+
     setSlug(newSlug)
-    
     // Mark as manually edited if the user types something different from auto-generated
     if (newSlug !== generateSlug(title)) {
       setIsSlugManuallyEdited(true)
@@ -121,18 +120,19 @@ export function EventForm({ venues, artists }: EventFormProps) {
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Left Column - Form Fields (2/3 width) */}
         <div className="lg:col-span-2 space-y-8">
+
           {/* Basic Information */}
           <div>
             <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Event Title *</Label>
-                <Input 
-                  id="title" 
-                  name="title" 
+                <Input
+                  id="title"
+                  name="title"
                   value={title}
                   onChange={handleTitleChange}
-                  required 
+                  required
                   placeholder="NAZAARA"
                   className="bg-background border-border"
                 />
@@ -140,20 +140,20 @@ export function EventForm({ venues, artists }: EventFormProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="slug">
-                  URL Slug * 
+                  URL Slug *
                   {!isSlugManuallyEdited && title && (
                     <span className="ml-2 text-xs text-muted-foreground">
                       (auto-generated)
                     </span>
                   )}
                 </Label>
-                <Input 
-                  id="slug" 
-                  name="slug" 
+                <Input
+                  id="slug"
+                  name="slug"
                   value={slug}
                   onChange={handleSlugChange}
                   onFocus={handleSlugFocus}
-                  required 
+                  required
                   placeholder="nazaara-01"
                   className={`bg-background border-border ${!isSlugManuallyEdited && title ? "text-muted-foreground" : ""}`}
                 />
@@ -164,9 +164,9 @@ export function EventForm({ venues, artists }: EventFormProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="tagline">Tagline</Label>
-                <Input 
-                  id="tagline" 
-                  name="tagline" 
+                <Input
+                  id="tagline"
+                  name="tagline"
                   placeholder="Live In Vancouver"
                   className="bg-background border-border"
                 />
@@ -174,9 +174,9 @@ export function EventForm({ venues, artists }: EventFormProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
-                <Textarea 
-                  id="description" 
-                  name="description" 
+                <Textarea
+                  id="description"
+                  name="description"
                   rows={4}
                   placeholder="Experience the ultimate South Asian music event..."
                   className="bg-background border-border resize-none"
@@ -214,9 +214,9 @@ export function EventForm({ venues, artists }: EventFormProps) {
               {!isTour && (
                 <div className="space-y-2">
                   <Label htmlFor="ticketUrl">Ticket URL</Label>
-                  <Input 
-                    id="ticketUrl" 
-                    name="ticketUrl" 
+                  <Input
+                    id="ticketUrl"
+                    name="ticketUrl"
                     placeholder="https://tickets.example.com/event"
                     className="bg-background border-border"
                   />
@@ -235,19 +235,18 @@ export function EventForm({ venues, artists }: EventFormProps) {
           <div>
             <h2 className="text-lg font-semibold mb-4">Publishing</h2>
             <div className="flex items-center space-x-2 mb-3">
-              <Checkbox 
-                id="isTour" 
-                name="isTour"
+              {/* FIX: Use explicit hidden input for reliable form submission with server actions */}
+              <input type="hidden" name="isTour" value={isTour ? "on" : ""} />
+              <Checkbox
+                id="isTour"
                 checked={isTour}
                 onCheckedChange={(v) => setIsTour(v === true)}
               />
               <Label htmlFor="isTour">This is a tour (multiple cities)</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="isPublished" 
-                name="isPublished"
-              />
+              <input type="hidden" name="isPublished" value="" />
+              <Checkbox id="isPublished" name="isPublished" />
               <Label htmlFor="isPublished">Published (visible to public)</Label>
             </div>
           </div>
@@ -277,7 +276,6 @@ export function EventForm({ venues, artists }: EventFormProps) {
                   </p>
                 </div>
               </div>
-              
               <div className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
                 <div className="flex-1">
@@ -287,7 +285,6 @@ export function EventForm({ venues, artists }: EventFormProps) {
                   </p>
                 </div>
               </div>
-              
               <div className="flex items-start gap-2">
                 <Ticket className="h-4 w-4 text-muted-foreground mt-0.5" />
                 <div className="flex-1">
