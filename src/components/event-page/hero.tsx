@@ -216,7 +216,6 @@ export default async function EventHero({ event }: EventHeroProps) {
                       const day = d.getUTCDate().toString().padStart(2, '0')
                       const month = d.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' })
                       const dateStr = `${day} ${month}`
-                      const timeStr = formatTime(s.startTime)
 
                       return (
                         <li key={i} className="flex items-center justify-between gap-3 text-[var(--white)]">
@@ -229,7 +228,6 @@ export default async function EventHero({ event }: EventHeroProps) {
                           <div className="flex items-center gap-3">
                             <div className="text-right">
                               <span className="text-sm font-neue-haas block">{dateStr}</span>
-                              <span className="text-xs font-neue-haas text-[var(--white)]/70">{timeStr}</span>
                             </div>
                             {s.ticketUrl ? (
                               <a
@@ -421,7 +419,6 @@ export default async function EventHero({ event }: EventHeroProps) {
                           const day = d.getUTCDate().toString().padStart(2, '0')
                           const month = d.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' })
                           const dateStr = `${day} ${month}`
-                          const timeStr = formatTime(s.startTime)
 
                           return (
                             <div key={i} className="flex items-center justify-between p-3">
@@ -432,7 +429,6 @@ export default async function EventHero({ event }: EventHeroProps) {
                               <div className="flex items-center gap-4">
                                 <div className="text-right">
                                   <span className="text-sm font-neue-haas text-[var(--white)]/90 block">{dateStr}</span>
-                                  <span className="text-xs font-neue-haas text-[var(--white)]/60">{timeStr}</span>
                                 </div>
                                 {s.ticketUrl ? (
                                   <a
