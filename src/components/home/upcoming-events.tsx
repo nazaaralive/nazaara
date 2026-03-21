@@ -22,7 +22,7 @@ export default async function UpcomingEvents() {
   console.log("[UpcomingEvents] Country from cookie:", country);
   
   // Determine the event shown in the hero (mirrors logic used by Hero component exactly)
-  const cityEvent = await getPublicEventForCity(city, country);
+  const cityEvent = await getPublicEventForCity(city || "");
   const fallbackEvent = cityEvent ? null : await getPublicFeaturedEvent();
   const heroEvent = cityEvent || fallbackEvent;
   const heroSlug = heroEvent?.slug;
