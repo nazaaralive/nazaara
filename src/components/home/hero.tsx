@@ -12,7 +12,7 @@ export default async function Hero() {
   const city = cookieStore.get("nza_city")?.value;
   const country = cookieStore.get("nza_country")?.value;
   
-  const cityEvent = await getPublicEventForCity(city, country);
+  const cityEvent = await getPublicEventForCity(city || "");
   const fallbackEvent = cityEvent ? null : await getPublicFeaturedEvent();
   const featuredEvent = cityEvent || fallbackEvent;
 
