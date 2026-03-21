@@ -291,7 +291,8 @@ export default async function EventHero({ event }: EventHeroProps) {
                 </div>
               )}
 
-              {/* Minimal info bar */}
+              {/* Minimal info bar - hidden for tours */}
+              {stops.length === 0 && (
               <div className="mt-4 flex items-center justify-center gap-6">
                 <span className="font-neue-haas text-[9px] uppercase tracking-[0.3em]"
                       style={{ color: 'var(--gold)', opacity: 0.7 }}>
@@ -306,6 +307,7 @@ export default async function EventHero({ event }: EventHeroProps) {
                   Limited Capacity
                 </span>
               </div>
+              )}
             </div>
           </div>
 
@@ -450,6 +452,7 @@ export default async function EventHero({ event }: EventHeroProps) {
                     </div>
                   )}
 
+                  {stops.length === 0 && (
                   <div className="flex items-center gap-6 text-[10px] font-neue-haas uppercase tracking-[0.3em] text-[var(--white)]/40">
                     <span className="flex items-center gap-2">
                       <span className="w-1 h-1 bg-[var(--gold)] rounded-full" />
@@ -464,6 +467,7 @@ export default async function EventHero({ event }: EventHeroProps) {
                       Limited Capacity
                     </span>
                   </div>
+                  )}
                 </div>
 
                 {/* CTA Section (hidden for tours) */}
