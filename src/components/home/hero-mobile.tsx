@@ -11,7 +11,7 @@ export default async function HeroMobile() {
   const country = cookieStore.get("nza_country")?.value;
   console.log("[HeroMobile] geo cookies:", { city: city || "<not set>", country: country || "<not set>" });
   
-  const cityEvent = await getPublicEventForCity(city, country);
+  const cityEvent = await getPublicEventForCity(city || "");
   const fallbackEvent = cityEvent ? null : await getPublicFeaturedEvent();
   const featuredEvent = cityEvent || fallbackEvent;
 
