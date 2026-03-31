@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useCallback, useEffect, useRef } from "react"
-import { X, Upload, GripVertical, Loader2, ImagePlus } from "lucide-react"
+import Image from "next/image"
+import { X, Upload, GripVertical, Loader2, ArrowDownAZ, ArrowUpZA, ArrowDownUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
@@ -22,10 +23,18 @@ interface GalleryUploadThingUploadProps {
   onImagesChange?: (images: ImageData[]) => void
 }
 
-export function GalleryUploadThingUpload({ 
-  defaultImages = [], 
-  onImagesChange 
-}: GalleryUploadThingUploadProps) {
+// Extract a sortable filename from a URL
+function getFilename(url: string): string {
+  try {
+    const pathname = new URL(url).pathname
+    const parts = pathname.split("/")
+    return (parts[parts.length - 1] || "").toLowerCase()
+  } catch {
+    return url.toLowerCase()
+  }
+}
+
+export function GalleryUploadThingUpload({ defaultImages = [], onImagesChange }: GalleryUploadThingUploadProps) {
   const [images, setImages] = useState<ImageData[]>(defaultImages)
   const [isDragOver, setIsDragOver] = useState(false)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
@@ -34,12 +43,10 @@ export function GalleryUploadThingUpload({
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [uploadingCount, setUploadingCount] = useState<number>(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  
+
   // Initialize UploadThing with batch upload handling
   const { startUpload, isUploading } = useUploadThing("galleryImage", {
     onUploadBegin: () => {
-      // Note: onUploadBegin only gets called once with fileName, not useful for count
-      // We'll set the count when we process files instead
       setUploadProgress(0)
     },
     onClientUploadComplete: (res) => {
@@ -51,7 +58,6 @@ export function GalleryUploadThingUpload({
           orderIndex: images.length + index,
           isNew: true,
         }))
-        
         setImages(prev => [...prev, ...newImages])
         setError(null)
         setUploadingCount(0)
@@ -77,34 +83,51 @@ export function GalleryUploadThingUpload({
 
   const removeImage = useCallback(async (index: number) => {
     const imageToRemove = images[index]
-    
     // Delete from UploadThing server if it's a newly uploaded image
     if (imageToRemove?.key && imageToRemove.isNew) {
       await deleteUploadedFiles(imageToRemove.key)
     }
-    
     setImages(prev => {
       const newImages = prev.filter((_, i) => i !== index)
-      // Reindex remaining images
       return newImages.map((img, i) => ({ ...img, orderIndex: i }))
     })
   }, [images])
 
   const removeAllImages = useCallback(async () => {
-    // Delete all newly uploaded images from UploadThing server
     const newImageKeys = images.filter(img => img.isNew).map(img => img.key)
     if (newImageKeys.length > 0) {
       await deleteUploadedFiles(newImageKeys)
     }
-    
     setImages([])
   }, [images])
 
-  // Efficient file handling for batch uploads
+  // Sorting helpers
+  const sortAZ = useCallback(() => {
+    setImages(prev =>
+      [...prev]
+        .sort((a, b) => getFilename(a.url).localeCompare(getFilename(b.url)))
+        .map((img, i) => ({ ...img, orderIndex: i }))
+    )
+  }, [])
+
+  const sortZA = useCallback(() => {
+    setImages(prev =>
+      [...prev]
+        .sort((a, b) => getFilename(b.url).localeCompare(getFilename(a.url)))
+        .map((img, i) => ({ ...img, orderIndex: i }))
+    )
+  }, [])
+
+  const reverseOrder = useCallback(() => {
+    setImages(prev =>
+      [...prev].reverse().map((img, i) => ({ ...img, orderIndex: i }))
+    )
+  }, [])
+
+  // File validation
   const validateFile = (file: File): string | null => {
     const acceptedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"]
     const maxFileSize = 1024 // MB (1GB)
-    
     if (!acceptedTypes.includes(file.type)) {
       return `${file.name} is not a supported file type`
     }
@@ -115,12 +138,11 @@ export function GalleryUploadThingUpload({
   }
 
   const processFiles = async (fileList: FileList) => {
-    // Process files in batches for efficiency
     const files = Array.from(fileList)
     const validFiles: File[] = []
     const errors: string[] = []
     let errorCount = 0
-    const maxErrors = 5 // Only show first 5 errors to avoid overwhelming the user
+    const maxErrors = 5
 
     for (const file of files) {
       const validationError = validateFile(file)
@@ -138,7 +160,7 @@ export function GalleryUploadThingUpload({
       const errorMessage = errors.join('; ')
       const additionalErrors = errorCount - errors.length
       setError(
-        additionalErrors > 0 
+        additionalErrors > 0
           ? `${errorMessage}; and ${additionalErrors} more errors`
           : errorMessage
       )
@@ -146,9 +168,7 @@ export function GalleryUploadThingUpload({
     }
 
     if (validFiles.length > 0) {
-      // Set the actual file count before uploading
       setUploadingCount(validFiles.length)
-      // Upload valid files even if some had errors
       await startUpload(validFiles)
     }
   }
@@ -158,14 +178,12 @@ export function GalleryUploadThingUpload({
     if (files && files.length > 0) {
       await processFiles(files)
     }
-    // Reset input value to allow selecting the same file again
     e.target.value = ""
   }
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(false)
-
     const files = e.dataTransfer.files
     if (files.length > 0) {
       await processFiles(files)
@@ -182,7 +200,7 @@ export function GalleryUploadThingUpload({
     setIsDragOver(false)
   }
 
-  // Photo reordering
+  // Photo reordering via drag
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDraggedIndex(index)
     e.dataTransfer.effectAllowed = "move"
@@ -200,7 +218,6 @@ export function GalleryUploadThingUpload({
 
   const handleDropPhoto = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault()
-
     if (draggedIndex === null || draggedIndex === dropIndex) {
       setDraggedIndex(null)
       setDragOverIndex(null)
@@ -210,18 +227,12 @@ export function GalleryUploadThingUpload({
     setImages(prev => {
       const newImages = [...prev]
       const draggedImage = newImages[draggedIndex]
-      
-      // Remove from old position
       newImages.splice(draggedIndex, 1)
-      
-      // Insert at new position
       const adjustedDropIndex = draggedIndex < dropIndex ? dropIndex - 1 : dropIndex
       newImages.splice(adjustedDropIndex, 0, draggedImage)
-      
-      // Reindex all images
       return newImages.map((img, i) => ({ ...img, orderIndex: i }))
     })
-    
+
     setDraggedIndex(null)
     setDragOverIndex(null)
   }
@@ -260,7 +271,6 @@ export function GalleryUploadThingUpload({
           className="hidden"
           disabled={isUploading}
         />
-
         <div className="flex flex-col items-center justify-center text-center space-y-4">
           <div
             className={cn(
@@ -275,17 +285,16 @@ export function GalleryUploadThingUpload({
               <Upload className="w-8 h-8" />
             )}
           </div>
-
           <div className="space-y-2">
             <h3 className="text-lg font-medium text-foreground">
-              {isUploading 
+              {isUploading
                 ? `Uploading ${uploadingCount} image${uploadingCount !== 1 ? 's' : ''}...`
-                : images.length === 0 
-                  ? "Upload gallery images" 
+                : images.length === 0
+                  ? "Upload gallery images"
                   : "Add more images"}
             </h3>
             <p className="text-sm text-muted-foreground text-balance">
-              {isUploading 
+              {isUploading
                 ? `Processing your images • ${uploadProgress}% complete`
                 : "Drag and drop your images here, or click to browse"}
             </p>
@@ -296,7 +305,7 @@ export function GalleryUploadThingUpload({
             )}
             {isUploading && uploadingCount > 10 && (
               <div className="w-full max-w-xs mx-auto bg-muted rounded-full h-2 overflow-hidden">
-                <div 
+                <div
                   className="bg-[--gold] h-full transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 />
@@ -316,20 +325,55 @@ export function GalleryUploadThingUpload({
       {/* Photo Grid */}
       {images.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <h4 className="text-sm font-medium text-foreground">
               {images.length} image{images.length !== 1 ? "s" : ""} in gallery
             </h4>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={removeAllImages}
-              className="text-muted-foreground hover:text-destructive bg-transparent"
-              disabled={isUploading}
-            >
-              Remove all
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={sortAZ}
+                disabled={isUploading}
+                title="Sort A → Z by filename"
+              >
+                <ArrowDownAZ className="w-4 h-4 mr-1" />
+                A-Z
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={sortZA}
+                disabled={isUploading}
+                title="Sort Z → A by filename"
+              >
+                <ArrowUpZA className="w-4 h-4 mr-1" />
+                Z-A
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={reverseOrder}
+                disabled={isUploading}
+                title="Reverse current order"
+              >
+                <ArrowDownUp className="w-4 h-4 mr-1" />
+                Reverse
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={removeAllImages}
+                className="text-muted-foreground hover:text-destructive bg-transparent"
+                disabled={isUploading}
+              >
+                Remove all
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -341,6 +385,7 @@ export function GalleryUploadThingUpload({
                   draggedIndex === index && "opacity-50",
                   dragOverIndex === index && "scale-105 transition-transform"
                 )}
+                style={{ contentVisibility: "auto", containIntrinsicSize: "0 200px" }}
                 draggable={!isUploading}
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={(e) => handleDragOverPhoto(e, index)}
@@ -349,23 +394,25 @@ export function GalleryUploadThingUpload({
                 onDragEnd={handleDragEnd}
               >
                 <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                  <img
+                  <Image
                     src={image.url}
                     alt={`Gallery image ${index + 1}`}
+                    width={300}
+                    height={300}
                     className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                    quality={40}
+                    loading="lazy"
                   />
                 </div>
-
                 <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="bg-black/60 text-white p-1 rounded">
                     <GripVertical className="w-3 h-3" />
                   </div>
                 </div>
-
                 <div className="absolute top-2 right-2 text-xs text-white bg-black/60 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                   #{index + 1}
                 </div>
-
                 <Button
                   type="button"
                   size="sm"
@@ -384,11 +431,10 @@ export function GalleryUploadThingUpload({
           </div>
 
           <p className="text-xs text-muted-foreground text-center">
-            Drag images to reorder them in the gallery
+            Drag images to reorder • Use sort buttons above for quick ordering
           </p>
         </div>
       )}
-
     </div>
   )
 }
