@@ -17,15 +17,27 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
   const [lightboxImageLoading, setLightboxImageLoading] = useState(false)
 
-  // Track which images are "near" the viewport and should be rendered.
-  // This set is BIDIRECTIONAL — images are added when they enter the
-  // rootMargin zone and REMOVED when they leave it, so the DOM never
-  // holds more than ~40-60 images at a time regardless of gallery size.
+  // Two-set system for memory-safe progressive loading:
+  //
+  // 1. `visibleSet` — bidirectional. Images enter when they're within 2000px
+  //    of the viewport and LEAVE when they scroll away. This controls which
+  //    images START loading, preventing the browser from fetching 265+ images
+  //    at once during aggressive scrolling.
+  //
+  // 2. `everLoaded` — monotonic (only grows). Once an image has fully loaded,
+  //    it stays in the DOM forever so its natural dimensions are preserved and
+  //    there are no layout shifts. CSS `content-visibility: auto` handles
+  //    rendering performance for off-screen loaded images.
+  //
+  // Render logic: show <Image> if (visibleSet OR everLoaded), else skeleton.
+
   const [visibleSet, setVisibleSet] = useState<Set<number>>(() => {
     const initial = new Set<number>()
     for (let i = 0; i < Math.min(15, images.length); i++) initial.add(i)
     return initial
   })
+
+  const [everLoaded, setEverLoaded] = useState<Set<number>>(new Set())
 
   // Distribute images into columns for masonry layout
   // Round-robin assignment keeps columns balanced
@@ -95,8 +107,9 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
       {
         // Load images when they're within 2000px of the viewport —
         // gives the browser plenty of time to fetch before the user sees them.
-        // Images are also REMOVED from the DOM once they leave this zone,
-        // keeping memory usage bounded.
+        // The visibleSet is bidirectional to prevent too many concurrent fetches,
+        // but everLoaded images stay in the DOM regardless (content-visibility
+        // handles their rendering performance).
         rootMargin: "2000px 0px",
         threshold: 0,
       }
@@ -211,6 +224,13 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
     [navigatePrevious, navigateNext]
   )
 
+  // Should we render the <Image> component for this index?
+  // Yes if the image is near the viewport (visibleSet) OR has loaded before (everLoaded).
+  const shouldRender = useCallback(
+    (index: number) => visibleSet.has(index) || everLoaded.has(index),
+    [visibleSet, everLoaded]
+  )
+
   return (
     <>
       {/* Masonry Grid — 3 columns on all screen sizes */}
@@ -232,7 +252,7 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
                   className="group relative w-full overflow-hidden rounded-sm sm:rounded-lg bg-muted transition-shadow duration-300 hover:shadow-2xl"
                   aria-label={`View image ${originalIndex + 1}`}
                 >
-                  {visibleSet.has(originalIndex) ? (
+                  {shouldRender(originalIndex) ? (
                     <Image
                       src={image.url}
                       alt={image.caption || `${title} - Image ${originalIndex + 1}`}
@@ -245,6 +265,13 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
                       onLoad={(e) => {
                         const img = e.currentTarget as HTMLImageElement
                         img.style.opacity = "1"
+                        // Mark as loaded forever — prevents layout shift on re-scroll
+                        setEverLoaded((prev) => {
+                          if (prev.has(originalIndex)) return prev
+                          const next = new Set(prev)
+                          next.add(originalIndex)
+                          return next
+                        })
                       }}
                     />
                   ) : (
