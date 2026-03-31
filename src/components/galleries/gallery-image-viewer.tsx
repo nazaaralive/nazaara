@@ -115,18 +115,30 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
     )
   }, [selectedImageIndex, images.length])
 
-  // Prefetch adjacent lightbox images so swiping feels instant
+  // Compute indices to preload around the current lightbox image
+  // 3 ahead + 2 behind so swiping in either direction feels instant
+  const preloadIndices = useMemo(() => {
+    if (selectedImageIndex === null) return []
+    const indices: number[] = []
+    for (let offset = -2; offset <= 3; offset++) {
+      if (offset === 0) continue // current image rendered separately
+      let idx = selectedImageIndex + offset
+      if (idx < 0) idx += images.length
+      if (idx >= images.length) idx -= images.length
+      indices.push(idx)
+    }
+    return indices
+  }, [selectedImageIndex, images.length])
+
+  // Track which lightbox images have finished loading
+  const [loadedLightboxImages, setLoadedLightboxImages] = useState<Set<number>>(new Set())
+
+  // When the selected image changes, check if it's already cached
   useEffect(() => {
-    if (selectedImageIndex === null) return
-    const prefetchIndices = [
-      selectedImageIndex === 0 ? images.length - 1 : selectedImageIndex - 1,
-      selectedImageIndex === images.length - 1 ? 0 : selectedImageIndex + 1,
-    ]
-    prefetchIndices.forEach((idx) => {
-      const img = new window.Image()
-      img.src = `/_next/image?url=${encodeURIComponent(images[idx].url)}&w=1920&q=75`
-    })
-  }, [selectedImageIndex, images])
+    if (selectedImageIndex !== null && loadedLightboxImages.has(selectedImageIndex)) {
+      setLightboxImageLoading(false)
+    }
+  }, [selectedImageIndex, loadedLightboxImages])
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -263,7 +275,7 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
             </span>
           </div>
 
-          {/* Main image */}
+          {/* Main image + hidden preloaded neighbours */}
           <div
             className="absolute inset-0 flex items-center justify-center p-4 pt-16 pb-20"
             onClick={(e) => e.stopPropagation()}
@@ -271,13 +283,14 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
             <div className="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
               {/* Loading spinner */}
               {lightboxImageLoading && (
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center z-10">
                   <Loader2 className="h-10 w-10 animate-spin text-white/60" />
                 </div>
               )}
 
+              {/* Current visible image */}
               <Image
-                key={selectedImageIndex}
+                key={`lightbox-${selectedImageIndex}`}
                 src={images[selectedImageIndex].url}
                 alt={
                   images[selectedImageIndex].caption ||
@@ -286,14 +299,35 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
                 width={1920}
                 height={1080}
                 className={cn(
-                  "object-contain w-full h-full transition-opacity duration-300",
+                  "object-contain w-full h-full transition-opacity duration-200",
                   lightboxImageLoading ? "opacity-0" : "opacity-100"
                 )}
                 sizes="100vw"
-                quality={80}
+                quality={75}
                 priority
-                onLoad={() => setLightboxImageLoading(false)}
+                onLoad={() => {
+                  setLightboxImageLoading(false)
+                  setLoadedLightboxImages((prev) => new Set(prev).add(selectedImageIndex!))
+                }}
               />
+
+              {/* Hidden preloaded images — same params as above so browser cache hits */}
+              {preloadIndices.map((idx) => (
+                <Image
+                  key={`preload-${idx}`}
+                  src={images[idx].url}
+                  alt=""
+                  width={1920}
+                  height={1080}
+                  className="absolute w-0 h-0 opacity-0 pointer-events-none"
+                  sizes="100vw"
+                  quality={75}
+                  priority
+                  onLoad={() => {
+                    setLoadedLightboxImages((prev) => new Set(prev).add(idx))
+                  }}
+                />
+              ))}
             </div>
           </div>
 
