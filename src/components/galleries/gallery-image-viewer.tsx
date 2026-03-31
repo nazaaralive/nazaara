@@ -17,7 +17,10 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
   const [lightboxImageLoading, setLightboxImageLoading] = useState(false)
 
-  // Track which images are "near" the viewport and should start loading
+  // Track which images are "near" the viewport and should be rendered.
+  // This set is BIDIRECTIONAL — images are added when they enter the
+  // rootMargin zone and REMOVED when they leave it, so the DOM never
+  // holds more than ~40-60 images at a time regardless of gallery size.
   const [visibleSet, setVisibleSet] = useState<Set<number>>(() => {
     const initial = new Set<number>()
     for (let i = 0; i < Math.min(15, images.length); i++) initial.add(i)
@@ -38,38 +41,72 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
   }, [images])
 
   // Intersection observer with a generous rootMargin so images load
-  // well before the user scrolls to them (Adobe Portfolio-style)
+  // well before the user scrolls to them (Adobe Portfolio-style).
+  // Updates are throttled via requestAnimationFrame to prevent
+  // hundreds of re-renders during aggressive scrolling.
   const observerRef = useRef<IntersectionObserver | null>(null)
   const itemRefs = useRef<Map<number, HTMLElement>>(new Map())
+  const pendingAdds = useRef<Set<number>>(new Set())
+  const pendingRemoves = useRef<Set<number>>(new Set())
+  const rafId = useRef<number | null>(null)
 
   useEffect(() => {
+    const flushUpdates = () => {
+      rafId.current = null
+      const adds = pendingAdds.current
+      const removes = pendingRemoves.current
+      if (adds.size === 0 && removes.size === 0) return
+
+      // Capture and clear
+      const toAdd = new Set(adds)
+      const toRemove = new Set(removes)
+      adds.clear()
+      removes.clear()
+
+      setVisibleSet((prev) => {
+        const next = new Set(prev)
+        toRemove.forEach((i) => next.delete(i))
+        toAdd.forEach((i) => next.add(i))
+        return next
+      })
+    }
+
+    const scheduleFlush = () => {
+      if (rafId.current === null) {
+        rafId.current = requestAnimationFrame(flushUpdates)
+      }
+    }
+
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        const newlyVisible: number[] = []
         entries.forEach((entry) => {
+          const idx = Number(entry.target.getAttribute("data-index"))
+          if (isNaN(idx)) return
           if (entry.isIntersecting) {
-            const idx = Number(entry.target.getAttribute("data-index"))
-            if (!isNaN(idx)) newlyVisible.push(idx)
+            pendingRemoves.current.delete(idx)
+            pendingAdds.current.add(idx)
+          } else {
+            pendingAdds.current.delete(idx)
+            pendingRemoves.current.add(idx)
           }
         })
-        if (newlyVisible.length > 0) {
-          setVisibleSet((prev) => {
-            const next = new Set(prev)
-            newlyVisible.forEach((i) => next.add(i))
-            return next
-          })
-        }
+        scheduleFlush()
       },
       {
-        // Load images when they're within 1500px of the viewport —
-        // gives the browser plenty of time to fetch before the user sees them
-        rootMargin: "1500px 0px",
+        // Load images when they're within 2000px of the viewport —
+        // gives the browser plenty of time to fetch before the user sees them.
+        // Images are also REMOVED from the DOM once they leave this zone,
+        // keeping memory usage bounded.
+        rootMargin: "2000px 0px",
         threshold: 0,
       }
     )
 
     itemRefs.current.forEach((el) => observerRef.current?.observe(el))
-    return () => observerRef.current?.disconnect()
+    return () => {
+      observerRef.current?.disconnect()
+      if (rafId.current !== null) cancelAnimationFrame(rafId.current)
+    }
   }, [images.length])
 
   const setItemRef = useCallback((el: HTMLElement | null, index: number) => {
