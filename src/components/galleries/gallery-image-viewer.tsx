@@ -130,8 +130,10 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
     return indices
   }, [selectedImageIndex, images.length])
 
-  // Track which lightbox images have finished loading
+  // Track which lightbox images have finished loading (low-quality preview)
   const [loadedLightboxImages, setLoadedLightboxImages] = useState<Set<number>>(new Set())
+  // Track which images have their full-res original ready
+  const [fullResReady, setFullResReady] = useState<Set<number>>(new Set())
 
   // When the selected image changes, check if it's already cached
   useEffect(() => {
@@ -281,29 +283,31 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
-              {/* Loading spinner */}
+              {/* Loading spinner — only while low-quality preview hasn't loaded yet */}
               {lightboxImageLoading && (
                 <div className="absolute inset-0 flex items-center justify-center z-10">
                   <Loader2 className="h-10 w-10 animate-spin text-white/60" />
                 </div>
               )}
 
-              {/* Current visible image */}
+              {/* Layer 1: Low-quality preview — loads fast, shown immediately */}
               <Image
-                key={`lightbox-${selectedImageIndex}`}
+                key={`preview-${selectedImageIndex}`}
                 src={images[selectedImageIndex].url}
                 alt={
                   images[selectedImageIndex].caption ||
                   `${title} - Image ${selectedImageIndex + 1}`
                 }
-                width={1920}
-                height={1080}
+                width={828}
+                height={466}
                 className={cn(
                   "object-contain w-full h-full transition-opacity duration-200",
-                  lightboxImageLoading ? "opacity-0" : "opacity-100"
+                  lightboxImageLoading ? "opacity-0" : "opacity-100",
+                  // Hide preview once full-res is ready
+                  fullResReady.has(selectedImageIndex) ? "invisible" : "visible"
                 )}
                 sizes="100vw"
-                quality={75}
+                quality={50}
                 priority
                 onLoad={() => {
                   setLightboxImageLoading(false)
@@ -311,20 +315,53 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
                 }}
               />
 
-              {/* Hidden preloaded images — same params as above so browser cache hits */}
+              {/* Layer 2: Full-res original — loads in background, swaps in seamlessly */}
+              {/* Uses unoptimized to serve the original file from utfs.io directly */}
+              <img
+                key={`fullres-${selectedImageIndex}`}
+                src={images[selectedImageIndex].url}
+                alt={
+                  images[selectedImageIndex].caption ||
+                  `${title} - Image ${selectedImageIndex + 1}`
+                }
+                className={cn(
+                  "absolute inset-0 w-full h-full object-contain transition-opacity duration-300",
+                  fullResReady.has(selectedImageIndex) ? "opacity-100" : "opacity-0"
+                )}
+                loading="eager"
+                onLoad={() => {
+                  setFullResReady((prev) => new Set(prev).add(selectedImageIndex!))
+                }}
+              />
+
+              {/* Hidden preloaded previews for adjacent images — fast low-quality */}
               {preloadIndices.map((idx) => (
                 <Image
                   key={`preload-${idx}`}
                   src={images[idx].url}
                   alt=""
-                  width={1920}
-                  height={1080}
+                  width={828}
+                  height={466}
                   className="absolute w-0 h-0 opacity-0 pointer-events-none"
                   sizes="100vw"
-                  quality={75}
+                  quality={50}
                   priority
                   onLoad={() => {
                     setLoadedLightboxImages((prev) => new Set(prev).add(idx))
+                  }}
+                />
+              ))}
+
+              {/* Hidden full-res preloads for next/prev only */}
+              {preloadIndices.slice(0, 3).map((idx) => (
+                <img
+                  key={`fullres-preload-${idx}`}
+                  src={images[idx].url}
+                  alt=""
+                  className="absolute w-0 h-0 opacity-0 pointer-events-none"
+                  loading="eager"
+                  onLoad={() => {
+                    setFullResReady((prev) => new Set(prev).add(idx))
                   }}
                 />
               ))}
