@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import Image from "next/image"
 import { X, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import type { PublicGalleryImage } from "@/lib/public-actions"
@@ -11,16 +11,78 @@ interface GalleryImageViewerProps {
   title: string
 }
 
+const COLUMN_COUNT = 3
+
 export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
-  const [isLoading, setIsLoading] = useState<Set<number>>(new Set())
   const [lightboxImageLoading, setLightboxImageLoading] = useState(false)
+
+  // Track which images are "near" the viewport and should start loading
+  const [visibleSet, setVisibleSet] = useState<Set<number>>(() => {
+    const initial = new Set<number>()
+    for (let i = 0; i < Math.min(15, images.length); i++) initial.add(i)
+    return initial
+  })
+
+  // Distribute images into columns for masonry layout
+  // Round-robin assignment keeps columns balanced
+  const columns = useMemo(() => {
+    const cols: { image: PublicGalleryImage; originalIndex: number }[][] = Array.from(
+      { length: COLUMN_COUNT },
+      () => []
+    )
+    images.forEach((image, index) => {
+      cols[index % COLUMN_COUNT].push({ image, originalIndex: index })
+    })
+    return cols
+  }, [images])
+
+  // Intersection observer with a generous rootMargin so images load
+  // well before the user scrolls to them (Adobe Portfolio-style)
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const itemRefs = useRef<Map<number, HTMLElement>>(new Map())
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        const newlyVisible: number[] = []
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = Number(entry.target.getAttribute("data-index"))
+            if (!isNaN(idx)) newlyVisible.push(idx)
+          }
+        })
+        if (newlyVisible.length > 0) {
+          setVisibleSet((prev) => {
+            const next = new Set(prev)
+            newlyVisible.forEach((i) => next.add(i))
+            return next
+          })
+        }
+      },
+      {
+        // Load images when they're within 1500px of the viewport —
+        // gives the browser plenty of time to fetch before the user sees them
+        rootMargin: "1500px 0px",
+        threshold: 0,
+      }
+    )
+
+    itemRefs.current.forEach((el) => observerRef.current?.observe(el))
+    return () => observerRef.current?.disconnect()
+  }, [images.length])
+
+  const setItemRef = useCallback((el: HTMLElement | null, index: number) => {
+    if (el) {
+      itemRefs.current.set(index, el)
+      observerRef.current?.observe(el)
+    }
+  }, [])
 
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (selectedImageIndex === null) return
-
       switch (e.key) {
         case "Escape":
           setSelectedImageIndex(null)
@@ -33,7 +95,6 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
           break
       }
     }
-
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [selectedImageIndex])
@@ -54,99 +115,108 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
     )
   }, [selectedImageIndex, images.length])
 
-  const handleImageLoad = (index: number) => {
-    setIsLoading(prev => {
-      const newSet = new Set(prev)
-      newSet.delete(index)
-      return newSet
+  // Prefetch adjacent lightbox images so swiping feels instant
+  useEffect(() => {
+    if (selectedImageIndex === null) return
+    const prefetchIndices = [
+      selectedImageIndex === 0 ? images.length - 1 : selectedImageIndex - 1,
+      selectedImageIndex === images.length - 1 ? 0 : selectedImageIndex + 1,
+    ]
+    prefetchIndices.forEach((idx) => {
+      const img = new window.Image()
+      img.src = `/_next/image?url=${encodeURIComponent(images[idx].url)}&w=1920&q=75`
     })
-    // Clear lightbox loading state when the currently selected image finishes loading
-    if (index === selectedImageIndex) {
-      setLightboxImageLoading(false)
-    }
-  }
+  }, [selectedImageIndex, images])
 
-  const handleImageLoadStart = (index: number) => {
-    setIsLoading(prev => new Set(prev).add(index))
-    // Set lightbox loading state when starting to load the currently selected image
-    if (index === selectedImageIndex) {
-      setLightboxImageLoading(true)
-    }
-  }
-
-  // Prevent body scroll when modal is open and handle initial loading state
+  // Prevent body scroll when modal is open
   useEffect(() => {
     if (selectedImageIndex !== null) {
-      document.body.style.overflow = 'hidden'
-      // Reset lightbox loading state when opening a new image
+      document.body.style.overflow = "hidden"
       setLightboxImageLoading(true)
     } else {
-      document.body.style.overflow = ''
+      document.body.style.overflow = ""
       setLightboxImageLoading(false)
     }
     return () => {
-      document.body.style.overflow = ''
+      document.body.style.overflow = ""
     }
   }, [selectedImageIndex])
 
+  // Touch swipe support for mobile lightbox
+  const touchStartX = useRef<number | null>(null)
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+  }, [])
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (touchStartX.current === null) return
+      const diff = e.changedTouches[0].clientX - touchStartX.current
+      if (Math.abs(diff) > 60) {
+        if (diff > 0) navigatePrevious()
+        else navigateNext()
+      }
+      touchStartX.current = null
+    },
+    [navigatePrevious, navigateNext]
+  )
+
   return (
     <>
-      {/* Image Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {images.map((image, index) => (
-          <button
-            key={image.id}
-            onClick={() => {
-              setLightboxImageLoading(true)
-              setSelectedImageIndex(index)
-            }}
-            className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-muted hover:shadow-2xl transition-all duration-300"
-            aria-label={`View image ${index + 1}`}
-          >
-            {/* Skeleton loading background */}
-            <div className={cn(
-              "absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted",
-              "animate-pulse transition-opacity duration-300",
-              isLoading.has(index) ? "opacity-100" : "opacity-0"
-            )} />
-            
-            <Image
-              src={image.url}
-              alt={image.caption || `${title} - Image ${index + 1}`}
-              fill
-              className={cn(
-                "object-cover transition-all duration-300 group-hover:scale-110",
-                isLoading.has(index) ? "opacity-0" : "opacity-100"
-              )}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              onLoadingComplete={() => handleImageLoad(index)}
-              onLoadStart={() => handleImageLoadStart(index)}
-            />
-            
-            {/* Loading spinner overlay */}
-            {isLoading.has(index) && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground font-medium">Loading...</span>
-                </div>
+      {/* Masonry Grid — 3 columns on all screen sizes */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
+        {columns.map((column, colIndex) => (
+          <div key={colIndex} className="flex flex-col gap-2 sm:gap-4 lg:gap-6">
+            {column.map(({ image, originalIndex }) => (
+              <div
+                key={image.id}
+                ref={(el) => setItemRef(el, originalIndex)}
+                data-index={originalIndex}
+                style={{ contentVisibility: "auto", containIntrinsicSize: "0 250px" }}
+              >
+                <button
+                  onClick={() => {
+                    setLightboxImageLoading(true)
+                    setSelectedImageIndex(originalIndex)
+                  }}
+                  className="group relative w-full overflow-hidden rounded-sm sm:rounded-lg bg-muted transition-shadow duration-300 hover:shadow-2xl"
+                  aria-label={`View image ${originalIndex + 1}`}
+                >
+                  {visibleSet.has(originalIndex) ? (
+                    <Image
+                      src={image.url}
+                      alt={image.caption || `${title} - Image ${originalIndex + 1}`}
+                      width={800}
+                      height={1200}
+                      className="w-full h-auto object-cover transition-all duration-500 ease-out opacity-0 group-hover:scale-105"
+                      sizes="(max-width: 640px) 33vw, (max-width: 1024px) 33vw, 33vw"
+                      quality={65}
+                      loading="lazy"
+                      onLoad={(e) => {
+                        const img = e.currentTarget as HTMLImageElement
+                        img.style.opacity = "1"
+                      }}
+                    />
+                  ) : (
+                    /* Placeholder skeleton for images not yet near viewport */
+                    <div className="w-full aspect-[3/4] bg-gradient-to-b from-muted via-muted/60 to-muted animate-pulse" />
+                  )}
+
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
               </div>
-            )}
-            
-            {/* Hover overlay */}
-            <div className={cn(
-              "absolute inset-0 bg-black/20 transition-opacity",
-              isLoading.has(index) ? "opacity-0" : "opacity-0 group-hover:opacity-100"
-            )} />
-          </button>
+            ))}
+          </div>
         ))}
       </div>
 
       {/* Lightbox Modal */}
       {selectedImageIndex !== null && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm"
           onClick={() => setSelectedImageIndex(null)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           {/* Close button */}
           <button
@@ -186,43 +256,53 @@ export function GalleryImageViewer({ images, title }: GalleryImageViewerProps) {
             </>
           )}
 
+          {/* Image counter */}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm">
+            <span className="text-white/80 text-sm font-light tracking-wide">
+              {selectedImageIndex + 1} / {images.length}
+            </span>
+          </div>
 
           {/* Main image */}
-          <div 
-            className="absolute inset-0 flex items-center justify-center p-4"
+          <div
+            className="absolute inset-0 flex items-center justify-center p-4 pt-16 pb-20"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
-              {/* Loading backdrop */}
-              {(lightboxImageLoading || isLoading.has(selectedImageIndex)) && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm rounded-lg">
-                  <div className="flex flex-col items-center gap-4 text-white">
-                    <Loader2 className="h-12 w-12 animate-spin" />
-                    <span className="text-lg font-medium tracking-wide">Loading image...</span>
-                  </div>
+              {/* Loading spinner */}
+              {lightboxImageLoading && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Loader2 className="h-10 w-10 animate-spin text-white/60" />
                 </div>
               )}
-              
+
               <Image
+                key={selectedImageIndex}
                 src={images[selectedImageIndex].url}
-                alt={images[selectedImageIndex].caption || `${title} - Image ${selectedImageIndex + 1}`}
+                alt={
+                  images[selectedImageIndex].caption ||
+                  `${title} - Image ${selectedImageIndex + 1}`
+                }
                 width={1920}
                 height={1080}
                 className={cn(
                   "object-contain w-full h-full transition-opacity duration-300",
-                  (lightboxImageLoading || isLoading.has(selectedImageIndex)) ? "opacity-0" : "opacity-100"
+                  lightboxImageLoading ? "opacity-0" : "opacity-100"
                 )}
+                sizes="100vw"
+                quality={80}
                 priority
-                onLoadingComplete={() => handleImageLoad(selectedImageIndex)}
-                onLoadStart={() => handleImageLoadStart(selectedImageIndex)}
+                onLoad={() => setLightboxImageLoading(false)}
               />
             </div>
           </div>
 
           {/* Caption if available */}
           {images[selectedImageIndex].caption && (
-            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 max-w-2xl text-center">
-              <p className="text-white/80 text-sm">{images[selectedImageIndex].caption}</p>
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 max-w-2xl text-center">
+              <p className="text-white/80 text-sm">
+                {images[selectedImageIndex].caption}
+              </p>
             </div>
           )}
         </div>
