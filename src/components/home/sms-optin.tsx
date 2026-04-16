@@ -1,0 +1,166 @@
+"use client";
+
+import { useState, useRef } from "react";
+import Link from "next/link";
+
+export function SmsOptIn() {
+  const [phone, setPhone] = useState("");
+  const [agreed, setAgreed] = useState(false);
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+  const honeypotRef = useRef<HTMLInputElement>(null);
+
+  const normalizePhone = (raw: string): string | null => {
+    const digits = raw.replace(/\D/g, "");
+    if (digits.length === 10) return "+1" + digits;
+    if (digits.length === 11 && digits.startsWith("1")) return "+" + digits;
+    if (digits.startsWith("+") && digits.length >= 11) return raw.replace(/[^\d+]/g, "");
+    return null;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg("");
+
+    if (honeypotRef.current?.value) return;
+
+    const normalized = normalizePhone(phone);
+    if (!normalized) {
+      setErrorMsg("Please enter a valid US phone number.");
+      return;
+    }
+    if (!agreed) {
+      setErrorMsg("Please agree to receive text messages.");
+      return;
+    }
+
+    setStatus("loading");
+    try {
+      const res = await fetch("https://nazaara-sms.vercel.app/api/optin-public", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: normalized, source: "website_footer" }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setStatus("success");
+        setPhone("");
+        setAgreed(false);
+      } else {
+        setErrorMsg(data.error || "Something went wrong. Please try again.");
+        setStatus("error");
+      }
+    } catch {
+      setErrorMsg("Network error. Please try again.");
+      setStatus("error");
+    }
+  };
+
+  if (status === "success") {
+    return (
+      <section className="relative py-20 md:py-28 overflow-hidden" style={{ backgroundColor: "var(--black-grey)" }}>
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, var(--gold) 1px, transparent 0)", backgroundSize: "40px 40px" }} />
+        <div className="relative container mx-auto px-6 lg:px-12 text-center">
+          <div className="max-w-xl mx-auto">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: "var(--gold)" }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--black-grey)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+            </div>
+            <h3 className="text-3xl md:text-4xl font-prettywise mb-4" style={{ color: "var(--white)" }}>
+              You&apos;re In
+            </h3>
+            <p className="text-base font-neue-haas" style={{ color: "var(--white)", opacity: 0.7 }}>
+              You&apos;ll get first access to event announcements, presales, and ticket drops. Reply STOP at any time to unsubscribe.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="relative py-20 md:py-28 overflow-hidden" style={{ backgroundColor: "var(--black-grey)" }}>
+      {/* Subtle dot pattern */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, var(--gold) 1px, transparent 0)", backgroundSize: "40px 40px" }} />
+
+      <div className="relative container mx-auto px-6 lg:px-12">
+        <div className="max-w-2xl mx-auto text-center">
+          {/* Eyebrow */}
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="w-8 h-px" style={{ backgroundColor: "var(--gold)" }} />
+            <span className="text-[10px] uppercase tracking-[0.3em] font-neue-haas" style={{ color: "var(--gold)" }}>
+              Stay Connected
+            </span>
+            <div className="w-8 h-px" style={{ backgroundColor: "var(--gold)" }} />
+          </div>
+
+          {/* Heading */}
+          <h2 className="text-3xl md:text-5xl font-prettywise mb-4" style={{ color: "var(--white)" }}>
+            Never Miss a Drop
+          </h2>
+          <p className="text-base md:text-lg font-neue-haas mb-10" style={{ color: "var(--white)", opacity: 0.7 }}>
+            Get first access to event announcements, presales, and exclusive ticket drops — straight to your phone.
+          </p>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+            {/* Honeypot */}
+            <input ref={honeypotRef} type="text" name="website" autoComplete="off" tabIndex={-1} style={{ position: "absolute", left: "-9999px" }} />
+
+            <div className="flex gap-3 mb-4">
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => { setPhone(e.target.value); setStatus("idle"); setErrorMsg(""); }}
+                placeholder="(555) 123-4567"
+                className="flex-1 px-4 py-3 rounded-lg text-base font-neue-haas outline-none transition-all"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  color: "var(--white)",
+                }}
+                required
+              />
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                className="px-6 py-3 rounded-lg text-sm font-neue-haas font-medium uppercase tracking-wider transition-all"
+                style={{
+                  backgroundColor: "var(--gold)",
+                  color: "var(--black-grey)",
+                  opacity: status === "loading" ? 0.6 : 1,
+                }}
+              >
+                {status === "loading" ? "..." : "Join"}
+              </button>
+            </div>
+
+            {errorMsg && (
+              <p className="text-sm font-neue-haas mb-3" style={{ color: "#f87171" }}>{errorMsg}</p>
+            )}
+
+            {/* Consent checkbox */}
+            <label className="flex items-start gap-3 text-left cursor-pointer mb-6">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-1 shrink-0"
+                style={{ accentColor: "var(--gold)" }}
+              />
+              <span className="text-xs font-neue-haas leading-relaxed" style={{ color: "var(--white)", opacity: 0.6 }}>
+                By checking this box, you agree to receive recurring automated marketing text messages from Nazaara Live at the phone number provided. Consent is not a condition of purchase. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for help.
+              </span>
+            </label>
+
+            {/* Compliance links */}
+            <p className="text-[11px] font-neue-haas" style={{ color: "var(--white)", opacity: 0.35 }}>
+              <Link href="/privacy" className="underline hover:opacity-80 transition-opacity">Privacy Policy</Link>
+              {" "}&bull;{" "}
+              <Link href="/terms" className="underline hover:opacity-80 transition-opacity">Terms of Service</Link>
+            </p>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+}
