@@ -5,6 +5,7 @@ import Link from "next/link";
 
 export function SmsOptIn() {
   const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -39,12 +40,17 @@ export function SmsOptIn() {
       const res = await fetch("https://nazaara-sms.vercel.app/api/optin-public", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: normalized, source: "website_footer" }),
+        body: JSON.stringify({
+          phone: normalized,
+          city: city.trim(),
+          source: "website_footer",
+        }),
       });
       const data = await res.json();
       if (res.ok) {
         setStatus("success");
         setPhone("");
+        setCity("");
         setAgreed(false);
       } else {
         setErrorMsg(data.error || "Something went wrong. Please try again.");
@@ -105,6 +111,23 @@ export function SmsOptIn() {
           <form onSubmit={handleSubmit} className="max-w-md mx-auto">
             {/* Honeypot */}
             <input ref={honeypotRef} type="text" name="website" autoComplete="off" tabIndex={-1} style={{ position: "absolute", left: "-9999px" }} />
+
+            <div className="mb-3">
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => { setCity(e.target.value); setStatus("idle"); setErrorMsg(""); }}
+                placeholder="Your city"
+                autoComplete="address-level2"
+                maxLength={100}
+                className="w-full px-4 py-3 rounded-lg text-base font-neue-haas outline-none transition-all"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  color: "var(--white)",
+                }}
+              />
+            </div>
 
             <div className="flex gap-3 mb-4">
               <input
