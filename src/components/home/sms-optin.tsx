@@ -3,24 +3,22 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 
-// Canonical city list — matches the admin CRM's baseCities so opt-ins
-// flow into the same segmentation buckets.
+// Cities available in the opt-in flow, sorted A–Z. "Other" is pinned
+// to the bottom as a catch-all fallback.
 const CITIES = [
+  "Atlanta",
+  "Calgary",
+  "Chicago",
+  "Dallas",
+  "Edmonton",
+  "Houston",
+  "Los Angeles",
+  "Miami",
+  "New York",
+  "San Francisco",
+  "Seattle",
   "Toronto",
   "Vancouver",
-  "Montreal",
-  "Calgary",
-  "Ottawa",
-  "Edmonton",
-  "Winnipeg",
-  "New York",
-  "Los Angeles",
-  "Chicago",
-  "Miami",
-  "Atlanta",
-  "Seattle",
-  "Dallas",
-  "Denver",
   "Other",
 ];
 
