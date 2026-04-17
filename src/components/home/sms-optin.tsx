@@ -3,6 +3,27 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 
+// Canonical city list — matches the admin CRM's baseCities so opt-ins
+// flow into the same segmentation buckets.
+const CITIES = [
+  "Toronto",
+  "Vancouver",
+  "Montreal",
+  "Calgary",
+  "Ottawa",
+  "Edmonton",
+  "Winnipeg",
+  "New York",
+  "Los Angeles",
+  "Chicago",
+  "Miami",
+  "Atlanta",
+  "Seattle",
+  "Dallas",
+  "Denver",
+  "Other",
+];
+
 export function SmsOptIn() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -120,7 +141,7 @@ export function SmsOptIn() {
             Never Miss a Drop
           </h2>
           <p className="text-base md:text-lg font-neue-haas mb-10" style={{ color: "var(--white)", opacity: 0.7 }}>
-            Get first access to event announcements, presales, and exclusive ticket drops — straight to your phone.
+            Get first access to event announcements, presales, and exclusive ticket drops, straight to your phone.
           </p>
 
           {/* Form */}
@@ -147,21 +168,30 @@ export function SmsOptIn() {
             </div>
 
             <div className="mb-3">
-              <input
-                type="text"
+              <select
                 value={city}
                 onChange={(e) => { setCity(e.target.value); setStatus("idle"); setErrorMsg(""); }}
-                placeholder="Your city"
                 autoComplete="address-level2"
-                maxLength={100}
-                className="w-full px-4 py-3 rounded-lg text-base font-neue-haas outline-none transition-all"
+                className="w-full px-4 py-3 rounded-lg text-base font-neue-haas outline-none transition-all appearance-none"
                 style={{
                   backgroundColor: "rgba(255,255,255,0.08)",
                   border: "1px solid rgba(255,255,255,0.15)",
-                  color: "var(--white)",
+                  color: city ? "var(--white)" : "rgba(255,255,255,0.5)",
+                  backgroundImage:
+                    "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>\")",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 1rem center",
+                  paddingRight: "2.5rem",
                 }}
                 required
-              />
+              >
+                <option value="" disabled style={{ color: "var(--black-grey)" }}>Your city</option>
+                {CITIES.map((c) => (
+                  <option key={c} value={c} style={{ color: "var(--black-grey)" }}>
+                    {c}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="flex gap-3 mb-4">
