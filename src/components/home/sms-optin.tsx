@@ -4,10 +4,11 @@ import { useState, useRef } from "react";
 import Link from "next/link";
 
 export function SmsOptIn() {
+  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
   const [agreed, setAgreed] = useState(false);
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "already" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const honeypotRef = useRef<HTMLInputElement>(null);
 
@@ -25,6 +26,14 @@ export function SmsOptIn() {
 
     if (honeypotRef.current?.value) return;
 
+    if (!name.trim()) {
+      setErrorMsg("Please enter your name.");
+      return;
+    }
+    if (!city.trim()) {
+      setErrorMsg("Please enter your city.");
+      return;
+    }
     const normalized = normalizePhone(phone);
     if (!normalized) {
       setErrorMsg("Please enter a valid US phone number.");
@@ -41,6 +50,7 @@ export function SmsOptIn() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          name: name.trim(),
           phone: normalized,
           city: city.trim(),
           source: "website_footer",
@@ -48,7 +58,8 @@ export function SmsOptIn() {
       });
       const data = await res.json();
       if (res.ok) {
-        setStatus("success");
+        setStatus(data.alreadySubscribed ? "already" : "success");
+        setName("");
         setPhone("");
         setCity("");
         setAgreed(false);
@@ -62,7 +73,12 @@ export function SmsOptIn() {
     }
   };
 
-  if (status === "success") {
+  if (status === "success" || status === "already") {
+    const headline = status === "already" ? "Already Signed Up" : "You\u2019re In";
+    const subcopy =
+      status === "already"
+        ? "Looks like you\u2019re already on the list. We\u2019ll keep you posted on drops and presales. Reply STOP at any time to unsubscribe."
+        : "You\u2019ll get first access to event announcements, presales, and ticket drops. Reply STOP at any time to unsubscribe.";
     return (
       <section className="relative py-20 md:py-28 overflow-hidden" style={{ backgroundColor: "var(--black-grey)" }}>
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, var(--gold) 1px, transparent 0)", backgroundSize: "40px 40px" }} />
@@ -72,10 +88,10 @@ export function SmsOptIn() {
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--black-grey)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
             </div>
             <h3 className="text-3xl md:text-4xl font-prettywise mb-4" style={{ color: "var(--white)" }}>
-              You&apos;re In
+              {headline}
             </h3>
             <p className="text-base font-neue-haas" style={{ color: "var(--white)", opacity: 0.7 }}>
-              You&apos;ll get first access to event announcements, presales, and ticket drops. Reply STOP at any time to unsubscribe.
+              {subcopy}
             </p>
           </div>
         </div>
@@ -115,6 +131,24 @@ export function SmsOptIn() {
             <div className="mb-3">
               <input
                 type="text"
+                value={name}
+                onChange={(e) => { setName(e.target.value); setStatus("idle"); setErrorMsg(""); }}
+                placeholder="Your name"
+                autoComplete="name"
+                maxLength={200}
+                className="w-full px-4 py-3 rounded-lg text-base font-neue-haas outline-none transition-all"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  color: "var(--white)",
+                }}
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <input
+                type="text"
                 value={city}
                 onChange={(e) => { setCity(e.target.value); setStatus("idle"); setErrorMsg(""); }}
                 placeholder="Your city"
@@ -126,6 +160,7 @@ export function SmsOptIn() {
                   border: "1px solid rgba(255,255,255,0.15)",
                   color: "var(--white)",
                 }}
+                required
               />
             </div>
 
