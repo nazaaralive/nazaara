@@ -96,8 +96,8 @@ export function SmsOptIn() {
     const headline = status === "already" ? "Already Signed Up" : "You\u2019re In";
     const subcopy =
       status === "already"
-        ? "Looks like you\u2019re already on the list. We\u2019ll keep you posted on drops and presales. Reply STOP at any time to unsubscribe."
-        : "You\u2019ll get first access to event announcements, presales, and ticket drops. Reply STOP at any time to unsubscribe.";
+        ? "Looks like this number is already subscribed to Nazaara Live SMS. We\u2019ll text you when drops and presales go live. Reply STOP at any time to unsubscribe."
+        : "Check your phone for a confirmation text from Nazaara Live. We\u2019ll text you when event announcements, presales, and ticket drops go live. Reply STOP at any time to unsubscribe.";
     return (
       <section className="relative py-20 md:py-28 overflow-hidden" style={{ backgroundColor: "var(--black-grey)" }}>
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, var(--gold) 1px, transparent 0)", backgroundSize: "40px 40px" }} />
@@ -136,10 +136,13 @@ export function SmsOptIn() {
 
           {/* Heading */}
           <h2 className="text-3xl md:text-5xl font-prettywise mb-4" style={{ color: "var(--white)" }}>
-            Never Miss a Drop
+            Get SMS Drops
           </h2>
-          <p className="text-base md:text-lg font-neue-haas mb-10" style={{ color: "var(--white)", opacity: 0.7 }}>
-            Get first access to event announcements, presales, and exclusive ticket drops, straight to your phone.
+          <p className="text-base md:text-lg font-neue-haas mb-3" style={{ color: "var(--white)", opacity: 0.85 }}>
+            Sign up for text messages from Nazaara Live. We&rsquo;ll text you when event announcements, presales, and ticket drops go live.
+          </p>
+          <p className="text-sm font-neue-haas mb-10" style={{ color: "var(--white)", opacity: 0.6 }}>
+            Typically 2&ndash;6 SMS per month. Msg &amp; data rates may apply.
           </p>
 
           {/* Form */}
@@ -192,13 +195,13 @@ export function SmsOptIn() {
               </select>
             </div>
 
-            <div className="flex gap-3 mb-4">
+            <div className="mb-4">
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => { setPhone(e.target.value); setStatus("idle"); setErrorMsg(""); }}
                 placeholder="(555) 123-4567"
-                className="flex-1 px-4 py-3 rounded-lg text-base font-neue-haas outline-none transition-all"
+                className="w-full px-4 py-3 rounded-lg text-base font-neue-haas outline-none transition-all"
                 style={{
                   backgroundColor: "rgba(255,255,255,0.08)",
                   border: "1px solid rgba(255,255,255,0.15)",
@@ -206,44 +209,44 @@ export function SmsOptIn() {
                 }}
                 required
               />
-              <button
-                type="submit"
-                disabled={status === "loading"}
-                className="px-6 py-3 rounded-lg text-sm font-neue-haas font-medium uppercase tracking-wider transition-all"
-                style={{
-                  backgroundColor: "var(--gold)",
-                  color: "var(--black-grey)",
-                  opacity: status === "loading" ? 0.6 : 1,
-                }}
-              >
-                {status === "loading" ? "..." : "Join"}
-              </button>
             </div>
+
+            {/* Consent checkbox — must be checked before submission is enabled */}
+            <label className="flex items-start gap-3 text-left cursor-pointer mb-5">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-1 shrink-0 h-4 w-4"
+                style={{ accentColor: "var(--gold)" }}
+                aria-describedby="sms-consent-text"
+              />
+              <span id="sms-consent-text" className="text-sm font-neue-haas leading-relaxed" style={{ color: "var(--white)", opacity: 0.9 }}>
+                By checking this box, you agree to receive recurring automated marketing text messages from Nazaara Live at the phone number provided. Consent is not a condition of any purchase. Message frequency varies (typically 2&ndash;6 per month). Msg &amp; data rates may apply. Reply STOP to cancel, HELP for help. See our{" "}
+                <Link href="/privacy" className="underline hover:opacity-80 transition-opacity" style={{ color: "var(--gold)" }}>Privacy Policy</Link>
+                {" "}and{" "}
+                <Link href="/terms" className="underline hover:opacity-80 transition-opacity" style={{ color: "var(--gold)" }}>Terms of Service</Link>.
+              </span>
+            </label>
 
             {errorMsg && (
               <p className="text-sm font-neue-haas mb-3" style={{ color: "#f87171" }}>{errorMsg}</p>
             )}
 
-            {/* Consent checkbox */}
-            <label className="flex items-start gap-3 text-left cursor-pointer mb-6">
-              <input
-                type="checkbox"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-                className="mt-1 shrink-0"
-                style={{ accentColor: "var(--gold)" }}
-              />
-              <span className="text-xs font-neue-haas leading-relaxed" style={{ color: "var(--white)", opacity: 0.6 }}>
-                By checking this box, you agree to receive recurring automated marketing text messages from Nazaara Live at the phone number provided. Consent is not a condition of purchase. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for help.
-              </span>
-            </label>
-
-            {/* Compliance links */}
-            <p className="text-[11px] font-neue-haas" style={{ color: "var(--white)", opacity: 0.35 }}>
-              <Link href="/privacy" className="underline hover:opacity-80 transition-opacity">Privacy Policy</Link>
-              {" "}&bull;{" "}
-              <Link href="/terms" className="underline hover:opacity-80 transition-opacity">Terms of Service</Link>
-            </p>
+            <button
+              type="submit"
+              disabled={status === "loading" || !agreed}
+              className="w-full px-6 py-3 rounded-lg text-sm font-neue-haas font-medium uppercase tracking-wider transition-all"
+              style={{
+                backgroundColor: "var(--gold)",
+                color: "var(--black-grey)",
+                opacity: (status === "loading" || !agreed) ? 0.45 : 1,
+                cursor: (status === "loading" || !agreed) ? "not-allowed" : "pointer",
+              }}
+              aria-disabled={status === "loading" || !agreed}
+            >
+              {status === "loading" ? "Joining..." : "Sign Up for SMS"}
+            </button>
           </form>
         </div>
       </div>
