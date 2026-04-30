@@ -26,7 +26,12 @@ export function SmsOptIn() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
-  const [agreed, setAgreed] = useState(false);
+  // Three separate consent states — required by TCR for "Mixed" use case.
+  // Marketing consent is the only one gating submit (we don't send transactional today,
+  // and T&C must NOT be required to submit per Twilio compliance guidance).
+  const [transactionalOptIn, setTransactionalOptIn] = useState(false);
+  const [marketingOptIn, setMarketingOptIn] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "already" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const honeypotRef = useRef<HTMLInputElement>(null);
@@ -58,8 +63,8 @@ export function SmsOptIn() {
       setErrorMsg("Please enter a valid US phone number.");
       return;
     }
-    if (!agreed) {
-      setErrorMsg("Please agree to receive text messages.");
+    if (!marketingOptIn) {
+      setErrorMsg("Please check the marketing SMS consent box to receive ticket drops.");
       return;
     }
 
@@ -73,6 +78,9 @@ export function SmsOptIn() {
           phone: normalized,
           city: city.trim(),
           source: "website_footer",
+          transactionalOptIn,
+          marketingOptIn,
+          acceptedTerms,
         }),
       });
       const data = await res.json();
@@ -81,7 +89,9 @@ export function SmsOptIn() {
         setName("");
         setPhone("");
         setCity("");
-        setAgreed(false);
+        setTransactionalOptIn(false);
+        setMarketingOptIn(false);
+        setAcceptedTerms(false);
       } else {
         setErrorMsg(data.error || "Something went wrong. Please try again.");
         setStatus("error");
@@ -211,23 +221,57 @@ export function SmsOptIn() {
               />
             </div>
 
-            {/* Consent checkbox — must be checked before submission is enabled */}
-            <label className="flex items-start gap-3 text-left cursor-pointer mb-5">
-              <input
-                type="checkbox"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-                className="mt-1 shrink-0 h-4 w-4"
-                style={{ accentColor: "var(--gold)" }}
-                aria-describedby="sms-consent-text"
-              />
-              <span id="sms-consent-text" className="text-sm font-neue-haas leading-relaxed" style={{ color: "var(--white)", opacity: 0.9 }}>
-                By checking this box, you agree to receive recurring automated marketing text messages from Nazaara Live at the phone number provided. Consent is not a condition of any purchase. Message frequency varies (typically 2&ndash;6 per month). Msg &amp; data rates may apply. Reply STOP to cancel, HELP for help. See our{" "}
-                <Link href="/privacy" className="underline hover:opacity-80 transition-opacity" style={{ color: "var(--gold)" }}>Privacy Policy</Link>
-                {" "}and{" "}
-                <Link href="/terms" className="underline hover:opacity-80 transition-opacity" style={{ color: "var(--gold)" }}>Terms of Service</Link>.
-              </span>
-            </label>
+            {/* Consent checkboxes — three separate, unchecked-by-default boxes for Mixed use case compliance. */}
+            <div className="space-y-4 mb-5">
+              {/* 1. Transactional/informational SMS consent (optional) */}
+              <label className="flex items-start gap-3 text-left cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={transactionalOptIn}
+                  onChange={(e) => setTransactionalOptIn(e.target.checked)}
+                  className="mt-1 shrink-0 h-4 w-4"
+                  style={{ accentColor: "var(--gold)" }}
+                  aria-describedby="transactional-consent-text"
+                />
+                <span id="transactional-consent-text" className="text-sm font-neue-haas leading-relaxed" style={{ color: "var(--white)", opacity: 0.9 }}>
+                  By checking this box, you are allowing Nazaara Live to send you transactional/informational SMS communications regarding account notifications, customer care, and order or ticket updates. Message frequency may vary. Msg &amp; data rates may apply. Reply STOP to opt-out.
+                </span>
+              </label>
+
+              {/* 2. Marketing/promotional SMS consent (REQUIRED to enable submit) */}
+              <label className="flex items-start gap-3 text-left cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={marketingOptIn}
+                  onChange={(e) => setMarketingOptIn(e.target.checked)}
+                  className="mt-1 shrink-0 h-4 w-4"
+                  style={{ accentColor: "var(--gold)" }}
+                  aria-describedby="marketing-consent-text"
+                  aria-required="true"
+                />
+                <span id="marketing-consent-text" className="text-sm font-neue-haas leading-relaxed" style={{ color: "var(--white)", opacity: 0.9 }}>
+                  By checking this box, you are allowing Nazaara Live to send you promotional/marketing SMS communications about event announcements, presales, and ticket drops. Frequency varies (typically 2&ndash;6 per month). Msg &amp; data rates may apply. Reply HELP for help, STOP to opt-out.
+                </span>
+              </label>
+
+              {/* 3. Terms of Service & Privacy Policy (optional per Twilio compliance guidance) */}
+              <label className="flex items-start gap-3 text-left cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  className="mt-1 shrink-0 h-4 w-4"
+                  style={{ accentColor: "var(--gold)" }}
+                  aria-describedby="terms-consent-text"
+                />
+                <span id="terms-consent-text" className="text-sm font-neue-haas leading-relaxed" style={{ color: "var(--white)", opacity: 0.9 }}>
+                  By checking this box, I accept Nazaara Live&rsquo;s{" "}
+                  <Link href="/terms" className="underline hover:opacity-80 transition-opacity" style={{ color: "var(--gold)" }}>Terms of Service</Link>
+                  {" "}and{" "}
+                  <Link href="/privacy" className="underline hover:opacity-80 transition-opacity" style={{ color: "var(--gold)" }}>Privacy Policy</Link>.
+                </span>
+              </label>
+            </div>
 
             {errorMsg && (
               <p className="text-sm font-neue-haas mb-3" style={{ color: "#f87171" }}>{errorMsg}</p>
@@ -235,15 +279,15 @@ export function SmsOptIn() {
 
             <button
               type="submit"
-              disabled={status === "loading" || !agreed}
+              disabled={status === "loading" || !marketingOptIn}
               className="w-full px-6 py-3 rounded-lg text-sm font-neue-haas font-medium uppercase tracking-wider transition-all"
               style={{
                 backgroundColor: "var(--gold)",
                 color: "var(--black-grey)",
-                opacity: (status === "loading" || !agreed) ? 0.45 : 1,
-                cursor: (status === "loading" || !agreed) ? "not-allowed" : "pointer",
+                opacity: (status === "loading" || !marketingOptIn) ? 0.45 : 1,
+                cursor: (status === "loading" || !marketingOptIn) ? "not-allowed" : "pointer",
               }}
-              aria-disabled={status === "loading" || !agreed}
+              aria-disabled={status === "loading" || !marketingOptIn}
             >
               {status === "loading" ? "Joining..." : "Sign Up for SMS"}
             </button>

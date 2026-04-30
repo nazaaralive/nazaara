@@ -163,12 +163,12 @@ export function Footer({ hideAbout = false, hideBookings = false, useExternalGal
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-white font-prettywise text-lg mb-1">TAMASHA</h3>
-                      <p className="text-xs font-neue-haas text-white/60">Premium Events & Tours</p>
+                      <h3 className="text-white font-prettywise text-lg mb-1">Nazaara</h3>
+                      <p className="text-xs font-neue-haas text-white/60">Premium Events and Tours Worldwide</p>
                     </div>
                     <div>
-                      <h3 className="text-white font-prettywise text-lg mb-1">Nazaara</h3>
-                      <p className="text-xs font-neue-haas text-white/60">Cultural Productions</p>
+                      <h3 className="text-white font-prettywise text-lg mb-1">TAMASHA</h3>
+                      <p className="text-xs font-neue-haas text-white/60">Event Series</p>
                     </div>
                     <div>
                       <h3 className="text-white/40 font-prettywise text-lg mb-1">Coming 2026</h3>
@@ -227,7 +227,7 @@ export function Footer({ hideAbout = false, hideBookings = false, useExternalGal
                 
                 <div className="flex flex-col lg:flex-row items-center gap-4 lg:gap-8">
                   <p className="text-xs font-neue-haas text-white/40">
-                    © 2025 Nazaara Live. All rights reserved.
+                    © 2026 Nazaara Live. All rights reserved.
                   </p>
                   <div className="flex items-center gap-6 text-xs font-neue-haas text-white/40">
                     <Link href="/privacy" className="hover:text-[var(--gold)] transition-colors">
