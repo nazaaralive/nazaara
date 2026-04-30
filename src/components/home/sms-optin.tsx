@@ -283,7 +283,7 @@ export function SmsOptIn() {
               className="w-full px-6 py-3 rounded-lg text-sm font-neue-haas font-medium uppercase tracking-wider transition-all"
               style={{
                 backgroundColor: "var(--gold)",
-                color: "var(--black-grey)",
+                color: "var(--maroon-red)",
                 opacity: (status === "loading" || !marketingOptIn) ? 0.45 : 1,
                 cursor: (status === "loading" || !marketingOptIn) ? "not-allowed" : "pointer",
               }}
