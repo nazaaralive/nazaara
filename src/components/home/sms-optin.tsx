@@ -32,7 +32,7 @@ export function SmsOptIn() {
   const [transactionalOptIn, setTransactionalOptIn] = useState(false);
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "already" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "already" | "not_subscribed" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const honeypotRef = useRef<HTMLInputElement>(null);
 
@@ -63,10 +63,8 @@ export function SmsOptIn() {
       setErrorMsg("Please enter a valid US phone number.");
       return;
     }
-    if (!marketingOptIn) {
-      setErrorMsg("Please check the marketing SMS consent box to receive ticket drops.");
-      return;
-    }
+    // No client-side gate on marketingOptIn — TCPA forbids conditioning form
+    // submission on marketing consent. Backend decides whether to subscribe.
 
     setStatus("loading");
     try {
@@ -85,13 +83,20 @@ export function SmsOptIn() {
       });
       const data = await res.json();
       if (res.ok) {
-        setStatus(data.alreadySubscribed ? "already" : "success");
-        setName("");
-        setPhone("");
-        setCity("");
-        setTransactionalOptIn(false);
-        setMarketingOptIn(false);
-        setAcceptedTerms(false);
+        if (data.subscribed === false) {
+          // Form submitted but marketing consent wasn't given — leave the
+          // form populated so the user can re-tick the marketing box and
+          // submit again without re-typing.
+          setStatus("not_subscribed");
+        } else {
+          setStatus(data.alreadySubscribed ? "already" : "success");
+          setName("");
+          setPhone("");
+          setCity("");
+          setTransactionalOptIn(false);
+          setMarketingOptIn(false);
+          setAcceptedTerms(false);
+        }
       } else {
         setErrorMsg(data.error || "Something went wrong. Please try again.");
         setStatus("error");
@@ -228,7 +233,7 @@ export function SmsOptIn() {
                 <input
                   type="checkbox"
                   checked={transactionalOptIn}
-                  onChange={(e) => setTransactionalOptIn(e.target.checked)}
+                  onChange={(e) => { setTransactionalOptIn(e.target.checked); setStatus("idle"); setErrorMsg(""); }}
                   className="mt-1 shrink-0 h-4 w-4"
                   style={{ accentColor: "var(--gold)" }}
                   aria-describedby="transactional-consent-text"
@@ -243,11 +248,10 @@ export function SmsOptIn() {
                 <input
                   type="checkbox"
                   checked={marketingOptIn}
-                  onChange={(e) => setMarketingOptIn(e.target.checked)}
+                  onChange={(e) => { setMarketingOptIn(e.target.checked); setStatus("idle"); setErrorMsg(""); }}
                   className="mt-1 shrink-0 h-4 w-4"
                   style={{ accentColor: "var(--gold)" }}
                   aria-describedby="marketing-consent-text"
-                  aria-required="true"
                 />
                 <span id="marketing-consent-text" className="text-sm font-neue-haas leading-relaxed" style={{ color: "var(--white)", opacity: 0.9 }}>
                   By checking this box, you are allowing Nazaara Live to send you promotional/marketing SMS communications about event announcements, presales, and ticket drops. Frequency varies (typically 2&ndash;6 per month). Msg &amp; data rates may apply. Reply HELP for help, STOP to opt-out.
@@ -259,7 +263,7 @@ export function SmsOptIn() {
                 <input
                   type="checkbox"
                   checked={acceptedTerms}
-                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  onChange={(e) => { setAcceptedTerms(e.target.checked); setStatus("idle"); setErrorMsg(""); }}
                   className="mt-1 shrink-0 h-4 w-4"
                   style={{ accentColor: "var(--gold)" }}
                   aria-describedby="terms-consent-text"
@@ -277,19 +281,33 @@ export function SmsOptIn() {
               <p className="text-sm font-neue-haas mb-3" style={{ color: "#f87171" }}>{errorMsg}</p>
             )}
 
+            {status === "not_subscribed" && (
+              <div
+                role="status"
+                className="mb-3 p-3 rounded-lg text-sm font-neue-haas leading-relaxed"
+                style={{
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  backgroundColor: "rgba(255,255,255,0.05)",
+                  color: "var(--white)",
+                }}
+              >
+                Almost there. Tick the marketing SMS box above and submit again to receive event drops from Nazaara Live.
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={status === "loading" || !marketingOptIn}
+              disabled={status === "loading"}
               className="w-full px-6 py-3 rounded-lg text-sm font-neue-haas font-medium uppercase tracking-wider transition-all"
               style={{
                 backgroundColor: "var(--gold)",
                 color: "var(--maroon-red)",
-                opacity: (status === "loading" || !marketingOptIn) ? 0.45 : 1,
-                cursor: (status === "loading" || !marketingOptIn) ? "not-allowed" : "pointer",
+                opacity: status === "loading" ? 0.6 : 1,
+                cursor: status === "loading" ? "not-allowed" : "pointer",
               }}
-              aria-disabled={status === "loading" || !marketingOptIn}
+              aria-disabled={status === "loading"}
             >
-              {status === "loading" ? "Joining..." : "Sign Up for SMS"}
+              {status === "loading" ? "Submitting..." : "Sign Up for SMS"}
             </button>
           </form>
         </div>
