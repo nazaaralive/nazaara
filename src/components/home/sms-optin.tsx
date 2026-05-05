@@ -26,10 +26,11 @@ export function SmsOptIn() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
-  // Three separate consent states — required by TCR for "Mixed" use case.
-  // Marketing consent is the only one gating submit (we don't send transactional today,
-  // and T&C must NOT be required to submit per Twilio compliance guidance).
-  const [transactionalOptIn, setTransactionalOptIn] = useState(false);
+  // Two consent states — marketing (the actual SMS opt-in) and terms acceptance.
+  // Transactional/informational SMS is handled by our ticketing partners (Eventbrite,
+  // Shopify, etc.), NOT through this Twilio campaign, so we don't collect that consent here.
+  // Marketing consent is the only thing the backend uses to decide whether to subscribe.
+  // T&C must NOT be required to submit per Twilio TCPA compliance guidance.
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "already" | "not_subscribed" | "error">("idle");
@@ -76,7 +77,6 @@ export function SmsOptIn() {
           phone: normalized,
           city: city.trim(),
           source: "website_footer",
-          transactionalOptIn,
           marketingOptIn,
           acceptedTerms,
         }),
@@ -93,7 +93,6 @@ export function SmsOptIn() {
           setName("");
           setPhone("");
           setCity("");
-          setTransactionalOptIn(false);
           setMarketingOptIn(false);
           setAcceptedTerms(false);
         }
@@ -223,24 +222,11 @@ export function SmsOptIn() {
               />
             </div>
 
-            {/* Consent checkboxes — three separate, unchecked-by-default boxes for Mixed use case compliance. */}
+            {/* Consent checkboxes — two unchecked-by-default boxes (marketing + terms).
+                Transactional/informational SMS is fulfilled by our ticketing partners,
+                not via this Twilio campaign, so it isn't collected here. */}
             <div className="space-y-4 mb-5">
-              {/* 1. Transactional/informational SMS consent (optional) */}
-              <label className="flex items-start gap-3 text-left cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={transactionalOptIn}
-                  onChange={(e) => { setTransactionalOptIn(e.target.checked); setStatus("idle"); setErrorMsg(""); }}
-                  className="mt-1 shrink-0 h-4 w-4"
-                  style={{ accentColor: "var(--gold)" }}
-                  aria-describedby="transactional-consent-text"
-                />
-                <span id="transactional-consent-text" className="text-sm font-neue-haas leading-relaxed" style={{ color: "var(--white)", opacity: 0.9 }}>
-                  By checking this box, you are allowing Nazaara Live to send you transactional/informational SMS communications regarding account notifications, customer care, and order or ticket updates. Message frequency may vary. Msg &amp; data rates may apply. Reply STOP to opt-out.
-                </span>
-              </label>
-
-              {/* 2. Marketing/promotional SMS consent (REQUIRED to enable submit) */}
+              {/* 1. Marketing/promotional SMS consent (the only one the backend gates subscription on) */}
               <label className="flex items-start gap-3 text-left cursor-pointer">
                 <input
                   type="checkbox"
@@ -255,7 +241,7 @@ export function SmsOptIn() {
                 </span>
               </label>
 
-              {/* 3. Terms of Service & Privacy Policy (optional per Twilio compliance guidance) */}
+              {/* 2. Terms of Service & Privacy Policy (optional per Twilio compliance guidance) */}
               <label className="flex items-start gap-3 text-left cursor-pointer">
                 <input
                   type="checkbox"
