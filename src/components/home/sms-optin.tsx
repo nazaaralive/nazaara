@@ -179,7 +179,6 @@ export function SmsOptIn() {
                   border: "1px solid rgba(255,255,255,0.15)",
                   color: "var(--white)",
                 }}
-                required
               />
             </div>
 
@@ -199,7 +198,6 @@ export function SmsOptIn() {
                   backgroundPosition: "right 1rem center",
                   paddingRight: "2.5rem",
                 }}
-                required
               >
                 <option value="" disabled style={{ color: "var(--black-grey)" }}>Your city</option>
                 {CITIES.map((c) => (
@@ -222,7 +220,6 @@ export function SmsOptIn() {
                   border: "1px solid rgba(255,255,255,0.15)",
                   color: "var(--white)",
                 }}
-                required
               />
             </div>
 
