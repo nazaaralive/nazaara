@@ -76,7 +76,7 @@ export function EventDatePicker({ startTime, endTime, startName = "startTime", e
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Start Date & Time</Label>
           <Popover>

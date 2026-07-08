@@ -67,7 +67,7 @@ export default async function VenueEditPage({ params }: PageProps) {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b border-border">
-        <div className="max-w-7xl mx-auto px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link href="/admin">
@@ -92,7 +92,7 @@ export default async function VenueEditPage({ params }: PageProps) {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8">
         <form action={updateVenue}>
           <div className="grid gap-8 lg:grid-cols-2">
             {/* Left Column - Form Fields */}

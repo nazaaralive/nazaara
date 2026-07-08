@@ -120,7 +120,7 @@ export function EventsGrid({ events }: EventsGridProps) {
       </div>
 
       {/* Events Grid - Updated to 4 columns */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
         {paginatedEvents.map((event) => {
           const startDate = new Date(event.startTime);
           const day = formatInTimeZone(startDate, 'UTC', 'd');
@@ -168,7 +168,7 @@ export function EventsGrid({ events }: EventsGridProps) {
                   
                   {/* Event Info */}
                   <div className="pt-4">
-                    <h3 className="font-semibold text-lg text-foreground group-hover:text-[--gold] transition-colors duration-300 line-clamp-1">
+                    <h3 className="font-semibold text-base sm:text-lg text-foreground group-hover:text-[--gold] transition-colors duration-300 line-clamp-1">
                       {event.title}
                     </h3>
                     {event.tagline && (

@@ -72,12 +72,12 @@ export default async function AdminPage() {
     ])
 
     return (
-        <div className="min-h-screen bg-background p-8">
+        <div className="min-h-screen bg-background p-4 sm:p-8">
             <SuccessToast />
             <div className="max-w-7xl mx-auto">
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-foreground font-serif">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-serif">
                             Admin Dashboard
                         </h1>
                         <p className="text-muted-foreground mt-2">
@@ -126,9 +126,9 @@ export default async function AdminPage() {
                     </div>
 
                     <TabsContent value="events" className="space-y-6">
-                        <div className="flex justify-between items-center pb-6 border-b border-border">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pb-6 border-b border-border">
                             <div>
-                                <h2 className="text-3xl font-bold text-foreground">Events</h2>
+                                <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Events</h2>
                                 <p className="text-muted-foreground mt-1">Manage your events, lineups, and schedules</p>
                             </div>
                             <Link href="/admin/events/new">
@@ -143,9 +143,9 @@ export default async function AdminPage() {
                     </TabsContent>
 
                     <TabsContent value="artists" className="space-y-6">
-                        <div className="flex justify-between items-center pb-6 border-b border-border">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pb-6 border-b border-border">
                             <div>
-                                <h2 className="text-3xl font-bold text-foreground">Artists</h2>
+                                <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Artists</h2>
                                 <p className="text-muted-foreground mt-1">Manage artist profiles and social links</p>
                             </div>
                             <Link href="/admin/artists/new">
@@ -160,9 +160,9 @@ export default async function AdminPage() {
                     </TabsContent>
 
                     <TabsContent value="djs" className="space-y-6">
-                        <div className="flex justify-between items-center pb-6 border-b border-border">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pb-6 border-b border-border">
                             <div>
-                                <h2 className="text-3xl font-bold text-foreground">DJs</h2>
+                                <h2 className="text-2xl sm:text-3xl font-bold text-foreground">DJs</h2>
                                 <p className="text-muted-foreground mt-1">Manage internal DJ roster for bookings page</p>
                             </div>
                             <Link href="/admin/djs/new">
@@ -177,9 +177,9 @@ export default async function AdminPage() {
                     </TabsContent>
 
                     <TabsContent value="venues" className="space-y-6">
-                        <div className="flex justify-between items-center pb-6 border-b border-border">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pb-6 border-b border-border">
                             <div>
-                                <h2 className="text-3xl font-bold text-foreground">Venues</h2>
+                                <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Venues</h2>
                                 <p className="text-muted-foreground mt-1">Manage venue information and locations</p>
                             </div>
                             <Link href="/admin/venues/new">
@@ -194,9 +194,9 @@ export default async function AdminPage() {
                     </TabsContent>
 
                     <TabsContent value="galleries" className="space-y-6">
-                        <div className="flex justify-between items-center pb-6 border-b border-border">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pb-6 border-b border-border">
                             <div>
-                                <h2 className="text-3xl font-bold text-foreground">Galleries</h2>
+                                <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Galleries</h2>
                                 <p className="text-muted-foreground mt-1">Manage photo galleries and collections</p>
                             </div>
                             <Link href="/admin/galleries/new">
@@ -292,7 +292,7 @@ export default async function AdminPage() {
                                     <CardDescription>Your account information</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <div className="text-sm font-medium text-muted-foreground">Name</div>
                                             <div className="text-base text-foreground">{session.user.name || "Not set"}</div>

@@ -391,9 +391,9 @@ export function EventEditForm({ event, venues, artists }: EventEditFormProps) {
       </div>
 
       {/* Actions - Full Width */}
-      <div className="flex justify-between items-center pt-8 mt-8 border-t border-border">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-4 pt-8 mt-8 border-t border-border">
         <DeleteEventForm eventId={event.id} />
-        <div className="flex gap-3">
+        <div className="flex gap-3 justify-end">
           <Link href="/admin">
             <Button variant="outline">
               Cancel

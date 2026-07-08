@@ -40,7 +40,7 @@ export default async function GalleryEditPage({ params }: PageProps) {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b border-border">
-        <div className="max-w-7xl mx-auto px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link href="/admin?tab=galleries">
@@ -70,7 +70,7 @@ export default async function GalleryEditPage({ params }: PageProps) {
       </div>
 
       {/* Form */}
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8">
         <GalleryFormV2 
           mode="edit" 
           gallery={gallery}
