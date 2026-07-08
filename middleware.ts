@@ -49,7 +49,15 @@ export function middleware(req: RequestWithGeo) {
   const cfCity = req.headers.get("cf-ipcity");
   const cfCountry = req.headers.get("cf-ipcountry");
   
-  const city = geoCity || vercelCity || cfCity || "";
+  // x-vercel-ip-city is URL-encoded (e.g. "New%20York") — decode before
+  // storing so city matching downstream works for multi-word cities.
+  const rawCity = geoCity || vercelCity || cfCity || "";
+  let city = rawCity;
+  try {
+    city = decodeURIComponent(rawCity);
+  } catch {
+    // keep raw value if malformed
+  }
   const country = geoCountry || vercelCountry || cfCountry || "";
 
   const res = NextResponse.next();

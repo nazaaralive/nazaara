@@ -10,6 +10,7 @@ import {
 } from "@/lib/public-actions";
 import SectionHeader from "@/components/ui/section-header";
 import TicketButton from "@/components/home/ticket-button";
+import { nowInCityWallClock } from "@/lib/event-time";
 
 export default async function UpcomingEvents() {
   // Get the city and country cookies to determine which event is featured in hero
@@ -99,14 +100,18 @@ export default async function UpcomingEvents() {
   console.log("[UpcomingEvents] Current time (now):", now.toISOString());
   
   const upcomingEventsOnly = allEvents.filter(event => {
+    // Stored times are wall-clock labeled as UTC (see src/lib/event-time.ts),
+    // so the "noon the day after" cutoff must be compared against the current
+    // wall-clock time in the EVENT's city, not real UTC now.
     const eventStartTime = new Date(event.startTime);
     const nextDayNoon = new Date(eventStartTime);
     nextDayNoon.setUTCDate(nextDayNoon.getUTCDate() + 1);
     nextDayNoon.setUTCHours(12, 0, 0, 0);
-    const isUpcoming = nextDayNoon >= now;
-    
-    console.log(`[UpcomingEvents][DateFilter] Event: ${event.slug} | Start: ${eventStartTime.toISOString()} | Cutoff: ${nextDayNoon.toISOString()} | Now: ${now.toISOString()} | Include: ${isUpcoming}`);
-    
+    const cityNow = nowInCityWallClock(event.city);
+    const isUpcoming = nextDayNoon >= cityNow;
+
+    console.log(`[UpcomingEvents][DateFilter] Event: ${event.slug} | Start: ${eventStartTime.toISOString()} | Cutoff: ${nextDayNoon.toISOString()} | CityNow (${event.city}): ${cityNow.toISOString()} | Include: ${isUpcoming}`);
+
     return isUpcoming;
   });
   {

@@ -30,8 +30,8 @@ export function EventDatePicker({ startTime, endTime, startName = "startTime", e
   const [endDate, setEndDate] = useState<Date | undefined>(endTime)
   
   // Format times in UTC to preserve exact values without timezone conversion
-  const startHourFormatted = startTime ? formatInTimeZone(startTime, "UTC", "HH:mm") : "20:00"
-  const endHourFormatted = endTime ? formatInTimeZone(endTime, "UTC", "HH:mm") : "02:00"
+  const startHourFormatted = startTime ? formatInTimeZone(startTime, "UTC", "HH:mm") : "22:00"
+  const endHourFormatted = endTime ? formatInTimeZone(endTime, "UTC", "HH:mm") : "03:00"
   
   console.log('🔍 [EVENT DATE PICKER] Formatted times (UTC):', {
     startHourFormatted,

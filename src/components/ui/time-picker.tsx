@@ -19,7 +19,7 @@ function TimePicker({ value, onChange, className }: TimePickerProps) {
   const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'))
   const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0')).filter((_, i) => i % 5 === 0) // 5-minute intervals
   
-  const [selectedHour, selectedMinute] = (value || "20:00").split(":")
+  const [selectedHour, selectedMinute] = (value || "22:00").split(":")
   
   const handleTimeSelect = (hour: string, minute: string) => {
     const timeString = `${hour}:${minute}`

@@ -2,6 +2,7 @@ import UpcomingEvents from "@/components/home/upcoming-events";
 import { EventMarquee } from "@/components/home/event-marquee";
 import Hero from "@/components/home/hero";
 import { getPublicEvents } from "@/lib/public-actions";
+import { isEventTodayOrLater } from "@/lib/event-time";
 import type { Metadata } from "next";
 
 // Revalidate every 60 seconds (or set to 0 for no caching)
@@ -83,14 +84,13 @@ export default async function Home() {
   // Fetch events for the marquee
   const events = await getPublicEvents();
 
-  // Filter to only show today's events or future events
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const upcomingEvents = events.filter(event => {
-    const eventDate = new Date(event.startTime);
-    eventDate.setHours(0, 0, 0, 0);
-    return eventDate >= today;
-  });
+  // Filter to only show today's events or future events. "Today" is judged
+  // in each event's own city timezone (stored times are wall-clock labeled
+  // as UTC — see src/lib/event-time.ts), so an event stays in the marquee
+  // for its entire local event day.
+  const upcomingEvents = events.filter(event =>
+    isEventTodayOrLater(event.startTime, event.city)
+  );
 
   // Generate JSON-LD structured data for Organization
   const organizationSchema = {

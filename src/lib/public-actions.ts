@@ -3,74 +3,10 @@
 import { db } from "@/db/drizzle"
 import { events, artists, venues, eventsArtists, galleries, galleryImages, eventStops } from "@/db/schema"
 import { eq, and, gte, asc, desc, sql, inArray } from "drizzle-orm"
-
-// Regional groupings for smart geographical fallback
-const REGIONS = {
-  // Canada
-  'Vancouver': { country: 'Canada', region: 'Western Canada' },
-  'Surrey': { country: 'Canada', region: 'Western Canada' },
-  'Burnaby': { country: 'Canada', region: 'Western Canada' },
-  'Richmond': { country: 'Canada', region: 'Western Canada' },
-  'Calgary': { country: 'Canada', region: 'Western Canada' },
-  'Edmonton': { country: 'Canada', region: 'Western Canada' },
-  'Toronto': { country: 'Canada', region: 'Eastern Canada' },
-  'Ottawa': { country: 'Canada', region: 'Eastern Canada' },
-  'Montreal': { country: 'Canada', region: 'Eastern Canada' },
-  // USA
-  'New York': { country: 'United States', region: 'East Coast' },
-  'Boston': { country: 'United States', region: 'East Coast' },
-  'Philadelphia': { country: 'United States', region: 'East Coast' },
-  'Washington': { country: 'United States', region: 'East Coast' },
-  'San Francisco': { country: 'United States', region: 'West Coast' },
-  'Los Angeles': { country: 'United States', region: 'West Coast' },
-  'Seattle': { country: 'United States', region: 'West Coast' },
-  'Portland': { country: 'United States', region: 'West Coast' },
-  'Chicago': { country: 'United States', region: 'Midwest' },
-  'Detroit': { country: 'United States', region: 'Midwest' },
-  'Dallas': { country: 'United States', region: 'South' },
-  'Houston': { country: 'United States', region: 'South' },
-  'Atlanta': { country: 'United States', region: 'South' },
-  // UK
-  'London': { country: 'United Kingdom', region: 'UK' },
-  'Manchester': { country: 'United Kingdom', region: 'UK' },
-  'Birmingham': { country: 'United Kingdom', region: 'UK' },
-} as const;
-
-function getRegionInfo(city: string) {
-  return REGIONS[city as keyof typeof REGIONS];
-}
-
-// Metro area groupings (priority over regions)
-const METRO_AREAS: Record<string, string[]> = {
-  // Canada
-  Vancouver: [
-    "Vancouver", "Surrey", "Burnaby", "Richmond", "North Vancouver",
-    "West Vancouver", "Coquitlam", "Port Coquitlam", "Port Moody",
-    "Delta", "Langley", "White Rock", "New Westminster"
-  ],
-  Calgary: ["Calgary", "Airdrie", "Chestermere", "Okotoks"],
-  Toronto: [
-    "Toronto", "Mississauga", "Brampton", "Vaughan", "Markham",
-    "Richmond Hill", "Oakville", "Burlington", "Milton", "Pickering",
-    "Ajax", "Whitby"
-  ],
-  // USA
-  "New York": [
-    "New York", "Manhattan", "Brooklyn", "Queens", "Bronx",
-    "Staten Island", "Jersey City", "Hoboken", "Newark"
-  ],
-  Boston: ["Boston", "Cambridge", "Somerville", "Brookline"],
-  Miami: ["Miami", "Miami Beach", "Doral", "Hialeah", "Coral Gables"],
-};
-
-function getMetroAnchor(city?: string): string | undefined {
-  if (!city) return undefined;
-  const entries = Object.entries(METRO_AREAS);
-  for (const [anchor, members] of entries) {
-    if (members.some(m => m.toLowerCase() === city.toLowerCase())) return anchor;
-  }
-  return undefined;
-}
+import {
+  METRO_AREAS, getRegionInfo, getMetroAnchor,
+  isEventUpcoming, decodeCityName,
+} from "@/lib/event-time"
 
 export interface PublicArtist {
   name: string;
@@ -196,13 +132,15 @@ export async function getPublicEvents(): Promise<PublicEvent[]> {
 
     const primaryArtist = eventArtistsList[0]?.name || event.title;
 
-    const now = new Date();
     const isFeatured = false;
 
+    // "Past" is judged in the EVENT CITY's local time. Stored times are
+    // wall-clock values labeled as UTC (see src/lib/event-time.ts), so
+    // comparing against plain new Date() would mark events past hours early.
     let status = "On Sale";
     if (!event.ticketUrl) {
       status = "Coming Soon";
-    } else if (event.startTime < now) {
+    } else if (!isEventUpcoming(event.startTime, event.venueCity || undefined)) {
       status = "Past Event";
     }
 
@@ -283,8 +221,8 @@ export async function getPublicEvents(): Promise<PublicEvent[]> {
 
 export async function getPublicUpcomingEvents(): Promise<PublicEvent[]> {
   const allEvents = await getPublicEvents();
-  const now = new Date();
-  return allEvents.filter(event => event.startTime > now);
+  // Per-event city-local comparison (see src/lib/event-time.ts).
+  return allEvents.filter(event => isEventUpcoming(event.startTime, event.city));
 }
 
 export async function getPublicFeaturedEvent(): Promise<PublicEvent | null> {
@@ -295,14 +233,11 @@ export async function getPublicFeaturedEvent(): Promise<PublicEvent | null> {
     const allEvents = await getPublicEvents();
     console.log(`[getPublicFeaturedEvent] Retrieved ${allEvents.length} public events`);
 
-    const now = new Date();
-    console.log(`[getPublicFeaturedEvent] Current time: ${now.toISOString()}`);
-
-    // Filter for upcoming events
+    // Filter for upcoming events — judged in each event's own city timezone
+    // (stored times are wall-clock labeled as UTC; see src/lib/event-time.ts).
     const upcomingEvents = allEvents.filter(event => {
-      const eventDate = new Date(event.startTime);
-      const isUpcoming = eventDate > now;
-      console.log(`[getPublicFeaturedEvent] Event "${event.title}" (${event.slug}): ${eventDate.toISOString()} - Upcoming: ${isUpcoming}`);
+      const isUpcoming = isEventUpcoming(event.startTime, event.city);
+      console.log(`[getPublicFeaturedEvent] Event "${event.title}" (${event.slug}): ${new Date(event.startTime).toISOString()} (${event.city}) - Upcoming: ${isUpcoming}`);
       return isUpcoming;
     });
 
@@ -355,6 +290,9 @@ export async function getPublicEventStops(eventId: number): Promise<PublicEventS
 }
 
 export async function getPublicEventForCity(cityName: string): Promise<PublicEvent | null> {
+  // Geo-IP cookie values arrive URL-encoded ("New%20York") — decode so
+  // multi-word cities actually match instead of falling through to fallback.
+  cityName = decodeCityName(cityName);
   console.log(`[getPublicEventForCity] Starting search for city: "${cityName}"`);
 
   try {
@@ -363,14 +301,11 @@ export async function getPublicEventForCity(cityName: string): Promise<PublicEve
     const allEvents = await getPublicEvents();
     console.log(`[getPublicEventForCity] Retrieved ${allEvents.length} public events`);
 
-    const now = new Date();
-    console.log(`[getPublicEventForCity] Current date: ${now.toISOString()}`);
-
-    // Filter for upcoming events
-    const upcomingEvents = allEvents.filter(event => {
-      const eventDate = new Date(event.startTime);
-      return eventDate > now;
-    });
+    // Filter for upcoming events — judged in each event's own city timezone
+    // (stored times are wall-clock labeled as UTC; see src/lib/event-time.ts).
+    const upcomingEvents = allEvents.filter(event =>
+      isEventUpcoming(event.startTime, event.city)
+    );
 
     console.log(`[getPublicEventForCity] Found ${upcomingEvents.length} upcoming events`);
 
@@ -516,11 +451,11 @@ export async function getPublicEventBySlug(slug: string): Promise<PublicEvent | 
 
   const { date, year } = formatDateToDisplay(event.startTime);
 
-  const now = new Date();
+  // "Past" is judged in the event city's local time (see src/lib/event-time.ts).
   let status = "On Sale";
   if (!event.ticketUrl) {
     status = "Coming Soon";
-  } else if (event.startTime < now) {
+  } else if (!isEventUpcoming(event.startTime, event.venueCity || undefined)) {
     status = "Past Event";
   }
 
