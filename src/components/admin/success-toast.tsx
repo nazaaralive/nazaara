@@ -57,6 +57,16 @@ export function SuccessToast() {
         description: "Your new gallery has been created.",
         duration: 3000,
       })
+    } else if (success === "dj-updated") {
+      toast.success("DJ saved successfully", {
+        description: "Your changes have been saved.",
+        duration: 3000,
+      })
+    } else if (success === "dj-created") {
+      toast.success("DJ created successfully", {
+        description: "Your new DJ has been created.",
+        duration: 3000,
+      })
     } else if (success === "gallery-deleted") {
       toast.success("Gallery deleted successfully", {
         description: "The gallery has been deleted.",

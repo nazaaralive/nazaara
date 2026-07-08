@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
+import NextImage from "next/image"
 import { Search, Image, ExternalLink, Calendar } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
@@ -103,12 +104,14 @@ export function GalleriesGrid({ galleries }: GalleriesGridProps) {
                 className="group relative overflow-hidden rounded-lg border border-border bg-card hover:shadow-lg transition-all hover:-translate-y-0.5"
               >
                 {/* Thumbnail */}
-                <div className="aspect-[4/3] bg-muted overflow-hidden">
+                <div className="aspect-[4/3] relative bg-muted overflow-hidden">
                   {thumbnail ? (
-                    <img
+                    <NextImage
                       src={thumbnail}
                       alt={gallery.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">

@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react"
 import { getEventBySlug, getAdminVenues, getAdminArtists } from "@/lib/admin-actions"
 import Link from "next/link"
 import { EventEditForm } from "@/components/admin/event-edit-form"
+import { SuccessToast } from "@/components/admin/success-toast"
 
 // Disable caching to always show fresh data after updates
 export const revalidate = 0
@@ -108,6 +109,7 @@ export default async function EventEditPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <SuccessToast />
       {/* Header */}
       <div className="border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { getGalleryBySlug } from "@/lib/admin-actions"
 import Link from "next/link"
+import { SuccessToast } from "@/components/admin/success-toast"
 import { GalleryFormV2 } from "@/components/admin/gallery-form-v2"
 
 interface PageProps {
@@ -38,6 +39,7 @@ export default async function GalleryEditPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <SuccessToast />
       {/* Header */}
       <div className="border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">

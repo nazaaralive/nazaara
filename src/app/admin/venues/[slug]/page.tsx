@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Save, MapPin, Calendar } from "lucide-react"
 import { getVenueBySlug, updateVenue, deleteVenue } from "@/lib/admin-actions"
 import Link from "next/link"
+import { SuccessToast } from "@/components/admin/success-toast"
 import { MultiImageUpload } from "@/components/admin/multi-image-upload"
 
 interface PageProps {
@@ -65,6 +66,7 @@ export default async function VenueEditPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <SuccessToast />
       {/* Header */}
       <div className="border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">

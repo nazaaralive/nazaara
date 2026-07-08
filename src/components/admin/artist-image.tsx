@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { Users } from "lucide-react"
 
 interface ArtistImageProps {
@@ -8,16 +9,22 @@ interface ArtistImageProps {
   alt: string
 }
 
+// Uses next/image so the browser downloads an optimized ~200-400px WebP
+// thumbnail instead of the full-size UploadThing original (often several MB).
+// Optimized variants are cached at Vercel's edge after the first request,
+// which is what makes the admin grids load fast on repeat visits.
 export function ArtistImage({ src, alt }: ArtistImageProps) {
   const [imageError, setImageError] = useState(false)
 
   return (
     <>
       {src && !imageError ? (
-        <img 
-          src={src} 
+        <Image
+          src={src}
           alt={alt}
-          className="w-full h-full object-cover"
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="object-cover"
           onError={() => setImageError(true)}
         />
       ) : (

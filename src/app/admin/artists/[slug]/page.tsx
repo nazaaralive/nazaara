@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { ArrowLeft, Save, Music, Calendar, Instagram, Cloud } from "lucide-react"
 import { getArtistBySlug, updateArtist, deleteArtist } from "@/lib/admin-actions"
 import Link from "next/link"
+import { SuccessToast } from "@/components/admin/success-toast"
 import { ImageUpload } from "@/components/admin/image-upload"
 
 interface PageProps {
@@ -59,6 +60,7 @@ export default async function ArtistEditPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <SuccessToast />
       {/* Header */}
       <div className="border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { MapPin } from "lucide-react"
 
 interface VenueImageProps {
@@ -8,16 +9,19 @@ interface VenueImageProps {
   alt: string
 }
 
+// next/image → optimized thumbnail instead of full-size original (see artist-image.tsx).
 export function VenueImage({ src, alt }: VenueImageProps) {
   const [imageError, setImageError] = useState(false)
 
   return (
     <>
       {src && !imageError ? (
-        <img 
-          src={src} 
+        <Image
+          src={src}
           alt={alt}
-          className="w-full h-full object-cover"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover"
           onError={() => setImageError(true)}
         />
       ) : (

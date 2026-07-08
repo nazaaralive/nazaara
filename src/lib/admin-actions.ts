@@ -390,7 +390,8 @@ export async function updateEvent(formData: FormData) {
   revalidatePath("/", "page")             // Home page
   revalidatePath(`/event/${slug}`, "page") // Event detail page
 
-  redirect("/admin?success=event-updated")
+  // Stay on the event's edit page after saving (don't bounce to the dashboard)
+  redirect(`/admin/events/${slug}?success=event-updated`)
 }
 
 
@@ -527,7 +528,10 @@ export async function createEvent(formData: FormData) {
   }
 
   revalidatePath("/admin")
-  redirect(`/admin?success=event-created`)
+  revalidatePath("/", "page")
+  // Land on the new event's edit page so publish status and details are
+  // immediately visible/adjustable (instead of bouncing to the dashboard).
+  redirect(`/admin/events/${slug}?success=event-created`)
 }
 
 // Venue CRUD operations
@@ -589,7 +593,7 @@ export async function createVenue(formData: FormData) {
     .returning({ slug: venues.slug })
 
   revalidatePath("/admin")
-  redirect(`/admin?success=venue-created`)
+  redirect(`/admin/venues/${result[0].slug}?success=venue-created`)
 }
 
 export async function updateVenue(formData: FormData) {
@@ -635,7 +639,7 @@ export async function updateVenue(formData: FormData) {
 
   revalidatePath("/admin")
   revalidatePath(`/admin/venues/${slug}`)
-  redirect("/admin?success=venue-updated")
+  redirect(`/admin/venues/${slug}?success=venue-updated`)
 }
 
 export async function deleteVenue(formData: FormData) {
@@ -707,7 +711,7 @@ export async function createArtist(formData: FormData) {
     .returning({ slug: artists.slug })
 
   revalidatePath("/admin")
-  redirect(`/admin?success=artist-created`)
+  redirect(`/admin/artists/${result[0].slug}?success=artist-created`)
 }
 
 export async function updateArtist(formData: FormData) {
@@ -737,7 +741,7 @@ export async function updateArtist(formData: FormData) {
 
   revalidatePath("/admin")
   revalidatePath(`/admin/artists/${slug}`)
-  redirect("/admin?success=artist-updated")
+  redirect(`/admin/artists/${slug}?success=artist-updated`)
 }
 
 export async function deleteArtist(formData: FormData) {
@@ -856,7 +860,7 @@ export async function createGallery(formData: FormData) {
   }
 
   revalidatePath("/admin")
-  redirect("/admin?tab=galleries&success=gallery-created")
+  redirect(`/admin/galleries/${slug}?success=gallery-created`)
 }
 
 export async function updateGallery(formData: FormData) {
@@ -934,7 +938,7 @@ export async function updateGallery(formData: FormData) {
 
   revalidatePath("/admin")
   revalidatePath(`/admin/galleries/${slug}`)
-  redirect("/admin?tab=galleries&success=gallery-updated")
+  redirect(`/admin/galleries/${slug}?success=gallery-updated`)
 }
 
 export async function deleteGallery(formData: FormData) {
@@ -1050,7 +1054,7 @@ export async function createDJ(formData: FormData) {
     .returning({ slug: djs.slug })
 
   revalidatePath("/admin")
-  redirect(`/admin?success=dj-created`)
+  redirect(`/admin/djs/${result[0].slug}?success=dj-created`)
 }
 
 export async function updateDJ(formData: FormData) {
@@ -1124,7 +1128,7 @@ export async function updateDJ(formData: FormData) {
 
   revalidatePath("/admin")
   revalidatePath(`/admin/djs/${slug}`)
-  redirect("/admin?success=dj-updated")
+  redirect(`/admin/djs/${slug}?success=dj-updated`)
 }
 
 export async function deleteDJ(formData: FormData) {

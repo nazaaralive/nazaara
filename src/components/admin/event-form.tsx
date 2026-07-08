@@ -245,7 +245,10 @@ export function EventForm({ venues, artists }: EventFormProps) {
               <Label htmlFor="isTour">This is a tour (multiple cities)</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <input type="hidden" name="isPublished" value="" />
+              {/* NOTE: no hidden input here. A hidden input with the same name
+                  used to sit before this checkbox, so formData.get("isPublished")
+                  always returned "" and publish-on-create silently failed.
+                  The Radix Checkbox submits "on" by itself when checked. */}
               <Checkbox id="isPublished" name="isPublished" />
               <Label htmlFor="isPublished">Published (visible to public)</Label>
             </div>

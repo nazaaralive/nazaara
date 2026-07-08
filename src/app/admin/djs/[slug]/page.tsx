@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { ArrowLeft, Save, Headphones, Instagram, Eye, EyeOff } from "lucide-react"
 import { getDJBySlug, updateDJ, deleteDJ } from "@/lib/admin-actions"
 import Link from "next/link"
+import { SuccessToast } from "@/components/admin/success-toast"
 import { ImageUpload } from "@/components/admin/image-upload"
 import { HighlightsEditor } from "@/components/admin/highlights-editor"
 
@@ -62,6 +63,7 @@ export default async function DJEditPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <SuccessToast />
       {/* Header */}
       <div className="border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">

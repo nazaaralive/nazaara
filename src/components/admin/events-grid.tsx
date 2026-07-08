@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Search, Calendar, ExternalLink } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { formatInTimeZone } from "date-fns-tz"
@@ -133,10 +134,12 @@ export function EventsGrid({ events }: EventsGridProps) {
                   {/* Event Poster */}
                   <div className="relative aspect-[3/4] bg-muted overflow-hidden rounded-lg">
                     {event.image && event.image.startsWith('http') ? (
-                      <img
+                      <Image
                         src={event.image}
                         alt={event.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        fill
+                        sizes="(max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground bg-muted">
