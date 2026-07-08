@@ -22,18 +22,19 @@ const CITIES = [
   "Other",
 ];
 
-export function SmsOptIn() {
+export function SmsOptIn({ source = "website_footer" }: { source?: string } = {}) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
-  // Two consent states — marketing (the actual SMS opt-in) and terms acceptance.
-  // Transactional/informational SMS is handled by our ticketing partners (Eventbrite,
-  // Shopify, etc.), NOT through this Twilio campaign, so we don't collect that consent here.
-  // Marketing consent is the only thing the backend uses to decide whether to subscribe.
-  // T&C must NOT be required to submit per Twilio TCPA compliance guidance.
+  // Three consent states, per Twilio Mixed-use-case guidance (ticket #26582473):
+  // transactional, marketing, and terms acceptance. ALL are optional and
+  // unchecked by default — none of them gate form submission (TCPA forbids
+  // forced consent). The phone field is also optional. The backend decides
+  // what (if anything) to subscribe based on which boxes were ticked.
+  const [transactionalOptIn, setTransactionalOptIn] = useState(false);
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "already" | "not_subscribed" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "already" | "saved" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const honeypotRef = useRef<HTMLInputElement>(null);
 
@@ -59,13 +60,23 @@ export function SmsOptIn() {
       setErrorMsg("Please enter your city.");
       return;
     }
-    const normalized = normalizePhone(phone);
-    if (!normalized) {
-      setErrorMsg("Please enter a valid US phone number.");
+    // Phone is OPTIONAL (Twilio compliance: providing a number must be
+    // voluntary). It's only required if the user actually asked for SMS —
+    // we can't text a number we don't have. If provided, it must be valid.
+    const wantsSms = marketingOptIn || transactionalOptIn;
+    let normalized: string | null = null;
+    if (phone.trim()) {
+      normalized = normalizePhone(phone);
+      if (!normalized) {
+        setErrorMsg("That phone number doesn't look valid — please double-check it.");
+        return;
+      }
+    } else if (wantsSms) {
+      setErrorMsg("Add your phone number so we can text you.");
       return;
     }
-    // No client-side gate on marketingOptIn — TCPA forbids conditioning form
-    // submission on marketing consent. Backend decides whether to subscribe.
+    // No client-side gate on any consent checkbox — TCPA forbids conditioning
+    // form submission on consent. Backend decides whether to subscribe.
 
     setStatus("loading");
     try {
@@ -76,7 +87,8 @@ export function SmsOptIn() {
           name: name.trim(),
           phone: normalized,
           city: city.trim(),
-          source: "website_footer",
+          source,
+          transactionalOptIn,
           marketingOptIn,
           acceptedTerms,
         }),
@@ -84,15 +96,22 @@ export function SmsOptIn() {
       const data = await res.json();
       if (res.ok) {
         if (data.subscribed === false) {
-          // Form submitted but marketing consent wasn't given — leave the
-          // form populated so the user can re-tick the marketing box and
-          // submit again without re-typing.
-          setStatus("not_subscribed");
+          // Submission accepted without marketing consent — a genuine success
+          // state. The user is NOT subscribed to marketing SMS and doesn't
+          // need to do anything else.
+          setStatus("saved");
+          setName("");
+          setPhone("");
+          setCity("");
+          setTransactionalOptIn(false);
+          setMarketingOptIn(false);
+          setAcceptedTerms(false);
         } else {
           setStatus(data.alreadySubscribed ? "already" : "success");
           setName("");
           setPhone("");
           setCity("");
+          setTransactionalOptIn(false);
           setMarketingOptIn(false);
           setAcceptedTerms(false);
         }
@@ -106,11 +125,13 @@ export function SmsOptIn() {
     }
   };
 
-  if (status === "success" || status === "already") {
-    const headline = status === "already" ? "Already Signed Up" : "You\u2019re In";
+  if (status === "success" || status === "already" || status === "saved") {
+    const headline = status === "already" ? "Already Signed Up" : status === "saved" ? "Thanks!" : "You\u2019re In";
     const subcopy =
       status === "already"
         ? "Looks like this number is already subscribed to Nazaara Live SMS. We\u2019ll text you when drops and presales go live. Reply STOP at any time to unsubscribe."
+        : status === "saved"
+        ? "Your submission was received. You haven\u2019t opted in to SMS, so we won\u2019t text you \u2014 if you change your mind, come back anytime and check the marketing SMS box."
         : "Check your phone for a confirmation text from Nazaara Live. We\u2019ll text you when event announcements, presales, and ticket drops go live. Reply STOP at any time to unsubscribe.";
     return (
       <section className="relative py-20 md:py-28 overflow-hidden" style={{ backgroundColor: "var(--black-grey)" }}>
@@ -212,7 +233,8 @@ export function SmsOptIn() {
                 type="tel"
                 value={phone}
                 onChange={(e) => { setPhone(e.target.value); setStatus("idle"); setErrorMsg(""); }}
-                placeholder="(555) 123-4567"
+                placeholder="(555) 123-4567 — optional"
+                aria-label="Phone number (optional)"
                 className="w-full px-4 py-3 rounded-lg text-base font-neue-haas outline-none transition-all"
                 style={{
                   backgroundColor: "rgba(255,255,255,0.08)",
@@ -222,11 +244,26 @@ export function SmsOptIn() {
               />
             </div>
 
-            {/* Consent checkboxes — two unchecked-by-default boxes (marketing + terms).
-                Transactional/informational SMS is fulfilled by our ticketing partners,
-                not via this Twilio campaign, so it isn't collected here. */}
+            {/* Consent checkboxes — three unchecked-by-default boxes per Twilio
+                Mixed-use-case guidance (transactional / marketing / terms).
+                ALL are optional; none gate submission. */}
             <div className="space-y-4 mb-5">
-              {/* 1. Marketing/promotional SMS consent (the only one the backend gates subscription on) */}
+              {/* 1. Transactional/informational SMS consent (optional) */}
+              <label className="flex items-start gap-3 text-left cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={transactionalOptIn}
+                  onChange={(e) => { setTransactionalOptIn(e.target.checked); setStatus("idle"); setErrorMsg(""); }}
+                  className="mt-1 shrink-0 h-4 w-4"
+                  style={{ accentColor: "var(--gold)" }}
+                  aria-describedby="transactional-consent-text"
+                />
+                <span id="transactional-consent-text" className="text-sm font-neue-haas leading-relaxed" style={{ color: "var(--white)", opacity: 0.9 }}>
+                  By checking this box, you are allowing Nazaara Live to send you transactional/informational SMS communications regarding account notifications, customer care, and order or ticket updates. Message frequency may vary. Msg &amp; data rates may apply. Reply HELP for help, STOP to opt-out.
+                </span>
+              </label>
+
+              {/* 2. Marketing/promotional SMS consent (optional — gates marketing subscription only) */}
               <label className="flex items-start gap-3 text-left cursor-pointer">
                 <input
                   type="checkbox"
@@ -241,7 +278,7 @@ export function SmsOptIn() {
                 </span>
               </label>
 
-              {/* 2. Terms of Service & Privacy Policy (optional per Twilio compliance guidance) */}
+              {/* 3. Terms of Service & Privacy Policy (optional per Twilio compliance guidance) */}
               <label className="flex items-start gap-3 text-left cursor-pointer">
                 <input
                   type="checkbox"
@@ -262,20 +299,6 @@ export function SmsOptIn() {
 
             {errorMsg && (
               <p className="text-sm font-neue-haas mb-3" style={{ color: "#f87171" }}>{errorMsg}</p>
-            )}
-
-            {status === "not_subscribed" && (
-              <div
-                role="status"
-                className="mb-3 p-3 rounded-lg text-sm font-neue-haas leading-relaxed"
-                style={{
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  backgroundColor: "rgba(255,255,255,0.05)",
-                  color: "var(--white)",
-                }}
-              >
-                Almost there. Tick the marketing SMS box above and submit again to receive event drops from Nazaara Live.
-              </div>
             )}
 
             <button

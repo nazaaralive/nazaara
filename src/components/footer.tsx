@@ -111,6 +111,12 @@ export function Footer({ hideAbout = false, hideBookings = false, useExternalGal
                         Gallery
                       </Link>
                     )}
+                    <Link
+                      href="/sms"
+                      className="block text-white font-neue-haas font-light hover:text-[var(--gold)] transition-colors"
+                    >
+                      Get SMS Drops
+                    </Link>
                   </nav>
                 </div>
               </div>

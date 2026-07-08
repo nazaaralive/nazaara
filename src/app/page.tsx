@@ -1,7 +1,6 @@
 import UpcomingEvents from "@/components/home/upcoming-events";
 import { EventMarquee } from "@/components/home/event-marquee";
 import Hero from "@/components/home/hero";
-import { SmsOptIn } from "@/components/home/sms-optin";
 import { getPublicEvents } from "@/lib/public-actions";
 import type { Metadata } from "next";
 
@@ -407,9 +406,6 @@ export default async function Home() {
         </div>
       </section>
       */}
-
-      {/* SMS Opt-In Section */}
-      <SmsOptIn />
 
       </div>
     </>
