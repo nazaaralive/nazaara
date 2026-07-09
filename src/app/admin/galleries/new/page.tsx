@@ -3,7 +3,6 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
-import Link from "next/link"
 import { GalleryFormV2 } from "@/components/admin/gallery-form-v2"
 
 export default async function NewGalleryPage() {
@@ -21,12 +20,12 @@ export default async function NewGalleryPage() {
       <div className="border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
           <div className="flex items-center gap-4">
-            <Link href="/admin?tab=galleries">
+            <a href="/admin?tab=galleries">
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
-            </Link>
+            </a>
             <div>
               <h1 className="text-2xl font-bold text-foreground">
                 Create Gallery

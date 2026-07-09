@@ -66,12 +66,12 @@ export default async function ArtistEditPage({ params }: PageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/admin">
+              <a href="/admin">
                 <Button variant="ghost" size="sm">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
                 </Button>
-              </Link>
+              </a>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">
                   Edit Artist

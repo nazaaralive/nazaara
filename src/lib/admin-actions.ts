@@ -2,7 +2,7 @@
 
 import { db } from "@/db/drizzle"
 import { events, artists, venues, eventsArtists, galleries, galleryImages, djs, eventStops } from "@/db/schema"
-import { eq, count, sql, desc } from "drizzle-orm"
+import { eq, count, sql, desc, lt, inArray } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { generateSlug } from "@/lib/utils/slug"
@@ -22,7 +22,44 @@ export async function getAdminStats() {
   }
 }
 
+// Events whose start date is older than this are automatically hard-deleted
+// (event row + poster image on UploadThing; artist links and tour stops
+// cascade via FK) the next time the admin dashboard loads.
+const AUTO_DELETE_EVENTS_AFTER_DAYS = 100
+
+async function cleanupExpiredEvents() {
+  const cutoff = new Date(Date.now() - AUTO_DELETE_EVENTS_AFTER_DAYS * 24 * 60 * 60 * 1000)
+  const stale = await db
+    .select({ id: events.id, slug: events.slug, imageKey: events.imageKey })
+    .from(events)
+    .where(lt(events.startTime, cutoff))
+
+  if (stale.length === 0) return
+
+  // Best-effort poster cleanup on UploadThing; never block the deletion.
+  const imageKeys = stale.map(e => e.imageKey).filter((k): k is string => !!k)
+  if (imageKeys.length > 0) {
+    try {
+      const utapi = getUTApi()
+      await utapi.deleteFiles(imageKeys)
+    } catch (error) {
+      console.error("cleanupExpiredEvents: failed to delete images from UploadThing:", error)
+    }
+  }
+
+  await db.delete(events).where(inArray(events.id, stale.map(e => e.id)))
+  console.log(`cleanupExpiredEvents: deleted ${stale.length} event(s) older than ${AUTO_DELETE_EVENTS_AFTER_DAYS} days:`, stale.map(e => e.slug).join(", "))
+}
+
 export async function getAdminEvents() {
+  // Auto-prune events older than 100 days before listing. Failure here must
+  // never break the dashboard.
+  try {
+    await cleanupExpiredEvents()
+  } catch (error) {
+    console.error("cleanupExpiredEvents failed (non-fatal):", error)
+  }
+
   const eventsWithDetails = await db
     .select({
       id: events.id,
@@ -37,7 +74,7 @@ export async function getAdminEvents() {
     })
     .from(events)
     .leftJoin(venues, eq(events.venueId, venues.id))
-    .orderBy(events.startTime)
+    .orderBy(desc(events.startTime)) // latest events first
 
   // Get artists for each event in a single query
   const eventArtists = await db
@@ -168,6 +205,36 @@ export async function getEventBySlug(slug: string) {
     })),
     stops,
   }
+}
+
+// Live slug availability check for the event forms. Returns whether the
+// normalized slug is free and, if taken, the first free "-2"/"-3"/… variant.
+export async function checkEventSlug(rawSlug: string): Promise<{
+  normalized: string
+  available: boolean
+  suggestion: string | null
+}> {
+  const normalized = generateSlug(rawSlug || "")
+  if (!normalized) return { normalized: "", available: false, suggestion: null }
+
+  // One query fetches the slug itself and every suffixed variant, so we can
+  // both answer availability and compute a free suggestion.
+  const rows = await db
+    .select({ slug: events.slug })
+    .from(events)
+    .where(sql`${events.slug} = ${normalized} OR ${events.slug} LIKE ${normalized + "-%"}`)
+
+  const taken = new Set(rows.map(r => r.slug))
+  if (!taken.has(normalized)) {
+    return { normalized, available: true, suggestion: null }
+  }
+  for (let i = 2; i < 100; i++) {
+    const candidate = `${normalized}-${i}`
+    if (!taken.has(candidate)) {
+      return { normalized, available: false, suggestion: candidate }
+    }
+  }
+  return { normalized, available: false, suggestion: null }
 }
 
 export async function deleteEvent(formData: FormData) {

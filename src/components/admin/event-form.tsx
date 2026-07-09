@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { EventDatePicker } from "@/components/admin/event-date-picker"
+import { VenueSelector } from "@/components/admin/venue-selector"
 import { ImageUpload } from "@/components/admin/image-upload"
 import { ArtistSelector } from "@/components/admin/artist-selector"
-import { createEvent } from "@/lib/admin-actions"
+import { createEvent, checkEventSlug } from "@/lib/admin-actions"
 import Link from "next/link"
-import { Calendar, MapPin, Save, Ticket, Loader2 } from "lucide-react"
+import { Calendar, MapPin, Save, Ticket, Loader2, CheckCircle2, XCircle } from "lucide-react"
 import { EventStopsEditor } from "@/components/admin/event-stops-editor"
 
 interface Venue {
@@ -42,13 +42,13 @@ function generateSlug(text: string): string {
     .replace(/^-+|-+$/g, '')  // Remove leading/trailing hyphens
 }
 
-function SubmitButton() {
+function SubmitButton({ disabled = false }: { disabled?: boolean }) {
   const { pending } = useFormStatus()
 
   return (
     <Button
       type="submit"
-      disabled={pending}
+      disabled={pending || disabled}
       className="bg-[--gold] text-[--maroon-red] hover:bg-[--gold]/90 font-semibold px-6 py-2.5 shadow-lg hover:shadow-xl border border-[--gold] hover:border-[--dark-gold] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {pending ? (
@@ -71,6 +71,9 @@ export function EventForm({ venues, artists }: EventFormProps) {
   const [slug, setSlug] = useState("")
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false)
   const [isTour, setIsTour] = useState<boolean>(false)
+  // Live slug availability: idle | checking | available | taken
+  const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "available" | "taken">("idle")
+  const [slugSuggestion, setSlugSuggestion] = useState<string | null>(null)
 
   // Auto-generate slug from title only if not manually edited
   useEffect(() => {
@@ -78,6 +81,41 @@ export function EventForm({ venues, artists }: EventFormProps) {
       setSlug(generateSlug(title))
     }
   }, [title, isSlugManuallyEdited])
+
+  // Debounced availability check against the DB whenever the slug changes.
+  // If the slug was AUTO-generated and is already taken, silently adopt the
+  // suggested free variant (e.g. "diwali-2") so the default is always usable.
+  // If the user typed it manually, show the conflict and a clickable suggestion.
+  useEffect(() => {
+    if (!slug.trim()) {
+      setSlugStatus("idle")
+      setSlugSuggestion(null)
+      return
+    }
+    let cancelled = false
+    setSlugStatus("checking")
+    const t = setTimeout(async () => {
+      try {
+        const result = await checkEventSlug(slug)
+        if (cancelled) return
+        if (result.available) {
+          setSlugStatus("available")
+          setSlugSuggestion(null)
+        } else if (!isSlugManuallyEdited && result.suggestion) {
+          // Auto-generated default collided — swap in the free variant.
+          setSlug(result.suggestion)
+          // The state update re-runs this effect, which will verify the
+          // suggestion and mark it available.
+        } else {
+          setSlugStatus("taken")
+          setSlugSuggestion(result.suggestion)
+        }
+      } catch {
+        if (!cancelled) setSlugStatus("idle") // never block the form on a failed check
+      }
+    }, 400)
+    return () => { cancelled = true; clearTimeout(t) }
+  }, [slug, isSlugManuallyEdited])
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value)
@@ -160,6 +198,31 @@ export function EventForm({ venues, artists }: EventFormProps) {
                 <p className="text-xs text-muted-foreground">
                   This will be used in the URL: /events/{slug || "your-event-slug"}
                 </p>
+                {/* Live availability indicator */}
+                {slug && slugStatus === "checking" && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" /> Checking availability…
+                  </p>
+                )}
+                {slug && slugStatus === "available" && (
+                  <p className="text-xs text-green-500 flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3" /> Slug is available
+                  </p>
+                )}
+                {slug && slugStatus === "taken" && (
+                  <p className="text-xs text-red-400 flex items-center gap-1 flex-wrap">
+                    <XCircle className="h-3 w-3" /> Already used by another event.
+                    {slugSuggestion && (
+                      <button
+                        type="button"
+                        className="underline underline-offset-2 text-[--gold] hover:opacity-80"
+                        onClick={() => { setSlug(slugSuggestion); setIsSlugManuallyEdited(true) }}
+                      >
+                        Use &ldquo;{slugSuggestion}&rdquo; instead
+                      </button>
+                    )}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -194,18 +257,7 @@ export function EventForm({ venues, artists }: EventFormProps) {
               {!isTour && (
                 <div className="space-y-2">
                   <Label htmlFor="venueId">Venue *</Label>
-                  <Select name="venueId" required>
-                    <SelectTrigger className="bg-background border-border">
-                      <SelectValue placeholder="Select a venue" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {venues.map((venue) => (
-                        <SelectItem key={venue.id} value={venue.id.toString()}>
-                          {venue.name} - {venue.city}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <VenueSelector venues={venues} />
                 </div>
               )}
 
@@ -309,7 +361,9 @@ export function EventForm({ venues, artists }: EventFormProps) {
             Cancel
           </Button>
         </Link>
-        <SubmitButton />
+        {/* Block create while the slug is known-taken (DB has a unique
+            constraint anyway — this just fails friendly instead of a 500) */}
+        <SubmitButton disabled={slugStatus === "taken"} />
       </div>
     </form>
   )

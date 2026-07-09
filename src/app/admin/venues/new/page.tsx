@@ -23,12 +23,12 @@ export default async function NewVenuePage() {
     <div className="min-h-screen bg-background p-4 sm:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/admin">
+          <a href="/admin">
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Admin
             </Button>
-          </Link>
+          </a>
           <div>
             <h1 className="text-3xl font-bold text-foreground font-serif">
               Add New Venue

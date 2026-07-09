@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { EventDatePicker } from "@/components/admin/event-date-picker"
+import { VenueSelector } from "@/components/admin/venue-selector"
 import { ImageUpload } from "@/components/admin/image-upload"
 import { ArtistSelector } from "@/components/admin/artist-selector"
 import { updateEvent } from "@/lib/admin-actions"
@@ -259,18 +259,7 @@ export function EventEditForm({ event, venues, artists }: EventEditFormProps) {
               <h2 className="text-lg font-semibold mb-4">Location</h2>
               <div className="space-y-2">
                 <Label htmlFor="venueId">Venue *</Label>
-                <Select name="venueId" defaultValue={event.venueId?.toString() || ""}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {venues.map((venue) => (
-                      <SelectItem key={venue.id} value={venue.id.toString()}>
-                        {venue.name} - {venue.city}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <VenueSelector venues={venues} defaultVenueId={event.venueId} />
               </div>
             </div>
           )}
