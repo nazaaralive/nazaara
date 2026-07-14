@@ -184,3 +184,38 @@ export function decodeCityName(city?: string): string {
     return city;
   }
 }
+
+// ── City inference from event text ──────────────────────────────
+// Events have no city column of their own — city normally comes from the
+// joined venue. When the venue is still TBA the event becomes invisible to
+// geo-targeting ("Mango Szn: Vancouver" showed a NYC event to Vancouver
+// visitors). Event naming is consistent ("<name>: <City>", taglines like
+// "Live In Vancouver"), so as a fallback we scan the title + tagline for a
+// known city name.
+const KNOWN_CITIES: string[] = (() => {
+  const set = new Set<string>();
+  Object.keys(REGIONS).forEach(c => set.add(c));
+  Object.entries(METRO_AREAS).forEach(([anchor, members]) => {
+    set.add(anchor);
+    members.forEach(m => set.add(m));
+  });
+  ["Victoria", "Austin", "Miami", "Winnipeg", "Denver"].forEach(c => set.add(c));
+  // Longest first so "North Vancouver" wins over "Vancouver" when present.
+  return Array.from(set).sort((a, b) => b.length - a.length);
+})();
+
+export function inferCityFromText(text?: string | null): string | undefined {
+  if (!text) return undefined;
+  const lower = text.toLowerCase();
+  for (const city of KNOWN_CITIES) {
+    const cl = city.toLowerCase();
+    const idx = lower.indexOf(cl);
+    if (idx === -1) continue;
+    // Word-boundary check so "Yorkville" doesn't match "York" etc.
+    const before = idx === 0 ? "" : lower[idx - 1];
+    const after = idx + cl.length >= lower.length ? "" : lower[idx + cl.length];
+    const isBoundary = (ch: string) => ch === "" || !/[a-z0-9]/.test(ch);
+    if (isBoundary(before) && isBoundary(after)) return city;
+  }
+  return undefined;
+}

@@ -5,7 +5,7 @@ import { events, artists, venues, eventsArtists, galleries, galleryImages, event
 import { eq, and, gte, asc, desc, sql, inArray } from "drizzle-orm"
 import {
   METRO_AREAS, getRegionInfo, getMetroAnchor,
-  isEventUpcoming, decodeCityName,
+  isEventUpcoming, decodeCityName, inferCityFromText,
 } from "@/lib/event-time"
 
 export interface PublicArtist {
@@ -160,8 +160,15 @@ export async function getPublicEvents(): Promise<PublicEvent[]> {
       venueAddress: event.venueAddress,
       venueAddressUrl: event.venueAddressUrl,
       venueImages: event.venueImages,
-      city: event.venueCity || "TBA",
-      country: event.venueCountry || "TBA",
+      // No venue yet? Infer the city from the event title/tagline so
+      // geo-targeting still works for TBA-venue events ("Mango Szn: Vancouver").
+      city: event.venueCity || inferCityFromText(`${event.title} ${event.tagline || ""}`) || "TBA",
+      country: event.venueCountry
+        || (() => {
+          const inferred = inferCityFromText(`${event.title} ${event.tagline || ""}`);
+          const region = inferred ? getRegionInfo(inferred) : undefined;
+          return region ? region.country : "TBA";
+        })(),
       image: event.image,
       status,
       isFeatured,
@@ -477,8 +484,13 @@ export async function getPublicEventBySlug(slug: string): Promise<PublicEvent | 
     venueAddress: event.venueAddress,
     venueAddressUrl: event.venueAddressUrl,
     venueImages: event.venueImages,
-    city: event.venueCity || "TBA",
-    country: event.venueCountry || "TBA",
+    city: event.venueCity || inferCityFromText(`${event.title} ${event.tagline || ""}`) || "TBA",
+    country: event.venueCountry
+      || (() => {
+        const inferred = inferCityFromText(`${event.title} ${event.tagline || ""}`);
+        const region = inferred ? getRegionInfo(inferred) : undefined;
+        return region ? region.country : "TBA";
+      })(),
     image: event.image,
     status,
     isFeatured: false,
