@@ -49,14 +49,19 @@ export function middleware(req: RequestWithGeo) {
   const cfCity = req.headers.get("cf-ipcity");
   const cfCountry = req.headers.get("cf-ipcountry");
   
-  // x-vercel-ip-city is URL-encoded (e.g. "New%20York") — decode before
-  // storing so city matching downstream works for multi-word cities.
+  // x-vercel-ip-city arrives URL-encoded (e.g. "Los%20Angeles"). Store the
+  // cookie ENCODED: spaces are not valid cookie characters, and storing a
+  // decoded multi-word city makes browsers silently drop the Set-Cookie —
+  // which broke geo-targeting for LA / SF / New York visitors entirely.
+  // We normalize (decode → re-encode) so the value is always cookie-safe,
+  // and the read side (decodeCityName in lib/event-time.ts, used by
+  // getPublicEventForCity) decodes it before matching.
   const rawCity = geoCity || vercelCity || cfCity || "";
   let city = rawCity;
   try {
-    city = decodeURIComponent(rawCity);
+    city = encodeURIComponent(decodeURIComponent(rawCity));
   } catch {
-    // keep raw value if malformed
+    city = encodeURIComponent(rawCity);
   }
   const country = geoCountry || vercelCountry || cfCountry || "";
 

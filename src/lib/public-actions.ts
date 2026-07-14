@@ -134,13 +134,14 @@ export async function getPublicEvents(): Promise<PublicEvent[]> {
 
     const isFeatured = false;
 
-    // "Past" is judged in the EVENT CITY's local time. Stored times are
-    // wall-clock values labeled as UTC (see src/lib/event-time.ts), so
-    // comparing against plain new Date() would mark events past hours early.
+    // "Past" is judged in the EVENT CITY's local time and only after the
+    // event has ENDED (see src/lib/event-time.ts). Stored times are
+    // wall-clock values labeled as UTC, so comparing against plain
+    // new Date() would mark events past hours early.
     let status = "On Sale";
     if (!event.ticketUrl) {
       status = "Coming Soon";
-    } else if (!isEventUpcoming(event.startTime, event.venueCity || undefined)) {
+    } else if (!isEventUpcoming(event.startTime, event.endTime, event.venueCity || undefined)) {
       status = "Past Event";
     }
 
@@ -221,8 +222,9 @@ export async function getPublicEvents(): Promise<PublicEvent[]> {
 
 export async function getPublicUpcomingEvents(): Promise<PublicEvent[]> {
   const allEvents = await getPublicEvents();
-  // Per-event city-local comparison (see src/lib/event-time.ts).
-  return allEvents.filter(event => isEventUpcoming(event.startTime, event.city));
+  // Per-event city-local comparison; events stay listed until they END
+  // (see src/lib/event-time.ts).
+  return allEvents.filter(event => isEventUpcoming(event.startTime, event.endTime, event.city));
 }
 
 export async function getPublicFeaturedEvent(): Promise<PublicEvent | null> {
@@ -233,11 +235,11 @@ export async function getPublicFeaturedEvent(): Promise<PublicEvent | null> {
     const allEvents = await getPublicEvents();
     console.log(`[getPublicFeaturedEvent] Retrieved ${allEvents.length} public events`);
 
-    // Filter for upcoming events — judged in each event's own city timezone
-    // (stored times are wall-clock labeled as UTC; see src/lib/event-time.ts).
+    // Filter for upcoming/ongoing events — judged in each event's own city
+    // timezone, visible until the event ENDS (see src/lib/event-time.ts).
     const upcomingEvents = allEvents.filter(event => {
-      const isUpcoming = isEventUpcoming(event.startTime, event.city);
-      console.log(`[getPublicFeaturedEvent] Event "${event.title}" (${event.slug}): ${new Date(event.startTime).toISOString()} (${event.city}) - Upcoming: ${isUpcoming}`);
+      const isUpcoming = isEventUpcoming(event.startTime, event.endTime, event.city);
+      console.log(`[getPublicFeaturedEvent] Event "${event.title}" (${event.slug}): ${new Date(event.startTime).toISOString()} (${event.city}) - Upcoming/ongoing: ${isUpcoming}`);
       return isUpcoming;
     });
 
@@ -301,10 +303,10 @@ export async function getPublicEventForCity(cityName: string): Promise<PublicEve
     const allEvents = await getPublicEvents();
     console.log(`[getPublicEventForCity] Retrieved ${allEvents.length} public events`);
 
-    // Filter for upcoming events — judged in each event's own city timezone
-    // (stored times are wall-clock labeled as UTC; see src/lib/event-time.ts).
+    // Filter for upcoming/ongoing events — judged in each event's own city
+    // timezone, visible until the event ENDS (see src/lib/event-time.ts).
     const upcomingEvents = allEvents.filter(event =>
-      isEventUpcoming(event.startTime, event.city)
+      isEventUpcoming(event.startTime, event.endTime, event.city)
     );
 
     console.log(`[getPublicEventForCity] Found ${upcomingEvents.length} upcoming events`);
@@ -451,11 +453,12 @@ export async function getPublicEventBySlug(slug: string): Promise<PublicEvent | 
 
   const { date, year } = formatDateToDisplay(event.startTime);
 
-  // "Past" is judged in the event city's local time (see src/lib/event-time.ts).
+  // "Past" only after the event ENDS, in the event city's local time
+  // (see src/lib/event-time.ts).
   let status = "On Sale";
   if (!event.ticketUrl) {
     status = "Coming Soon";
-  } else if (!isEventUpcoming(event.startTime, event.venueCity || undefined)) {
+  } else if (!isEventUpcoming(event.startTime, event.endTime, event.venueCity || undefined)) {
     status = "Past Event";
   }
 

@@ -142,9 +142,27 @@ export function nowInCityWallClock(city?: string): Date {
   return new Date(formatInTimeZone(new Date(), tz, "yyyy-MM-dd'T'HH:mm:ss'Z'"));
 }
 
-// True while the event's start time is still in the future IN ITS OWN CITY.
-export function isEventUpcoming(startTime: Date | string, city?: string): boolean {
-  return new Date(startTime) > nowInCityWallClock(city);
+// The moment an event stops being shown: its END time in its own city.
+// Guard for legacy data where the end date wasn't bumped past midnight
+// (e.g. start 22:00, end "03:00 the same day" → end <= start): fall back
+// to start + 6 hours so a night event stays visible through the night.
+export function effectiveEventEnd(startTime: Date | string, endTime?: Date | string | null): Date {
+  const start = new Date(startTime);
+  const end = endTime ? new Date(endTime) : null;
+  if (end && end > start) return end;
+  return new Date(start.getTime() + 6 * 60 * 60 * 1000);
+}
+
+// True until the event has ENDED in its own city (upcoming OR ongoing).
+// Events stay in the hero and listings for their entire duration — a party
+// that starts at 22:00 remains featured until close (e.g. 03:00), not
+// hidden the second doors open.
+export function isEventUpcoming(
+  startTime: Date | string,
+  endTime?: Date | string | null,
+  city?: string
+): boolean {
+  return effectiveEventEnd(startTime, endTime) > nowInCityWallClock(city);
 }
 
 // True from the start of the event's calendar day (in its own city) onward —
