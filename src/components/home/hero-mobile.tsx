@@ -143,12 +143,16 @@ export default async function HeroMobile() {
             
             {/* Main poster container */}
             <Link href={`/event/${featuredEvent.slug}`}>
-              <div className="relative aspect-[3/4] overflow-hidden shadow-2xl cursor-pointer">
-                <Image 
+              {/* Dynamic frame — box follows the poster's own aspect ratio
+                  so the artwork is never cropped (see hero-image.tsx). */}
+              <div className="relative overflow-hidden shadow-2xl cursor-pointer">
+                <Image
                   src={featuredEvent.image || ""}
                   alt={featuredEvent.title}
-                  fill
-                  className="object-cover"
+                  width={840}
+                  height={1120}
+                  sizes="100vw"
+                  className="w-full h-auto max-h-[70vh] object-contain"
                   priority
                 />
                 
