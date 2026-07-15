@@ -169,16 +169,16 @@ export function Footer({ hideAbout = false, hideBookings = false, useExternalGal
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-white font-prettywise text-lg mb-1">Nazaara</h3>
-                      <p className="text-xs font-neue-haas text-white/60">Premium Events and Tours Worldwide</p>
+                      <h3 className="text-white font-prettywise text-lg mb-1">NAZAARA</h3>
+                      <p className="text-xs font-neue-haas text-white/60">Artists Tours, Events &amp; Activations Worldwide</p>
                     </div>
                     <div>
                       <h3 className="text-white font-prettywise text-lg mb-1">TAMASHA</h3>
                       <p className="text-xs font-neue-haas text-white/60">Event Series</p>
                     </div>
                     <div>
-                      <h3 className="text-white/40 font-prettywise text-lg mb-1">Coming 2026</h3>
-                      <p className="text-xs font-neue-haas text-white/30">Next Chapter</p>
+                      <h3 className="text-white font-prettywise text-lg mb-1">MANGO SZN</h3>
+                      <p className="text-xs font-neue-haas text-white/60">Event Series</p>
                     </div>
                   </div>
                 </div>

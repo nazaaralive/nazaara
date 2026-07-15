@@ -42,7 +42,7 @@ function generateSlug(text: string): string {
     .replace(/^-+|-+$/g, '')  // Remove leading/trailing hyphens
 }
 
-function SubmitButton({ disabled = false }: { disabled?: boolean }) {
+function SubmitButton({ disabled = false, willBePublished = false }: { disabled?: boolean; willBePublished?: boolean }) {
   const { pending } = useFormStatus()
 
   return (
@@ -59,7 +59,7 @@ function SubmitButton({ disabled = false }: { disabled?: boolean }) {
       ) : (
         <>
           <Save className="h-4 w-4 mr-2" />
-          Create Event
+          {willBePublished ? "Create & Publish" : "Create Draft"}
         </>
       )}
     </Button>
@@ -71,6 +71,7 @@ export function EventForm({ venues, artists }: EventFormProps) {
   const [slug, setSlug] = useState("")
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false)
   const [isTour, setIsTour] = useState<boolean>(false)
+  const [publishChecked, setPublishChecked] = useState(false)
   // Live slug availability: idle | checking | available | taken
   const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "available" | "taken">("idle")
   const [slugSuggestion, setSlugSuggestion] = useState<string | null>(null)
@@ -301,7 +302,7 @@ export function EventForm({ venues, artists }: EventFormProps) {
                   used to sit before this checkbox, so formData.get("isPublished")
                   always returned "" and publish-on-create silently failed.
                   The Radix Checkbox submits "on" by itself when checked. */}
-              <Checkbox id="isPublished" name="isPublished" />
+              <Checkbox id="isPublished" name="isPublished" onCheckedChange={(v) => setPublishChecked(v === true)} />
               <Label htmlFor="isPublished">Published (visible to public)</Label>
             </div>
           </div>
@@ -363,7 +364,7 @@ export function EventForm({ venues, artists }: EventFormProps) {
         </Link>
         {/* Block create while the slug is known-taken (DB has a unique
             constraint anyway — this just fails friendly instead of a 500) */}
-        <SubmitButton disabled={slugStatus === "taken"} />
+        <SubmitButton disabled={slugStatus === "taken"} willBePublished={publishChecked} />
       </div>
     </form>
   )

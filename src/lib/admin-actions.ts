@@ -270,7 +270,14 @@ export async function deleteEvent(formData: FormData) {
   redirect("/admin")
 }
 
-export async function updateEvent(formData: FormData) {
+// Shared persistence core for updateEvent (explicit save/publish) and
+// autosaveEvent (silent draft autosave). When opts.keepPublishState is true
+// the form's Published checkbox is IGNORED and the event's current publish
+// state is preserved — autosave must never publish or unpublish anything.
+async function persistEventFromForm(
+  formData: FormData,
+  opts: { keepPublishState?: boolean } = {}
+): Promise<{ eventId: number; slug: string }> {
   const eventId = parseInt(formData.get("eventId") as string)
   const slug = formData.get("slug") as string
   const title = formData.get("title") as string
@@ -345,9 +352,10 @@ export async function updateEvent(formData: FormData) {
     index++
   }
 
-  // Get the current event to check if image is being replaced
+  // Get the current event to check if image is being replaced (and to
+  // preserve the publish state during autosave)
   const currentEvent = await db
-    .select({ imageKey: events.imageKey, image: events.image })
+    .select({ imageKey: events.imageKey, image: events.image, isPublished: events.isPublished })
     .from(events)
     .where(eq(events.id, eventId))
     .limit(1)
@@ -403,7 +411,7 @@ export async function updateEvent(formData: FormData) {
       imageKey: imageKey || null,
       ticketUrl: ticketUrl || null,
       isTour,
-      isPublished,
+      isPublished: opts.keepPublishState ? (currentEvent[0]?.isPublished ?? false) : isPublished,
       venueId,
     })
     .where(eq(events.id, eventId))
@@ -450,6 +458,12 @@ export async function updateEvent(formData: FormData) {
       )
   }
 
+  return { eventId, slug }
+}
+
+export async function updateEvent(formData: FormData) {
+  const { slug } = await persistEventFromForm(formData)
+
   // Revalidate admin pages
   revalidatePath("/admin")
   revalidatePath(`/admin/events/${slug}`)
@@ -459,6 +473,41 @@ export async function updateEvent(formData: FormData) {
 
   // Stay on the event's edit page after saving (don't bounce to the dashboard)
   redirect(`/admin/events/${slug}?success=event-updated`)
+}
+
+// Silent autosave for DRAFT events, called imperatively from the edit form
+// (no redirect, returns a result object). Refuses to touch published events —
+// their edits go live only via the explicit "Publish changes" button.
+export async function autosaveEvent(formData: FormData): Promise<{
+  ok: boolean
+  reason?: string
+  slug?: string
+}> {
+  try {
+    const eventId = parseInt(formData.get("eventId") as string)
+    if (!eventId) return { ok: false, reason: "invalid" }
+
+    const current = await db
+      .select({ isPublished: events.isPublished })
+      .from(events)
+      .where(eq(events.id, eventId))
+      .limit(1)
+    if (!current[0]) return { ok: false, reason: "not-found" }
+    if (current[0].isPublished) return { ok: false, reason: "published" }
+
+    // Incomplete mid-edit states (e.g. cleared title) simply skip this cycle.
+    const slug = formData.get("slug") as string
+    const title = formData.get("title") as string
+    if (!slug || !title) return { ok: false, reason: "incomplete" }
+
+    const result = await persistEventFromForm(formData, { keepPublishState: true })
+    revalidatePath("/admin")
+    revalidatePath(`/admin/events/${result.slug}`)
+    return { ok: true, slug: result.slug }
+  } catch (error) {
+    console.error("autosaveEvent failed:", error)
+    return { ok: false, reason: "error" }
+  }
 }
 
 

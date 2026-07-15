@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useFormStatus } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,7 +11,7 @@ import { EventDatePicker } from "@/components/admin/event-date-picker"
 import { VenueSelector } from "@/components/admin/venue-selector"
 import { ImageUpload } from "@/components/admin/image-upload"
 import { ArtistSelector } from "@/components/admin/artist-selector"
-import { updateEvent } from "@/lib/admin-actions"
+import { updateEvent, autosaveEvent } from "@/lib/admin-actions"
 import { DeleteEventForm } from "@/components/admin/delete-event-form"
 import { Save, Calendar, Clock, Loader2 } from "lucide-react"
 import Link from "next/link"
@@ -72,24 +72,24 @@ function generateSlug(text: string): string {
     .replace(/^-+|-+$/g, '')   // Remove leading/trailing hyphens
 }
 
-function SubmitButton() {
+function SubmitButton({ willBePublished }: { willBePublished: boolean }) {
   const { pending } = useFormStatus()
-  
+
   return (
-    <Button 
-      type="submit" 
+    <Button
+      type="submit"
       disabled={pending}
       className="bg-[--gold] text-[--maroon-red] hover:bg-[--gold]/90 font-semibold px-6 py-2.5 shadow-lg hover:shadow-xl border border-[--gold] hover:border-[--dark-gold] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {pending ? (
         <>
           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          Saving...
+          {willBePublished ? "Publishing..." : "Saving..."}
         </>
       ) : (
         <>
           <Save className="h-4 w-4 mr-2" />
-          Save Changes
+          {willBePublished ? "Publish Changes" : "Save Draft"}
         </>
       )}
     </Button>
@@ -101,6 +101,76 @@ export function EventEditForm({ event, venues, artists }: EventEditFormProps) {
   const [slug, setSlug] = useState(event.slug)
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(true) // Default to true for existing events
   const [isTour, setIsTour] = useState<boolean>(event.isTour)
+  // Live mirror of the Published checkbox (drives the submit button label)
+  const [publishChecked, setPublishChecked] = useState<boolean>(event.isPublished)
+
+  // ── Autosave (drafts only) ────────────────────────────────────
+  // Any input/change inside the form schedules a debounced autosave. Only
+  // DRAFT events autosave — published events require the explicit
+  // "Publish Changes" click so half-finished edits never go live.
+  const formRef = useRef<HTMLFormElement>(null)
+  const isDraft = !event.isPublished
+  const [saveState, setSaveState] = useState<"idle" | "dirty" | "saving" | "saved" | "error">("idle")
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const savingRef = useRef(false)
+
+  const runAutosave = useCallback(async () => {
+    if (!formRef.current || savingRef.current) return
+    savingRef.current = true
+    setSaveState("saving")
+    try {
+      const fd = new FormData(formRef.current)
+      const result = await autosaveEvent(fd)
+      if (result.ok) {
+        setSaveState("saved")
+        // Keep the URL in sync if the slug changed mid-edit
+        if (result.slug && result.slug !== event.slug) {
+          window.history.replaceState({}, "", `/admin/events/${result.slug}`)
+        }
+      } else if (result.reason === "incomplete") {
+        setSaveState("dirty") // required field mid-edit; retry on next change
+      } else {
+        setSaveState("error")
+      }
+    } catch {
+      setSaveState("error")
+    } finally {
+      savingRef.current = false
+    }
+  }, [event.slug])
+
+  const scheduleAutosave = useCallback(() => {
+    setSaveState(prev => (prev === "saving" ? prev : "dirty"))
+    if (!isDraft) return // published events: track dirty only, no silent saves
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(runAutosave, 2000)
+  }, [isDraft, runAutosave])
+
+  useEffect(() => {
+    const form = formRef.current
+    if (!form) return
+    const handler = () => scheduleAutosave()
+    form.addEventListener("input", handler)
+    form.addEventListener("change", handler)
+    return () => {
+      form.removeEventListener("input", handler)
+      form.removeEventListener("change", handler)
+      if (saveTimer.current) clearTimeout(saveTimer.current)
+    }
+  }, [scheduleAutosave])
+
+  // Warn before leaving with unsaved changes (published events have no
+  // autosave, and drafts may have a save still pending).
+  useEffect(() => {
+    const warn = (e: BeforeUnloadEvent) => {
+      if (saveState === "dirty" || saveState === "saving") {
+        e.preventDefault()
+        e.returnValue = ""
+      }
+    }
+    window.addEventListener("beforeunload", warn)
+    return () => window.removeEventListener("beforeunload", warn)
+  }, [saveState])
 
   // Only auto-generate if slug is empty and not manually edited
   useEffect(() => {
@@ -153,7 +223,16 @@ export function EventEditForm({ event, venues, artists }: EventEditFormProps) {
   }
 
   return (
-    <form action={updateEvent}>
+    <form
+      ref={formRef}
+      action={updateEvent}
+      onSubmit={() => {
+        // Explicit save/publish in flight — cancel pending autosave and clear
+        // the dirty flag so the leave-warning doesn't fire on the redirect.
+        if (saveTimer.current) clearTimeout(saveTimer.current)
+        setSaveState("idle")
+      }}
+    >
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Left Column - Form Fields (2/3 width) */}
         <div className="lg:col-span-2 space-y-8">
@@ -335,13 +414,19 @@ export function EventEditForm({ event, venues, artists }: EventEditFormProps) {
               <Label htmlFor="isTour">This is a tour (multiple cities)</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="isPublished" 
-                name="isPublished" 
+              <Checkbox
+                id="isPublished"
+                name="isPublished"
                 defaultChecked={event.isPublished}
+                onCheckedChange={(v) => setPublishChecked(v === true)}
               />
               <Label htmlFor="isPublished">Published (visible to public)</Label>
             </div>
+            {isDraft && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Draft mode: your edits autosave automatically. Publishing requires the button below.
+              </p>
+            )}
           </div>
 
           {/* Event Schedule Info */}
@@ -382,13 +467,20 @@ export function EventEditForm({ event, venues, artists }: EventEditFormProps) {
       {/* Actions - Full Width */}
       <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-4 pt-8 mt-8 border-t border-border">
         <DeleteEventForm eventId={event.id} />
-        <div className="flex gap-3 justify-end">
+        <div className="flex gap-3 justify-end items-center">
+          {/* Autosave / unsaved-changes status */}
+          <span className="text-xs text-muted-foreground" aria-live="polite">
+            {saveState === "saving" && (<span className="inline-flex items-center gap-1"><Loader2 className="h-3 w-3 animate-spin" /> Saving…</span>)}
+            {saveState === "saved" && <span className="text-green-500">✓ Draft saved</span>}
+            {saveState === "dirty" && (isDraft ? "Unsaved changes…" : "Unpublished changes")}
+            {saveState === "error" && <span className="text-red-400">Autosave failed — use the button</span>}
+          </span>
           <Link href="/admin">
             <Button variant="outline">
               Cancel
             </Button>
           </Link>
-          <SubmitButton />
+          <SubmitButton willBePublished={publishChecked} />
         </div>
       </div>
     </form>
