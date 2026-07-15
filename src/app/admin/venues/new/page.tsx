@@ -2,10 +2,8 @@ import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft } from "lucide-react"
+import { VenueLocationFields } from "@/components/admin/venue-location-fields"
 import Link from "next/link"
 import { createVenue } from "@/lib/admin-actions"
 import { MultiImageUpload } from "@/components/admin/multi-image-upload"
@@ -41,79 +39,9 @@ export default async function NewVenuePage() {
 
         <form action={createVenue}>
           <div className="grid gap-8 lg:grid-cols-2">
-            {/* Left Column - Form Fields */}
+            {/* Left Column - Form Fields (with Google Places autocomplete) */}
             <div className="space-y-8">
-              {/* Basic Information */}
-              <div>
-                <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Venue Name *</Label>
-                    <Input 
-                      id="name" 
-                      name="name" 
-                      required 
-                      placeholder="Fortune Sound Club"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea 
-                      id="description" 
-                      name="description" 
-                      rows={3}
-                      placeholder="A premier nightclub known for its state-of-the-art sound system..."
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Location */}
-              <div>
-                <h2 className="text-lg font-semibold mb-4">Location</h2>
-                <div className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="city">City *</Label>
-                      <Input 
-                        id="city" 
-                        name="city" 
-                        required 
-                        placeholder="Vancouver"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="country">Country *</Label>
-                      <Input 
-                        id="country" 
-                        name="country" 
-                        required 
-                        placeholder="Canada"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Street Address</Label>
-                    <Input 
-                      id="address" 
-                      name="address" 
-                      placeholder="147 E Pender St"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="addressUrl">Directions URL</Label>
-                    <Input 
-                      id="addressUrl" 
-                      name="addressUrl" 
-                      placeholder="https://maps.google.com/..."
-                    />
-                  </div>
-                </div>
-              </div>
+              <VenueLocationFields />
             </div>
 
             {/* Right Column - Images */}

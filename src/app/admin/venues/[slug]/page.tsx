@@ -2,10 +2,8 @@ import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Save, MapPin, Calendar } from "lucide-react"
+import { VenueLocationFields } from "@/components/admin/venue-location-fields"
 import { getVenueBySlug, updateVenue, deleteVenue } from "@/lib/admin-actions"
 import Link from "next/link"
 import { SuccessToast } from "@/components/admin/success-toast"
@@ -101,86 +99,17 @@ export default async function VenueEditPage({ params }: PageProps) {
             <div className="space-y-8">
               <input type="hidden" name="venueId" value={venue.id} />
               
-              {/* Basic Information */}
-              <div>
-                <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Venue Name *</Label>
-                    <Input 
-                      id="name" 
-                      name="name" 
-                      defaultValue={venue.name} 
-                      required 
-                      className="bg-background"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea 
-                      id="description" 
-                      name="description" 
-                      defaultValue={venue.description || ""} 
-                      rows={3}
-                      placeholder="A brief description of the venue"
-                      className="bg-background resize-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Location */}
-              <div>
-                <h2 className="text-lg font-semibold mb-4">Location</h2>
-                <div className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="city">City *</Label>
-                      <Input 
-                        id="city" 
-                        name="city" 
-                        defaultValue={venue.city} 
-                        required 
-                        className="bg-background"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="country">Country *</Label>
-                      <Input 
-                        id="country" 
-                        name="country" 
-                        defaultValue={venue.country} 
-                        required 
-                        className="bg-background"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Street Address</Label>
-                    <Input 
-                      id="address" 
-                      name="address" 
-                      defaultValue={venue.address || ""} 
-                      placeholder="123 Main Street"
-                      className="bg-background"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="addressUrl">Directions URL</Label>
-                    <Input 
-                      id="addressUrl" 
-                      name="addressUrl" 
-                      defaultValue={venue.addressUrl || ""} 
-                      placeholder="https://maps.google.com/..."
-                      className="bg-background"
-                    />
-                  </div>
-                </div>
-              </div>
+              {/* Basic Information + Location (with Google Places autocomplete) */}
+              <VenueLocationFields
+                defaults={{
+                  name: venue.name,
+                  description: venue.description || "",
+                  city: venue.city,
+                  country: venue.country,
+                  address: venue.address || "",
+                  addressUrl: venue.addressUrl || "",
+                }}
+              />
 
               {/* Venue Info */}
               <div>
