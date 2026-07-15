@@ -27,34 +27,35 @@ interface VenueDefaults {
   addressUrl?: string
 }
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  interface Window { google?: any }
-}
+// NOTE: do NOT `declare global { interface Window { google … } }` here —
+// the project already declares Window.google elsewhere (Google One Tap
+// types) and a second declaration with a different type fails the build.
+// We cast locally instead.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const win = (): any => window as any
 
-// Official Google Maps JS bootstrap loader (importLibrary), guarded so it
-// only ever runs once per page.
-function loadGoogleMaps(apiKey: string) {
-  if (typeof window === "undefined") return
-  if (window.google?.maps?.importLibrary) return
-  /* eslint-disable */
-  ;((g: any) => {
-    var h: any, a: any, k: any, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b: any = window
-    b = b[c] || (b[c] = {})
-    var d = b.maps || (b.maps = {}), r = new Set(), e = new URLSearchParams(), u = () => h || (h = new Promise(async (f, n) => {
-      await (a = m.createElement("script"))
-      e.set("libraries", [...r] + "")
-      for (k in g) e.set(k.replace(/[A-Z]/g, (t: string) => "_" + t[0].toLowerCase()), g[k])
-      e.set("callback", c + ".maps." + q)
-      a.src = `https://maps.${c}apis.com/maps/api/js?` + e
-      d[q] = f
-      a.onerror = () => (h = n(Error(p + " could not load.")))
-      a.nonce = (m.querySelector("script[nonce]") as any)?.nonce || ""
-      m.head.append(a)
-    }))
-    d[l] ? console.warn(p + " only loads once. Ignoring:", g) : (d[l] = (f: any, ...n: any[]) => r.add(f) && u().then(() => d[l](f, ...n)))
-  })({ key: apiKey, v: "weekly" })
-  /* eslint-enable */
+// Load the Google Maps JS API (with the Places library) exactly once via a
+// classic callback script tag. After it resolves, window.google.maps
+// (including importLibrary) is available.
+let gmapsPromise: Promise<void> | null = null
+function loadGoogleMaps(apiKey: string): Promise<void> {
+  if (typeof window === "undefined") return Promise.resolve()
+  if (win().google?.maps?.importLibrary) return Promise.resolve()
+  if (gmapsPromise) return gmapsPromise
+  gmapsPromise = new Promise<void>((resolve, reject) => {
+    win().__gmapsReady = () => resolve()
+    const script = document.createElement("script")
+    script.src =
+      "https://maps.googleapis.com/maps/api/js" +
+      `?key=${encodeURIComponent(apiKey)}&v=weekly&libraries=places&callback=__gmapsReady`
+    script.async = true
+    script.onerror = () => {
+      gmapsPromise = null
+      reject(new Error("The Google Maps JavaScript API could not load."))
+    }
+    document.head.appendChild(script)
+  })
+  return gmapsPromise
 }
 
 export function VenueLocationFields({ defaults = {} }: { defaults?: VenueDefaults }) {
@@ -76,8 +77,8 @@ export function VenueLocationFields({ defaults = {} }: { defaults?: VenueDefault
 
     async function init() {
       try {
-        loadGoogleMaps(apiKey as string)
-        const { PlaceAutocompleteElement } = await window.google.maps.importLibrary("places")
+        await loadGoogleMaps(apiKey as string)
+        const { PlaceAutocompleteElement } = await win().google.maps.importLibrary("places")
         if (cancelled || !searchSlotRef.current) return
         searchSlotRef.current.innerHTML = ""
         const el = new PlaceAutocompleteElement()
