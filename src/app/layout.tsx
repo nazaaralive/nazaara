@@ -4,6 +4,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { PostHogAnalytics } from "@/components/analytics/posthog-provider";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "@/app/api/uploadthing/core";
@@ -204,6 +205,7 @@ export default async function RootLayout({
           externalGalleryUrl={settings.externalGalleryUrl}
         />
         <Analytics />
+        <PostHogAnalytics />
         <Toaster />
       </body>
     </html>
