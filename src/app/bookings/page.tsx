@@ -596,7 +596,7 @@ export default function BookingsPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                       </svg>
                     </div>
-                    <h3 className="heading-section text-[var(--off-white)]">Shukriya!</h3>
+                    <h3 className="heading-section text-[var(--off-white)]">Thank You</h3>
                     <p className="font-neue-haas text-[var(--off-white)]/70 max-w-sm mx-auto leading-relaxed">
                       Your inquiry is in. We&apos;ll come back within 24 hours with availability and ideas.
                     </p>
