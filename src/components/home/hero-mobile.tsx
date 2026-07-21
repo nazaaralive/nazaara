@@ -64,7 +64,7 @@ export default async function HeroMobile() {
             <div className="w-12 h-[1px]" style={{ backgroundColor: 'var(--gold)', opacity: 0.6 }} />
           </div>
 
-          <h2 className="font-neue-haas font-bold uppercase text-4xl text-white leading-tight tracking-tight">
+          <h2 className="font-prettywise text-5xl text-white leading-tight">
             New Events<br />Coming Soon
           </h2>
 
@@ -134,9 +134,10 @@ export default async function HeroMobile() {
           </div>
         </div>
 
-        {/* Creative poster layout */}
-        <div className="relative px-6 pb-6">
-          <div className="relative">
+        {/* Creative poster layout — frame shrink-wraps the image so there
+            are no empty side margins regardless of poster aspect ratio */}
+        <div className="relative px-6 pb-6 flex justify-center">
+          <div className="relative inline-block">
             {/* Artistic torn paper effect background */}
             <div className="absolute inset-0 -rotate-1 scale-105" style={{ backgroundColor: 'var(--white)', opacity: 0.03 }} />
             <div className="absolute inset-0 rotate-1 scale-102" style={{ backgroundColor: 'var(--gold)', opacity: 0.02 }} />
@@ -152,7 +153,7 @@ export default async function HeroMobile() {
                   width={840}
                   height={1120}
                   sizes="100vw"
-                  className="w-full h-auto max-h-[52svh] object-contain"
+                  className="w-auto h-auto max-h-[55svh] max-w-full object-contain"
                   priority
                 />
 
@@ -167,24 +168,24 @@ export default async function HeroMobile() {
                   opacity: 0.15,
                   clipPath: 'polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%)'
                 }} />
-
-                {/* Floating date element - separate from image */}
-                <div className="absolute -bottom-4 -right-4 w-16 h-16 flex items-center justify-center" style={{
-                  backgroundColor: 'var(--maroon-red)',
-                  border: '2px solid var(--gold)',
-                  borderRadius: '50%'
-                }}>
-                  <div className="text-center">
-                    <p className="font-prettywise text-xl leading-none" style={{ color: 'var(--gold)' }}>
-                      {day}
-                    </p>
-                    <p className="font-neue-haas text-[7px] uppercase tracking-wider" style={{ color: 'var(--white)', opacity: 0.7 }}>
-                      {month}
-                    </p>
-                  </div>
-                </div>
               </div>
             </Link>
+
+            {/* Floating date element - anchored to the shrink-wrapped frame */}
+            <div className="absolute -bottom-4 -right-4 w-16 h-16 flex items-center justify-center z-10" style={{
+              backgroundColor: 'var(--maroon-red)',
+              border: '2px solid var(--gold)',
+              borderRadius: '50%'
+            }}>
+              <div className="text-center">
+                <p className="font-prettywise text-xl leading-none" style={{ color: 'var(--gold)' }}>
+                  {day}
+                </p>
+                <p className="font-neue-haas text-[7px] uppercase tracking-wider" style={{ color: 'var(--white)', opacity: 0.7 }}>
+                  {month}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -219,7 +220,7 @@ export default async function HeroMobile() {
                         href={href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block font-neue-haas text-lg font-medium tracking-wide hover:text-[var(--gold)] transition-colors"
+                        className="block font-prettywise text-2xl hover:text-[var(--gold)] transition-colors"
                         style={{ color: 'var(--white)', opacity: 0.9 - index * 0.1 }}
                       >
                         {name}
@@ -227,7 +228,7 @@ export default async function HeroMobile() {
                     ) : (
                       <p
                         key={index}
-                        className="font-neue-haas text-lg font-medium tracking-wide"
+                        className="font-prettywise text-2xl"
                         style={{ color: 'var(--white)', opacity: 0.9 - index * 0.1 }}
                       >
                         {name}
@@ -254,7 +255,7 @@ export default async function HeroMobile() {
                           href={mapsHref}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-neue-haas text-lg font-medium hover:text-[var(--gold)] transition-colors"
+                          className="font-prettywise text-xl hover:text-[var(--gold)] transition-colors"
                           style={{ color: 'var(--white)' }}
                         >
                           {featuredEvent.venue}
@@ -273,7 +274,7 @@ export default async function HeroMobile() {
                   })()}
                 </div>
                 <div className="text-right">
-                  <p className="font-neue-haas text-2xl font-bold" style={{ color: 'var(--gold)' }}>
+                  <p className="font-prettywise text-3xl" style={{ color: 'var(--gold)' }}>
                     {startTimeStr}
                   </p>
                   <p className="font-neue-haas text-[10px] uppercase tracking-[0.3em]" style={{ color: 'var(--white)', opacity: 0.5 }}>
