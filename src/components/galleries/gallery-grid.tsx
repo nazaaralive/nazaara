@@ -72,16 +72,6 @@ export function GalleryGrid({ galleries }: GalleryGridProps) {
 
               {/* Premium frame effect */}
               <div className="absolute inset-0 border border-[color:var(--gold)]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-              {/* City tag */}
-              {gallery.city && (
-                <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm border border-[color:var(--gold)]/20 px-2.5 py-1">
-                  <MapPin className="h-3 w-3 text-[color:var(--gold)]/70" />
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-[color:var(--gold)]">
-                    {gallery.city}
-                  </span>
-                </div>
-              )}
             </div>
 
             {/* Content */}
@@ -90,9 +80,17 @@ export function GalleryGrid({ galleries }: GalleryGridProps) {
                 {gallery.title}
               </h3>
               
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4 text-[color:var(--gold)]/60" />
-                <span className="font-light tracking-wide">{formatDate(gallery.date)}</span>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-[color:var(--gold)]/60" />
+                  <span className="font-light tracking-wide">{formatDate(gallery.date)}</span>
+                </div>
+                {gallery.city && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-[color:var(--gold)]/60" />
+                    <span className="font-light tracking-wide">{gallery.city}</span>
+                  </div>
+                )}
               </div>
               
               {/* Subtle accent line */}
