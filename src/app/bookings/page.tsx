@@ -437,12 +437,18 @@ export default function BookingsPage() {
 
               {/* Right Form - Enhanced Design */}
               <div className="relative">
-                {/* Premium form container with subtle gradient background */}
-                <div className="relative bg-gradient-to-br from-[var(--maroon-red)]/10 via-transparent to-[var(--dark-green)]/5 sm:p-12 backdrop-blur-sm">
+                {/* Card flip container: form on the front, thank-you on the back */}
+                <div className="relative [perspective:1400px]">
+                  <div
+                    className={`relative transition-transform duration-700 [transform-style:preserve-3d] ${
+                      contactSubmit.isSuccess ? "[transform:rotateY(180deg)]" : ""
+                    }`}
+                  >
+                {/* Front — premium form container with subtle gradient background */}
+                <div className="relative [backface-visibility:hidden] bg-gradient-to-br from-[var(--maroon-red)]/10 via-transparent to-[var(--dark-green)]/5 sm:p-12 backdrop-blur-sm">
 
                   <form
                     className="space-y-8"
-                    noValidate
                     onSubmit={async (e) => {
                       e.preventDefault();
                       if (!web3FormsKey) {
@@ -511,6 +517,7 @@ export default function BookingsPage() {
                           <input
                             name={index === 0 ? "event_type" : "event_date"}
                             type={field.type}
+                            required
                             className="w-full px-0 pt-6 pb-3 bg-transparent border-0 border-b border-[var(--gold)]/30 text-[var(--off-white)] placeholder:text-[var(--off-white)]/20 focus:border-[var(--gold)]/60 focus:outline-none transition-all duration-300 font-neue-haas text-lg"
                             placeholder={field.placeholder}
                           />
@@ -528,6 +535,7 @@ export default function BookingsPage() {
                           <input
                             name={index === 0 ? "event_location" : "expected_guests"}
                             type={field.type}
+                            required
                             className="w-full px-0 pt-6 pb-3 bg-transparent border-0 border-b border-[var(--gold)]/30 text-[var(--off-white)] placeholder:text-[var(--off-white)]/20 focus:border-[var(--gold)]/60 focus:outline-none transition-all duration-300 font-neue-haas text-lg"
                             placeholder={field.placeholder}
                           />
@@ -555,7 +563,7 @@ export default function BookingsPage() {
                     <div className="pt-8 space-y-6">
                       {/* Privacy Note */}
                       <p className="text-[10px] font-neue-haas text-[var(--off-white)]/30 tracking-wider">
-                        {contactSubmit.isSuccess ? "Thanks! We'll be in touch shortly." : contactFormContent.privacyNote}
+                        {contactFormContent.privacyNote}
                       </p>
 
                       {/* Submit Button */}
@@ -578,6 +586,30 @@ export default function BookingsPage() {
                       )}
                     </div>
                   </form>
+                </div>
+
+                {/* Back — thank-you card */}
+                <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center border border-[var(--gold)]/20 bg-gradient-to-br from-[var(--maroon-red)]/20 via-transparent to-[var(--dark-green)]/10 backdrop-blur-sm">
+                  <div className="text-center px-8 space-y-6">
+                    <div className="mx-auto w-16 h-16 rounded-full border-2 border-[var(--gold)] flex items-center justify-center">
+                      <svg className="w-8 h-8 text-[var(--gold)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                    </div>
+                    <h3 className="heading-section text-[var(--off-white)]">Shukriya!</h3>
+                    <p className="font-neue-haas text-[var(--off-white)]/70 max-w-sm mx-auto leading-relaxed">
+                      Your inquiry is in. We&apos;ll come back within 24 hours with availability and ideas.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setContactSubmit({ isSubmitting: false, isSuccess: false, errorMessage: null })}
+                      className="text-[10px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]/60 hover:text-[var(--gold)] transition-colors cursor-pointer"
+                    >
+                      Send another inquiry
+                    </button>
+                  </div>
+                </div>
+                  </div>
                 </div>
 
                 {/* Subtle background pattern */}
