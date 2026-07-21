@@ -592,3 +592,41 @@ export async function getPublicGalleryBySlug(slug: string): Promise<PublicGaller
     })),
   };
 }
+
+// ============================================================
+// ALUMNI
+// ============================================================
+
+export interface PublicAlumnus {
+  id: number;
+  slug: string;
+  name: string;
+  instagram: string | null;
+  soundcloud: string | null;
+  image: string | null;
+}
+
+/**
+ * Artists who have performed at a published Nazaara event that has
+ * already ended. Derived automatically from the events_artists junction —
+ * no separate alumni table or manual curation needed. Adding an artist to
+ * a past event puts them on /alumni; nothing else to maintain.
+ */
+export async function getPublicAlumni(): Promise<PublicAlumnus[]> {
+  const rows = await db
+    .selectDistinct({
+      id: artists.id,
+      slug: artists.slug,
+      name: artists.name,
+      instagram: artists.instagram,
+      soundcloud: artists.soundcloud,
+      image: artists.image,
+    })
+    .from(artists)
+    .innerJoin(eventsArtists, eq(eventsArtists.artistId, artists.id))
+    .innerJoin(events, eq(events.id, eventsArtists.eventId))
+    .where(and(eq(events.isPublished, true), sql`${events.endTime} < now()`))
+    .orderBy(asc(artists.name));
+
+  return rows;
+}

@@ -117,6 +117,26 @@ export function Navigation({
                 />
               </Link>
             )}
+            <Link
+              href="/alumni"
+              aria-current={isCurrent("/alumni") ? "page" : undefined}
+              className={cn(
+                "relative group text-sm uppercase tracking-[0.2em] font-light transition-colors",
+                isCurrent("/alumni")
+                  ? "text-primary"
+                  : "text-foreground/80 hover:text-primary"
+              )}
+            >
+              <span>Alumni</span>
+              <span
+                className={cn(
+                  "pointer-events-none absolute -bottom-1 left-0 h-px bg-primary transition-all duration-300",
+                  isCurrent("/alumni")
+                    ? "w-full opacity-90"
+                    : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"
+                )}
+              />
+            </Link>
             {useExternalGallery ? (
               <a
                 href={externalGalleryUrl || "https://tamasha.myportfolio.com/"}
@@ -255,6 +275,19 @@ export function Navigation({
                 Bookings
               </Link>
             )}
+            <Link
+              href="/alumni"
+              onClick={() => setOpen(false)}
+              className={cn(
+                "block rounded-md px-3 py-3 text-base uppercase tracking-[0.18em] transition-colors",
+                isCurrent("/alumni")
+                  ? "text-primary bg-primary/10"
+                  : "text-foreground/90 hover:bg-muted/30 hover:text-primary"
+              )}
+              aria-current={isCurrent("/alumni") ? "page" : undefined}
+            >
+              Alumni
+            </Link>
             {useExternalGallery ? (
               <a
                 href={externalGalleryUrl || "https://tamasha.myportfolio.com/"}
