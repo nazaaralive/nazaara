@@ -112,7 +112,7 @@ export default async function GalleryPage({ params }: PageProps) {
 
             {/* Gallery info */}
             <div className="space-y-6 max-w-4xl">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-light text-[color:var(--off-white)] tracking-tight leading-tight">
+              <h1 className="heading-display font-light text-[color:var(--off-white)] tracking-tight leading-tight">
                 {gallery.title}
               </h1>
               

@@ -46,7 +46,7 @@ export default function AboutPage() {
               <div className="w-8 sm:w-12 h-px bg-[var(--gold)]" />
             </div>
             
-            <h1 className="text-3xl sm:text-5xl md:text-7xl font-serif font-light text-foreground mb-4 sm:mb-6">
+            <h1 className="heading-display font-light text-foreground mb-4 sm:mb-6">
               {heroContent.mainHeading}
               <span className="block font-serif italic text-[var(--gold)] mt-2">{heroContent.subHeading}</span>
             </h1>
@@ -70,7 +70,7 @@ export default function AboutPage() {
                 <span className="text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[var(--gold)] font-light">{storyContent.sectionTitle}</span>
               </div>
               
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-light text-foreground mb-4 sm:mb-6">
+              <h2 className="heading-section font-light text-foreground mb-4 sm:mb-6">
                 {storyContent.heading}
                 <span className="block font-serif italic text-[var(--gold)]">{storyContent.subHeading}</span>
               </h2>
@@ -128,7 +128,7 @@ export default function AboutPage() {
                 <div className="w-6 sm:w-8 h-px bg-[var(--gold)]" />
                 <span className="text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[var(--gold)] font-light">{brandsContent.sectionTitle}</span>
               </div>
-              <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif font-light text-foreground">
+              <h2 className="heading-display font-light text-foreground">
                 {brandsContent.heading} <span className="font-serif italic text-[var(--gold)]">{brandsContent.subHeading}</span>
               </h2>
             </div>
@@ -229,7 +229,7 @@ export default function AboutPage() {
                 <div className="w-6 sm:w-8 h-px bg-[var(--gold)]" />
               </div>
               
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-light text-foreground">
+              <h2 className="heading-section font-light text-foreground">
                 Milestones That
                 <span className="block font-serif italic text-[var(--gold)]">Define Us</span>
               </h2>
@@ -318,7 +318,7 @@ export default function AboutPage() {
                 <div className="w-6 sm:w-8 h-px bg-[var(--gold)]" />
               </div>
               
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-light text-foreground mb-4 sm:mb-6">
+              <h2 className="heading-section font-light text-foreground mb-4 sm:mb-6">
                 Partner With
                 <span className="block font-serif italic text-[var(--gold)]">Excellence</span>
               </h2>

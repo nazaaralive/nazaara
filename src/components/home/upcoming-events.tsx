@@ -226,7 +226,7 @@ export default async function UpcomingEvents() {
             </div>
 
             {/* Main heading */}
-            <h2 className="font-prettywise text-4xl md:text-5xl lg:text-6xl text-[var(--white)] leading-tight">
+            <h2 className="heading-section text-[var(--white)] leading-tight">
               More Shows<br />Coming Soon
             </h2>
 

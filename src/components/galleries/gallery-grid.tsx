@@ -76,7 +76,7 @@ export function GalleryGrid({ galleries }: GalleryGridProps) {
 
             {/* Content */}
             <div className="p-6 space-y-4">
-              <h3 className="text-xl lg:text-2xl font-serif font-light text-foreground group-hover:text-[color:var(--gold)] transition-colors duration-500 leading-tight">
+              <h3 className="heading-card font-light text-foreground group-hover:text-[color:var(--gold)] transition-colors duration-500 leading-tight">
                 {gallery.title}
               </h3>
               

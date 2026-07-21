@@ -25,7 +25,7 @@ export default async function AlumniPage() {
               </span>
               <div className="w-16 h-px bg-[var(--gold)]/20" />
             </div>
-            <h1 className="text-[clamp(4rem,8vw,8rem)] font-prettywise leading-[0.9] text-[var(--off-white)] mb-4">
+            <h1 className="heading-display text-[var(--off-white)] mb-4">
               <span className="text-[var(--gold)]">Alumni</span>
             </h1>
             <p className="text-xs md:text-sm font-neue-haas uppercase tracking-[0.3em] text-[var(--off-white)]/60 max-w-2xl mx-auto">

@@ -79,7 +79,7 @@ export default function BookingsPage() {
           <div className="max-w-5xl">
 
             {/* Main Title */}
-            <h1 className="text-[clamp(4rem,10vw,10rem)] font-prettywise leading-[0.8] text-[var(--off-white)] mb-8">
+            <h1 className="heading-display text-[var(--off-white)] mb-8">
               {heroContent.title}
               <span className="block text-[var(--gold)]">{heroContent.subtitle}</span>
             </h1>
@@ -131,7 +131,7 @@ export default function BookingsPage() {
                 </span>
                 <div className="w-16 h-px bg-[var(--gold)]/20" />
               </div>
-              <h2 className="text-[clamp(3rem,6vw,6rem)] font-prettywise leading-[0.9] mb-6">
+              <h2 className="heading-section mb-6">
                 <span className="text-[var(--gold)]">{djRosterContent.heading}</span>
               </h2>
               <p className="text-lg font-neue-haas text-[var(--off-white)]/60 max-w-2xl mx-auto">
@@ -202,7 +202,7 @@ export default function BookingsPage() {
                     <div className="relative">
                       {/* Name and specialty */}
                       <div className="border-t border-[var(--gold)]/10 pt-6 pb-4">
-                        <h3 className="text-2xl font-prettywise text-[var(--off-white)] mb-3">
+                        <h3 className="heading-card text-[var(--off-white)] mb-3">
                           {dj.name}
                         </h3>
                         <p className="text-sm font-neue-haas text-[var(--gold)]/60 tracking-wide">
@@ -260,7 +260,7 @@ export default function BookingsPage() {
                                 {/* Bio Text */}
                                 <div className="lg:col-span-2 space-y-6">
                                   <div>
-                                    <h3 className="text-2xl font-prettywise text-[var(--gold)] mb-4">
+                                    <h3 className="heading-card text-[var(--gold)] mb-4">
                                       About {dj.name}
                                     </h3>
                                     <p className="text-base font-neue-haas text-[var(--off-white)]/70 leading-relaxed">
@@ -355,7 +355,7 @@ export default function BookingsPage() {
                 <div className="w-8 h-px bg-[var(--gold)]/40" />
               </div>
 
-              <h2 className="text-[clamp(3rem,5vw,5rem)] font-prettywise leading-[0.9] text-[var(--off-white)] mb-8">
+              <h2 className="heading-section text-[var(--off-white)] mb-8">
                 {privateEventsContent.heading}
                 <span className="block text-[var(--gold)]">{privateEventsContent.subHeading}</span>
               </h2>
@@ -402,7 +402,7 @@ export default function BookingsPage() {
                   </span>
                 </div>
 
-                <h2 className="text-[clamp(3rem,5vw,5rem)] font-prettywise leading-[0.9] text-[var(--off-white)] mb-8">
+                <h2 className="heading-section text-[var(--off-white)] mb-8">
                   {contactFormContent.heading}
                   <span className="block text-[var(--gold)]">{contactFormContent.subHeading}</span>
                 </h2>

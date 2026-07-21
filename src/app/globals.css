@@ -126,6 +126,33 @@
   --sidebar-ring: var(--gold);
 }
 
+/* ============================================================
+   Heading scale — one consistent Prettywise ramp for the whole
+   site. Three tiers, each ~1.55x apart, all fluid via clamp so
+   mobile and desktop stay proportional. Use these instead of
+   ad-hoc text-[clamp(...)] sizes.
+   ============================================================ */
+@layer components {
+  /* Page titles (h1): Alumni, Curated Excellence, gallery titles */
+  .heading-display {
+    font-family: var(--font-prettywise);
+    font-size: clamp(2.75rem, 6vw, 5.5rem);
+    line-height: 0.95;
+  }
+  /* Section titles (h2): Artist Roster, Next Up, Beyond Extraordinary */
+  .heading-section {
+    font-family: var(--font-prettywise);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1;
+  }
+  /* Card / sub titles (h3): album cards, DJ names */
+  .heading-card {
+    font-family: var(--font-prettywise);
+    font-size: clamp(1.375rem, 2vw, 1.75rem);
+    line-height: 1.15;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -15,8 +15,8 @@ export default function SectionHeader({
 }: SectionHeaderProps) {
   const titleSize =
     size === "lg"
-      ? "text-[clamp(4rem,8vw,8rem)]"
-      : "text-[clamp(2.5rem,5vw,4rem)]";
+      ? "heading-section"
+      : "heading-section";
 
   return (
     <div className={`mb-12 ${className}`}>
