@@ -3,18 +3,16 @@ interface HeroMobileTitleProps {
 }
 
 function getFontSize(titleLength: number): string {
-  // Dynamic font sizing based on title length.
-  // Roughly 60% of the original sizes — large enough to lead the
-  // section, small enough to stay readable and above the fold.
-  // Short titles (≤ 10 chars): 12vw
-  // Medium titles (10-15 chars): 11vw
-  // Long titles (15-20 chars): 10vw
-  // Very long titles (> 20 chars): 8.5vw
-
-  if (titleLength <= 10) return "12vw";
-  if (titleLength <= 15) return "11vw";
-  if (titleLength <= 20) return "10vw";
-  return "8.5vw";
+  // Dynamic font sizing based on title length
+  // Short titles (≤ 10 chars): 18vw
+  // Medium titles (10-15 chars): 16vw
+  // Long titles (15-20 chars): 14vw
+  // Very long titles (> 20 chars): 12vw
+  
+  if (titleLength <= 10) return "18vw";
+  if (titleLength <= 15) return "16vw";
+  if (titleLength <= 20) return "14vw";
+  return "12vw";
 }
 
 export default function HeroMobileTitle({ title }: HeroMobileTitleProps) {
@@ -22,7 +20,7 @@ export default function HeroMobileTitle({ title }: HeroMobileTitleProps) {
 
   return (
     <h1
-      className="font-prettywise leading-[1.05]"
+      className="font-prettywise leading-[1.1]"
       style={{
         color: "var(--white)",
         fontSize,
@@ -32,3 +30,4 @@ export default function HeroMobileTitle({ title }: HeroMobileTitleProps) {
     </h1>
   );
 }
+

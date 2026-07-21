@@ -10,7 +10,7 @@ export default async function HeroMobile() {
   const city = cookieStore.get("nza_city")?.value;
   const country = cookieStore.get("nza_country")?.value;
   console.log("[HeroMobile] geo cookies:", { city: city || "<not set>", country: country || "<not set>" });
-
+  
   const cityEvent = await getPublicEventForCity(city || "");
   const fallbackEvent = cityEvent ? null : await getPublicFeaturedEvent();
   const featuredEvent = cityEvent || fallbackEvent;
@@ -38,10 +38,10 @@ export default async function HeroMobile() {
   if (!featuredEvent) {
     console.log("[HeroMobile] no event – showing empty state");
     return (
-      <section className="relative min-h-[60svh] overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'var(--maroon-red)' }}>
+      <section className="relative min-h-[60dvh] overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'var(--maroon-red)' }}>
         {/* Shadow Overlay for depth */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/50" />
-
+        
         {/* Geometric Pattern Overlay */}
         <div className="absolute inset-0 opacity-10">
           <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
@@ -54,7 +54,7 @@ export default async function HeroMobile() {
             <rect width="100%" height="100%" fill="url(#hero-pattern-mobile-empty)" />
           </svg>
         </div>
-
+        
         <div className="relative text-center px-6 space-y-6">
           <div className="flex items-center justify-center gap-3">
             <div className="w-12 h-[1px]" style={{ backgroundColor: 'var(--gold)', opacity: 0.6 }} />
@@ -63,11 +63,11 @@ export default async function HeroMobile() {
             </span>
             <div className="w-12 h-[1px]" style={{ backgroundColor: 'var(--gold)', opacity: 0.6 }} />
           </div>
-
+          
           <h2 className="font-prettywise text-5xl text-white leading-tight">
             New Events<br />Coming Soon
           </h2>
-
+          
           <p className="font-neue-haas text-sm text-white/60 max-w-xs mx-auto">
             We&apos;re curating the next unforgettable experience. Stay tuned.
           </p>
@@ -82,7 +82,7 @@ export default async function HeroMobile() {
     return c === "united states" || c === "united states of america" || c === "usa" || c === "us" || c === "u.s." || c === "u.s";
   }
   const ageLabel = isUnitedStates(featuredEvent.country) ? "21+" : "19+";
-
+  
   // Format time in UTC without timezone conversion - extract time components directly from ISO string
   const formatTime = (dateString: string | Date) => {
     const dateStr = typeof dateString === 'string' ? dateString : dateString.toISOString();
@@ -96,19 +96,19 @@ export default async function HeroMobile() {
     const displayMinutes = minutes === 0 ? '' : `:${minutes.toString().padStart(2, '0')}`;
     return `${displayHours}${displayMinutes}${ampm}`;
   };
-
+  
   const startTimeStr = formatTime(featuredEvent.startTime);
-
+  
   // All artists including the headliner
   const featuringArtists = featuredEvent.artists || [];
   const [day, month] = featuredEvent.date.split(' ');
 
   return (
-    <section className="relative min-h-[100svh] overflow-hidden" style={{ backgroundColor: 'var(--maroon-red)' }}>
+    <section className="relative min-h-[100dvh] overflow-hidden" style={{ backgroundColor: 'var(--maroon-red)' }}>
       {/* Shadow Overlay for depth */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/50" />
       <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-transparent" />
-
+      
       {/* Geometric Pattern Overlay */}
       <div className="absolute inset-0 opacity-10">
         <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
@@ -121,10 +121,10 @@ export default async function HeroMobile() {
           <rect width="100%" height="100%" fill="url(#hero-pattern-mobile)" />
         </svg>
       </div>
-
-      <div className="relative flex flex-col min-h-[100svh]">
+      
+      <div className="relative flex flex-col min-h-[100dvh]">
         {/* Elevated header */}
-        <div className="relative px-6 pt-6 pb-4">
+        <div className="relative px-6 pt-8 pb-6">
           <div className="flex items-center justify-center gap-3">
             <div className="w-8 h-[1px]" style={{ backgroundColor: 'var(--gold)', opacity: 0.6 }} />
             <span className="font-neue-haas text-[10px] uppercase tracking-[0.5em]" style={{ color: 'var(--gold)' }}>
@@ -133,15 +133,14 @@ export default async function HeroMobile() {
             <div className="w-8 h-[1px]" style={{ backgroundColor: 'var(--gold)', opacity: 0.6 }} />
           </div>
         </div>
-
-        {/* Creative poster layout — frame shrink-wraps the image so there
-            are no empty side margins regardless of poster aspect ratio */}
-        <div className="relative px-6 pb-6 flex justify-center">
-          <div className="relative inline-block">
+        
+        {/* Creative poster layout */}
+        <div className="relative px-6 pb-6">
+          <div className="relative">
             {/* Artistic torn paper effect background */}
             <div className="absolute inset-0 -rotate-1 scale-105" style={{ backgroundColor: 'var(--white)', opacity: 0.03 }} />
             <div className="absolute inset-0 rotate-1 scale-102" style={{ backgroundColor: 'var(--gold)', opacity: 0.02 }} />
-
+            
             {/* Main poster container */}
             <Link href={`/event/${featuredEvent.slug}`}>
               {/* Dynamic frame — box follows the poster's own aspect ratio
@@ -153,55 +152,55 @@ export default async function HeroMobile() {
                   width={840}
                   height={1120}
                   sizes="100vw"
-                  className="w-auto h-auto max-h-[55svh] max-w-full object-contain"
+                  className="w-full h-auto max-h-[70vh] object-contain"
                   priority
                 />
-
+                
                 {/* Vintage photo corner tabs */}
-                <div className="absolute -top-1 left-4 w-4 h-3 rotate-12" style={{
-                  backgroundColor: 'var(--gold)',
+                <div className="absolute -top-1 left-4 w-4 h-3 rotate-12" style={{ 
+                  backgroundColor: 'var(--gold)', 
                   opacity: 0.15,
                   clipPath: 'polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%)'
                 }} />
-                <div className="absolute -top-1 right-4 w-4 h-3 -rotate-12" style={{
-                  backgroundColor: 'var(--gold)',
+                <div className="absolute -top-1 right-4 w-4 h-3 -rotate-12" style={{ 
+                  backgroundColor: 'var(--gold)', 
                   opacity: 0.15,
                   clipPath: 'polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%)'
                 }} />
+                
+                {/* Floating date element - separate from image */}
+                <div className="absolute -bottom-4 -right-4 w-16 h-16 flex items-center justify-center" style={{ 
+                  backgroundColor: 'var(--maroon-red)',
+                  border: '2px solid var(--gold)',
+                  borderRadius: '50%'
+                }}>
+                  <div className="text-center">
+                    <p className="font-prettywise text-xl leading-none" style={{ color: 'var(--gold)' }}>
+                      {day}
+                    </p>
+                    <p className="font-neue-haas text-[7px] uppercase tracking-wider" style={{ color: 'var(--white)', opacity: 0.7 }}>
+                      {month}
+                    </p>
+                  </div>
+                </div>
               </div>
             </Link>
-
-            {/* Floating date element - anchored to the shrink-wrapped frame */}
-            <div className="absolute -bottom-4 -right-4 w-16 h-16 flex items-center justify-center z-10" style={{
-              backgroundColor: 'var(--maroon-red)',
-              border: '2px solid var(--gold)',
-              borderRadius: '50%'
-            }}>
-              <div className="text-center">
-                <p className="font-prettywise text-xl leading-none" style={{ color: 'var(--gold)' }}>
-                  {day}
-                </p>
-                <p className="font-neue-haas text-[7px] uppercase tracking-wider" style={{ color: 'var(--white)', opacity: 0.7 }}>
-                  {month}
-                </p>
-              </div>
-            </div>
           </div>
         </div>
-
+        
         {/* Content section with creative typography */}
         <div className="relative flex-1 px-6 pb-8">
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Title composition */}
             <div className="relative">
               <HeroMobileTitle title={featuredEvent.title} />
               {featuredEvent.tagline && (
-                <p className="font-neue-haas text-sm leading-relaxed mt-3 pl-8" style={{ color: 'var(--white)', opacity: 0.7 }}>
+                <p className="font-neue-haas text-sm leading-relaxed mt-4 pl-8" style={{ color: 'var(--white)', opacity: 0.7 }}>
                   {featuredEvent.tagline}
                 </p>
               )}
             </div>
-
+            
             {/* Artists showcase - asymmetric layout */}
             {featuringArtists.length > 0 && (
               <div className="relative pl-8">
@@ -238,7 +237,7 @@ export default async function HeroMobile() {
                 </div>
               </div>
             )}
-
+            
             {/* Venue & time - minimalist approach */}
             <div className="space-y-6">
               <div className="flex justify-between items-end">
@@ -285,7 +284,7 @@ export default async function HeroMobile() {
             </div>
           </div>
         </div>
-
+        
         {/* Elevated CTA section */}
         <div className="sticky bottom-0 px-6 pb-8 pt-6 relative">
           {/* Subtle pattern overlay for CTA section */}
@@ -315,7 +314,7 @@ export default async function HeroMobile() {
               </div>
             </button>
           </HeroMobileButton>
-
+          
           {/* Minimal info bar */}
           <div className="mt-4 flex items-center justify-center gap-6">
             <span className="font-neue-haas text-[9px] uppercase tracking-[0.3em]" style={{ color: 'var(--gold)', opacity: 0.7 }}>
