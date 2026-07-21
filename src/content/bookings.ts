@@ -114,7 +114,7 @@ export interface ContactFormContent {
 export const contactFormContent: ContactFormContent = {
   sectionTitle: "Start the Conversation",
   heading: "Let's Build",
-  subHeading: "Your Night",
+  subHeading: "Your Experience",
   description: "Every Nazaara event starts with a short conversation. Give us the basics and we'll come back within a day with availability and ideas.",
   contactInfo: [
     {
