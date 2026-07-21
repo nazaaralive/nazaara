@@ -75,17 +75,17 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
               {/* Artist Card - Magazine Style */}
               <div className="relative">
                 {/* Geometric Frame Elements */}
-                <div 
-                  className="absolute -top-4 -left-4 w-8 h-8 border-t border-l" 
-                  style={{ borderColor: 'var(--gold)', opacity: 0.3 }} 
+                <div
+                  className="pointer-events-none absolute -top-3 -left-3 w-8 h-8 border-t border-l"
+                  style={{ borderColor: 'var(--gold)', opacity: 0.3 }}
                 />
-                <div 
-                  className="absolute -bottom-4 -right-4 w-8 h-8 border-b border-r" 
-                  style={{ borderColor: 'var(--gold)', opacity: 0.3 }} 
+                <div
+                  className="pointer-events-none absolute -bottom-3 -right-3 w-8 h-8 border-b border-r"
+                  style={{ borderColor: 'var(--gold)', opacity: 0.3 }}
                 />
                 
                 {/* Artist Image or Placeholder - Square Aspect */}
-                <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-[var(--maroon-red)]/20 to-[var(--maroon-red)]/5">
+                <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-[var(--maroon-red)]/20 to-[var(--maroon-red)]/5">
                   {artist.image ? (
                     <>
                       <Image
@@ -171,20 +171,8 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
                     </h3>
                   </div>
                   
-                  {/* Social handles if available */}
-                  {(artist.instagram || artist.soundcloud) && (
-                    <div className="flex items-center gap-2 mt-3 opacity-60 group-hover:opacity-100 transition-opacity duration-500">
-                      <div className="h-px flex-1" style={{ backgroundColor: 'var(--gold)', opacity: 0.2 }} />
-                      <div className="flex gap-3 text-[10px] uppercase tracking-[0.3em] text-white/40 group-hover:text-white/60 transition-colors duration-500">
-                        {artist.instagram && (
-                          <span>@{artist.instagram.replace('@', '')}</span>
-                        )}
-                        {artist.soundcloud && (
-                          <span>SC</span>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  {/* Accent rule */}
+                  <div className="mt-3 h-px w-full" style={{ backgroundColor: 'var(--gold)', opacity: 0.2 }} />
                 </div>
               </div>
             </div>
@@ -201,13 +189,13 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
               }`}
             >
               {/* Artist Image */}
-              <div className="flex-shrink-0 relative w-[45vw] max-w-[200px] aspect-square overflow-hidden">
+              <div className="flex-shrink-0 relative w-[42vw] max-w-[190px] aspect-[3/4] overflow-hidden">
                 {artist.image ? (
                   <Image
                     src={artist.image}
                     alt={artist.name}
                     fill
-                    sizes="45vw"
+                    sizes="42vw"
                     className="object-cover"
                   />
                 ) : (
@@ -228,11 +216,6 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
                 <h3 className="text-2xl sm:text-3xl font-prettywise text-white truncate">
                   {artist.name}
                 </h3>
-                {artist.instagram && (
-                  <p className="mt-1 text-[10px] uppercase tracking-[0.25em] text-white/40 truncate">
-                    @{artist.instagram.replace('@', '')}
-                  </p>
-                )}
               </div>
 
               {/* Social buttons */}
