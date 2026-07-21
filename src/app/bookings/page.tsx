@@ -69,11 +69,13 @@ export default function BookingsPage() {
             src={heroContent.backgroundImage}
             alt="DJ performing with dramatic lighting"
             fill
-            className="object-cover"
+            className="object-cover [filter:sepia(0.7)_saturate(1.3)_hue-rotate(3deg)_brightness(0.85)]"
             priority
           />
+          {/* Gold tint layer — multiplies the image toward the brand gold */}
+          <div className="absolute inset-0 bg-[var(--gold)]/25 mix-blend-multiply" />
           {/* Brand wash + darkening so the photo never competes with the copy */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[var(--maroon-red)]/85 via-[var(--maroon-red)]/70 to-[var(--dark-green)]/80" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--maroon-red)]/80 via-[var(--maroon-red)]/65 to-[var(--dark-green)]/75" />
           {/* Vertical anchor: solid at the edges, lighter in the middle */}
           <div className="absolute inset-0 bg-gradient-to-b from-[var(--maroon-red)]/70 via-transparent to-[var(--black-grey)]/80" />
         </div>
@@ -84,7 +86,7 @@ export default function BookingsPage() {
             {/* Main Title */}
             <h1 className="heading-display text-[var(--off-white)] mb-6 lg:mb-8 [text-shadow:0_2px_20px_rgba(0,0,0,0.5)]">
               {heroContent.title}
-              <span className="block text-[var(--gold)]">{heroContent.subtitle}</span>
+              <span className="block text-gold-metallic">{heroContent.subtitle}</span>
             </h1>
 
             <p className="text-base lg:text-lg font-neue-haas text-[var(--off-white)]/85 leading-relaxed max-w-2xl mb-8 lg:mb-12 [text-shadow:0_1px_12px_rgba(0,0,0,0.5)]">
@@ -135,7 +137,7 @@ export default function BookingsPage() {
                 <div className="w-16 h-px bg-[var(--gold)]/20" />
               </div>
               <h2 className="heading-section mb-6">
-                <span className="text-[var(--gold)]">{djRosterContent.heading}</span>
+                <span className="text-gold-metallic">{djRosterContent.heading}</span>
               </h2>
               <p className="text-lg font-neue-haas text-[var(--off-white)]/60 max-w-2xl mx-auto">
                 {djRosterContent.description}
@@ -304,9 +306,8 @@ export default function BookingsPage() {
                                     <div className="pt-4">
                                       <Button
                                         size="sm"
-                                        className="w-full px-6 py-3 text-xs uppercase tracking-[0.3em] font-light border-0"
+                                        className="w-full px-6 py-3 text-xs uppercase tracking-[0.3em] font-light border-0 bg-gold-metallic"
                                         style={{
-                                          backgroundColor: 'var(--gold)',
                                           color: 'var(--maroon-red)'
                                         }}
                                         onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
@@ -360,7 +361,7 @@ export default function BookingsPage() {
 
               <h2 className="heading-section text-[var(--off-white)] mb-8">
                 {privateEventsContent.heading}
-                <span className="block text-[var(--gold)]">{privateEventsContent.subHeading}</span>
+                <span className="block text-gold-metallic">{privateEventsContent.subHeading}</span>
               </h2>
 
               <div className="space-y-6 text-[var(--off-white)]/70 font-neue-haas leading-relaxed mb-12 max-w-3xl mx-auto">
@@ -407,7 +408,7 @@ export default function BookingsPage() {
 
                 <h2 className="heading-section text-[var(--off-white)] mb-8">
                   {contactFormContent.heading}
-                  <span className="block text-[var(--gold)]">{contactFormContent.subHeading}</span>
+                  <span className="block text-gold-metallic">{contactFormContent.subHeading}</span>
                 </h2>
 
                 <p className="text-lg font-neue-haas text-[var(--off-white)]/60 leading-relaxed mb-12">
@@ -574,9 +575,8 @@ export default function BookingsPage() {
                         type="submit"
                         size="lg"
                         disabled={contactSubmit.isSubmitting}
-                        className="w-full px-7 py-4 text-xs uppercase tracking-[0.3em] font-light border-0"
+                        className="w-full px-7 py-4 text-xs uppercase tracking-[0.3em] font-light border-0 bg-gold-metallic"
                         style={{
-                          backgroundColor: 'var(--gold)',
                           color: 'var(--maroon-red)'
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}

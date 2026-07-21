@@ -26,7 +26,7 @@ export default async function AlumniPage() {
               <div className="w-16 h-px bg-[var(--gold)]/20" />
             </div>
             <h1 className="heading-display text-[var(--off-white)] mb-4">
-              <span className="text-[var(--gold)]">Alumni</span>
+              <span className="text-gold-metallic">Alumni</span>
             </h1>
             <p className="text-xs md:text-sm font-neue-haas uppercase tracking-[0.3em] text-[var(--off-white)]/60 max-w-2xl mx-auto">
               A collection of artists that have graced our stage

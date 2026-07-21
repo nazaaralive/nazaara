@@ -263,7 +263,7 @@ export default async function HeroMobile() {
           <HeroMobileButton eventSlug={featuredEvent.slug} ticketUrl={featuredEvent.ticketUrl || ""} asChild>
             <button className="relative w-full overflow-hidden group">
               {/* Creative button design */}
-              <div className="absolute inset-0" style={{ backgroundColor: 'var(--gold)' }} />
+              <div className="absolute inset-0 bg-gold-metallic" />
               <div className="absolute inset-0 flex items-center justify-between px-6">
                 <div className="w-8 h-[1px]" style={{ backgroundColor: 'var(--maroon-red)', opacity: 0.3 }} />
                 <div className="w-8 h-[1px]" style={{ backgroundColor: 'var(--maroon-red)', opacity: 0.3 }} />

@@ -51,7 +51,7 @@
   /* Nazaara Live Brand Colors */
   --maroon-red: oklch(0.2799 0.1066 16.78);
   --turquoise: oklch(0.45 0.12 190);
-  --gold: oklch(0.92 0.12 95);
+  --gold: oklch(0.72 0.12 77);
   --dark-gold: oklch(0.4 0.12 75);
   --dark-green: oklch(0.15 0.05 190);
   --off-white: oklch(0.96 0.01 85);
@@ -150,6 +150,40 @@
     font-family: var(--font-prettywise);
     font-size: clamp(1.375rem, 2vw, 1.75rem);
     line-height: 1.15;
+  }
+}
+
+/* ============================================================
+   Metallic gold — a diagonal champagne→gold→brass sheen that
+   reads as metal instead of a flat yellow. Two utilities:
+     .text-gold-metallic  — clips the gradient to text (headings)
+     .bg-gold-metallic    — fills a surface (buttons, badges)
+   Solid --gold still drives borders, icons, and hairlines.
+   ============================================================ */
+@layer components {
+  .text-gold-metallic {
+    background: linear-gradient(
+      120deg,
+      oklch(0.88 0.09 90) 0%,
+      oklch(0.78 0.13 82) 28%,
+      oklch(0.62 0.11 72) 52%,
+      oklch(0.82 0.13 84) 74%,
+      oklch(0.70 0.12 78) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .bg-gold-metallic {
+    background: linear-gradient(
+      135deg,
+      oklch(0.86 0.09 90) 0%,
+      oklch(0.76 0.13 82) 30%,
+      oklch(0.63 0.11 73) 55%,
+      oklch(0.80 0.13 84) 78%,
+      oklch(0.70 0.12 78) 100%
+    );
   }
 }
 
