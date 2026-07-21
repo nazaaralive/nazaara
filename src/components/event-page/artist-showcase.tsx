@@ -201,20 +201,20 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
               }`}
             >
               {/* Artist Image */}
-              <div className="flex-shrink-0 relative w-32 h-32 sm:w-36 sm:h-36 overflow-hidden">
+              <div className="flex-shrink-0 relative w-[45vw] max-w-[200px] aspect-square overflow-hidden">
                 {artist.image ? (
                   <Image
                     src={artist.image}
                     alt={artist.name}
                     fill
-                    sizes="144px"
+                    sizes="45vw"
                     className="object-cover"
                   />
                 ) : (
                   <div className="absolute inset-0" style={{ backgroundColor: 'var(--black-grey)' }}>
                     <div className="absolute inset-2 border" style={{ borderColor: 'var(--gold)', opacity: 0.1 }} />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--gold)', opacity: 0.15 }}>
+                      <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--gold)', opacity: 0.15 }}>
                         <circle cx="12" cy="8" r="3" stroke="currentColor" strokeWidth="1" />
                         <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
                       </svg>
