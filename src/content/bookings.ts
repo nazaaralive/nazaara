@@ -8,9 +8,9 @@ export interface HeroContent {
 
 export const heroContent: HeroContent = {
   backgroundImage: "/bookings-bg.webp",
-  title: "Curated",
-  subtitle: "Excellence",
-  description: "From intimate gatherings to grand celebrations, we orchestrate extraordinary entertainment experiences with exclusive access to the world's most celebrated South Asian artists."
+  title: "Book the",
+  subtitle: "Spectacle",
+  description: "The artists who pack our floors are available for yours. Browse the roster, tell us your date, and we'll take it from there."
 };
 
 // Private Events Section Content
@@ -35,24 +35,24 @@ export interface PrivateEventsContent {
 
 export const privateEventsContent: PrivateEventsContent = {
   sectionTitle: "Private Services",
-  heading: "Beyond",
-  subHeading: "Extraordinary",
-  description: "From intimate celebrations to grand spectacles, we orchestrate private experiences that transcend the ordinary. Our reputation isn't built on portfolios—it's earned through whispers in elite circles.",
+  heading: "Your Occasion.",
+  subHeading: "Our Spectacle.",
+  description: "Weddings, private parties, corporate nights: we bring the same energy that sells out our shows to rooms of fifty or five thousand. Tell us the moment you're planning and we'll build the experience around it.",
   services: [
     {
       icon: "Star",
       title: "Bollywood A-Listers",
-      description: "Direct access to India's biggest stars for your most prestigious private events"
+      description: "Direct lines to India's biggest stars for the occasion that calls for one."
     },
     {
       icon: "Crown",
       title: "International Artists",
-      description: "Global South Asian sensations and cultural icons for exclusive performances"
+      description: "South Asian headliners from every scene, booked for your stage."
     },
     {
       icon: "Users",
       title: "Private Concerts",
-      description: "Intimate performances and private concerts by legendary artists"
+      description: "Full production, intimate rooms, and an artist your guests will never forget."
     }
   ],
   ctaButtonText: "Book a Consultation",
@@ -112,10 +112,10 @@ export interface ContactFormContent {
 }
 
 export const contactFormContent: ContactFormContent = {
-  sectionTitle: "Begin Your Journey",
-  heading: "Let's Create",
-  subHeading: "Magic Together",
-  description: "Every extraordinary event begins with a conversation. Share your vision, and we'll orchestrate an experience beyond imagination.",
+  sectionTitle: "Start the Conversation",
+  heading: "Let's Build",
+  subHeading: "Your Night",
+  description: "Every Nazaara event starts with a short conversation. Give us the basics and we'll come back within a day with availability and ideas.",
   contactInfo: [
     {
       title: "What We Need",
