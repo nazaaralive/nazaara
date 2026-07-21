@@ -93,18 +93,13 @@ export default async function AlumniPage() {
                         )}
 
                         {/* Bottom gradient for legibility */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[var(--black-grey)]/90 via-transparent to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[var(--black-grey)] via-[var(--black-grey)]/60 to-transparent" />
 
-                        {/* Name + handle overlaid on image */}
+                        {/* Name overlaid on image */}
                         <div className="absolute bottom-0 left-0 right-0 p-4">
-                          <h3 className="font-prettywise text-lg md:text-xl text-[var(--off-white)] leading-tight">
+                          <h3 className="font-prettywise text-xl md:text-2xl text-white leading-tight [text-shadow:0_1px_8px_rgba(0,0,0,0.8)]">
                             {artist.name}
                           </h3>
-                          {ig && (
-                            <p className="mt-1 font-neue-haas text-[10px] uppercase tracking-[0.25em] text-[var(--gold)]/70 group-hover:text-[var(--gold)] transition-colors">
-                              @{ig}
-                            </p>
-                          )}
                         </div>
 
                         {/* Gold hairline on hover */}
