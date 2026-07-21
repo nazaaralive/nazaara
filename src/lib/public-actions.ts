@@ -515,6 +515,7 @@ export interface PublicGallery {
   title: string;
   description?: string | null;
   date: Date;
+  city?: string | null;
   coverImage?: string | null;
   imageCount: number;
   firstImage?: string | null;
@@ -530,13 +531,14 @@ export async function getPublicGalleries(): Promise<PublicGallery[]> {
       title: galleries.title,
       description: galleries.description,
       date: galleries.date,
+      city: galleries.city,
       coverImage: galleries.coverImage,
       imageCount: sql<number>`COALESCE(COUNT(${galleryImages.id}), 0)`.as('imageCount'),
       firstImage: sql<string | null>`MIN(${galleryImages.url})`.as('firstImage'),
     })
     .from(galleries)
     .leftJoin(galleryImages, eq(galleries.id, galleryImages.galleryId))
-    .groupBy(galleries.id, galleries.slug, galleries.title, galleries.description, galleries.date, galleries.coverImage)
+    .groupBy(galleries.id, galleries.slug, galleries.title, galleries.description, galleries.date, galleries.city, galleries.coverImage)
     .orderBy(desc(galleries.date))
 
   return galleriesWithImageCount.map(gallery => ({
@@ -545,6 +547,7 @@ export async function getPublicGalleries(): Promise<PublicGallery[]> {
     title: gallery.title,
     description: gallery.description,
     date: gallery.date,
+    city: gallery.city,
     coverImage: gallery.coverImage,
     imageCount: Number(gallery.imageCount),
     firstImage: gallery.firstImage,
@@ -581,6 +584,7 @@ export async function getPublicGalleryBySlug(slug: string): Promise<PublicGaller
     title: gallery[0].title,
     description: gallery[0].description,
     date: gallery[0].date,
+    city: gallery[0].city,
     coverImage: gallery[0].coverImage,
     imageCount: images.length,
     firstImage: images[0]?.url || gallery[0].coverImage,

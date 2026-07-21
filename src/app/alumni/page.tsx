@@ -74,6 +74,8 @@ export default async function AlumniPage() {
                             alt={artist.name}
                             fill
                             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                            quality={60}
+                            loading="eager"
                             className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                           />
                         ) : (

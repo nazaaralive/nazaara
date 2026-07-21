@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Calendar, Camera } from "lucide-react"
+import { Calendar, Camera, MapPin } from "lucide-react"
 import type { PublicGallery } from "@/lib/public-actions"
 
 interface GalleryGridProps {
@@ -69,9 +69,19 @@ export function GalleryGrid({ galleries }: GalleryGridProps) {
 
               {/* Sophisticated overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10 opacity-60 group-hover:opacity-80 transition-opacity duration-700" />
-              
+
               {/* Premium frame effect */}
               <div className="absolute inset-0 border border-[color:var(--gold)]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+              {/* City tag */}
+              {gallery.city && (
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm border border-[color:var(--gold)]/20 px-2.5 py-1">
+                  <MapPin className="h-3 w-3 text-[color:var(--gold)]/70" />
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-[color:var(--gold)]">
+                    {gallery.city}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Content */}

@@ -240,6 +240,11 @@ export const galleries = pgTable("galleries", {
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"), // Optional gallery description
   date: timestamp("date").notNull(), // Gallery date (when photos were taken)
+
+  // City tag shown on album cards (so the city doesn't need to live in the
+  // title). Column added manually in Neon on 2026-07-20 (ALTER TABLE
+  // galleries ADD COLUMN city varchar(100)); kept in sync here.
+  city: varchar("city", { length: 100 }),
   
   // Optional designated cover image (URL) - if not set, use first image
   coverImage: text("cover_image"),

@@ -37,6 +37,7 @@ interface GalleryFormProps {
     slug: string
     description: string | null
     date: Date
+    city: string | null
     coverImage: string | null
     images: ImageData[]
   } | null
@@ -198,6 +199,21 @@ export function GalleryFormV2({ gallery, mode }: GalleryFormProps) {
                     nazaara.live/galleries/{slug || "your-gallery-slug"}
                   </p>
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  name="city"
+                  defaultValue={gallery?.city || ""}
+                  placeholder="e.g., Vancouver"
+                  disabled={isSubmitting}
+                  className="bg-background"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Shown as a tag on the album card — no need to put the city in the title anymore
+                </p>
               </div>
 
               <div className="space-y-2">

@@ -899,13 +899,14 @@ export async function getAdminGalleries() {
       title: galleries.title,
       description: galleries.description,
       date: galleries.date,
+      city: galleries.city,
       coverImage: galleries.coverImage,
       imageCount: sql<number>`COALESCE(COUNT(${galleryImages.id}), 0)`.as('imageCount'),
       firstImage: sql<string | null>`MIN(${galleryImages.url})`.as('firstImage'),
     })
     .from(galleries)
     .leftJoin(galleryImages, eq(galleries.id, galleryImages.galleryId))
-    .groupBy(galleries.id, galleries.slug, galleries.title, galleries.description, galleries.date, galleries.coverImage)
+    .groupBy(galleries.id, galleries.slug, galleries.title, galleries.description, galleries.date, galleries.city, galleries.coverImage)
     .orderBy(desc(galleries.date))
 
   return galleriesWithImageCount
@@ -944,6 +945,7 @@ export async function getGalleryBySlug(slug: string) {
 export async function createGallery(formData: FormData) {
   const title = formData.get("title") as string
   const description = formData.get("description") as string
+  const city = formData.get("city") as string
   const dateStr = formData.get("date") as string
 
   if (!title || !dateStr) {
@@ -972,6 +974,7 @@ export async function createGallery(formData: FormData) {
       slug,
       title,
       description: description || null,
+      city: city || null,
       date,
       coverImage: imageData[0]?.url || null, // Use first image as cover by default
     })
@@ -1000,6 +1003,7 @@ export async function updateGallery(formData: FormData) {
   const title = formData.get("title") as string
   const slug = formData.get("slug") as string
   const description = formData.get("description") as string
+  const city = formData.get("city") as string
   const dateStr = formData.get("date") as string
 
   if (!galleryId || !title || !slug || !dateStr) {
@@ -1043,6 +1047,7 @@ export async function updateGallery(formData: FormData) {
       slug,
       title,
       description: description || null,
+      city: city || null,
       date,
       coverImage: imageData[0]?.url || null,
       updatedAt: new Date(),
