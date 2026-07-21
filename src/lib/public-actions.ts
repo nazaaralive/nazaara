@@ -607,14 +607,12 @@ export interface PublicAlumnus {
 }
 
 /**
- * Artists who have performed at a published Nazaara event that has
- * already ended. Derived automatically from the events_artists junction —
- * no separate alumni table or manual curation needed. Adding an artist to
- * a past event puts them on /alumni; nothing else to maintain.
+ * Artists flagged for the public /alumni wall. Controlled manually via
+ * the Add to Alumni / Hide from Alumni buttons on the admin artists grid.
  */
 export async function getPublicAlumni(): Promise<PublicAlumnus[]> {
   const rows = await db
-    .selectDistinct({
+    .select({
       id: artists.id,
       slug: artists.slug,
       name: artists.name,
@@ -623,9 +621,7 @@ export async function getPublicAlumni(): Promise<PublicAlumnus[]> {
       image: artists.image,
     })
     .from(artists)
-    .innerJoin(eventsArtists, eq(eventsArtists.artistId, artists.id))
-    .innerJoin(events, eq(events.id, eventsArtists.eventId))
-    .where(and(eq(events.isPublished, true), sql`${events.endTime} < now()`))
+    .where(eq(artists.isAlumni, true))
     .orderBy(asc(artists.name));
 
   return rows;

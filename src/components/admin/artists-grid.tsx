@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import { Search, ExternalLink, Instagram, Music } from "lucide-react"
+import { Search, ExternalLink, Instagram, Music, GraduationCap } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { toggleArtistAlumni } from "@/lib/admin-actions"
 import {
   Pagination,
   PaginationContent,
@@ -22,6 +23,7 @@ interface Artist {
   instagram: string | null
   soundcloud: string | null
   image: string | null
+  isAlumni: boolean
   eventCount: number
 }
 
@@ -34,6 +36,26 @@ const ARTISTS_PER_PAGE = 16 // 4x4 grid
 export function ArtistsGrid({ artists }: ArtistsGridProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
+  // Local overrides for instant feedback; server revalidates in background
+  const [alumniOverrides, setAlumniOverrides] = useState<Record<number, boolean>>({})
+  const [togglingId, setTogglingId] = useState<number | null>(null)
+
+  const isAlumni = (artist: Artist) =>
+    alumniOverrides[artist.id] ?? artist.isAlumni
+
+  const handleToggleAlumni = async (artist: Artist) => {
+    const next = !isAlumni(artist)
+    setTogglingId(artist.id)
+    setAlumniOverrides((prev) => ({ ...prev, [artist.id]: next }))
+    try {
+      await toggleArtistAlumni(artist.id, next)
+    } catch {
+      // Roll back on failure
+      setAlumniOverrides((prev) => ({ ...prev, [artist.id]: !next }))
+    } finally {
+      setTogglingId(null)
+    }
+  }
 
   // Filter artists based on search query
   const filteredArtists = useMemo(() => {
@@ -125,14 +147,22 @@ export function ArtistsGrid({ artists }: ArtistsGridProps) {
             {/* Artist Image */}
             <div className="aspect-square relative overflow-hidden bg-muted">
               <ArtistImage src={artist.image} alt={artist.name} />
-              
+
               {/* Overlay on hover */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              
+
               {/* View icon on hover */}
               <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <ExternalLink className="h-5 w-5 text-white" />
               </div>
+
+              {/* Alumni badge */}
+              {isAlumni(artist) && (
+                <div className="absolute top-2 left-2 flex items-center gap-1 rounded bg-[--gold]/90 px-2 py-0.5">
+                  <GraduationCap className="h-3 w-3 text-black" />
+                  <span className="text-[10px] font-medium uppercase tracking-wide text-black">Alumni</span>
+                </div>
+              )}
             </div>
 
             {/* Artist Info */}
@@ -161,6 +191,28 @@ export function ArtistsGrid({ artists }: ArtistsGridProps) {
               <div className="text-xs text-muted-foreground">
                 {artist.eventCount} event{artist.eventCount !== 1 ? "s" : ""}
               </div>
+
+              {/* Alumni toggle */}
+              <button
+                type="button"
+                disabled={togglingId === artist.id}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleToggleAlumni(artist)
+                }}
+                className={
+                  isAlumni(artist)
+                    ? "w-full rounded border border-border px-2 py-1.5 text-xs text-muted-foreground hover:border-red-500/50 hover:text-red-500 transition-colors disabled:opacity-50"
+                    : "w-full rounded border border-[--gold]/40 px-2 py-1.5 text-xs text-[--gold] hover:bg-[--gold]/10 transition-colors disabled:opacity-50"
+                }
+              >
+                {togglingId === artist.id
+                  ? "Saving…"
+                  : isAlumni(artist)
+                    ? "Hide from Alumni"
+                    : "Add to Alumni"}
+              </button>
             </div>
           </Link>
         ))}

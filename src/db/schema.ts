@@ -85,7 +85,13 @@ export const artists = pgTable("artists", {
   
   // Media assets
   image: text("image"), // Artist profile image URL
-  
+
+  // Alumni wall — manual toggle from the admin artists grid.
+  // Column added manually in Neon on 2026-07-20 (ALTER TABLE artists
+  // ADD COLUMN is_alumni boolean NOT NULL DEFAULT false); kept in sync
+  // here so future drizzle-kit push/generate runs see the same shape.
+  isAlumni: boolean("is_alumni").default(false).notNull(),
+
   // Audit timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

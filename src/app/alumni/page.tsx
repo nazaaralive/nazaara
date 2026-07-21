@@ -15,28 +15,28 @@ export default async function AlumniPage() {
   return (
     <div className="min-h-screen bg-[var(--black-grey)]">
       {/* Hero Section */}
-      <section className="relative py-24 bg-gradient-to-b from-[var(--maroon-red)]/20 to-[var(--black-grey)]">
+      <section className="relative pt-12 pb-8 md:pt-16 md:pb-10 bg-gradient-to-b from-[var(--maroon-red)]/20 to-[var(--black-grey)]">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="max-w-7xl mx-auto text-center">
-            <div className="flex items-center justify-center gap-4 mb-8">
+            <div className="flex items-center justify-center gap-4 mb-6">
               <div className="w-16 h-px bg-[var(--gold)]/20" />
               <span className="text-[10px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]/40">
                 The Family
               </span>
               <div className="w-16 h-px bg-[var(--gold)]/20" />
             </div>
-            <h1 className="text-[clamp(4rem,8vw,8rem)] font-prettywise leading-[0.9] text-[var(--off-white)] mb-6">
+            <h1 className="text-[clamp(4rem,8vw,8rem)] font-prettywise leading-[0.9] text-[var(--off-white)] mb-4">
               <span className="text-[var(--gold)]">Alumni</span>
             </h1>
-            <p className="text-lg font-neue-haas text-[var(--off-white)]/60 max-w-2xl mx-auto">
-              The artists and DJs who have graced Nazaara stages around the world
+            <p className="text-xs md:text-sm font-neue-haas uppercase tracking-[0.3em] text-[var(--off-white)]/60 max-w-2xl mx-auto">
+              A collection of artists that have graced our stage
             </p>
           </div>
         </div>
       </section>
 
       {/* Alumni Grid */}
-      <section className="relative py-24 bg-gradient-to-b from-[var(--black-grey)] via-[var(--black-grey)] to-[var(--maroon-red)]/10 overflow-hidden">
+      <section className="relative pt-6 pb-24 bg-gradient-to-b from-[var(--black-grey)] via-[var(--black-grey)] to-[var(--maroon-red)]/10 overflow-hidden">
         {/* Art Deco inspired grid pattern */}
         <div className="absolute inset-0 opacity-[0.03]">
           <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">

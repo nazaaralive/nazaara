@@ -109,14 +109,30 @@ export async function getAdminArtists() {
       instagram: artists.instagram,
       soundcloud: artists.soundcloud,
       image: artists.image,
+      isAlumni: artists.isAlumni,
       eventCount: sql<number>`COALESCE(COUNT(${eventsArtists.eventId}), 0)`.as('eventCount'),
     })
     .from(artists)
     .leftJoin(eventsArtists, eq(artists.id, eventsArtists.artistId))
-    .groupBy(artists.id, artists.slug, artists.name, artists.instagram, artists.soundcloud, artists.image)
+    .groupBy(artists.id, artists.slug, artists.name, artists.instagram, artists.soundcloud, artists.image, artists.isAlumni)
     .orderBy(artists.name)
 
   return artistsWithEventCount
+}
+
+/**
+ * Toggle an artist's presence on the public /alumni wall.
+ * Called from the Add/Hide buttons on the admin artists grid.
+ */
+export async function toggleArtistAlumni(artistId: number, isAlumni: boolean) {
+  await db
+    .update(artists)
+    .set({ isAlumni, updatedAt: new Date() })
+    .where(eq(artists.id, artistId))
+
+  revalidatePath("/admin")
+  revalidatePath("/alumni")
+  return { success: true }
 }
 
 export async function getAdminVenues() {
