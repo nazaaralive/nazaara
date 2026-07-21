@@ -22,12 +22,13 @@ export default function EventBio({ bio }: EventBioProps) {
           <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[var(--gold)]/20" />
         </div>
         
-        {/* Bio content with better typography */}
+        {/* Bio content — preserves the line breaks exactly as written in the
+            admin, styled light so it reads editorial rather than bold. */}
         <div className="space-y-6">
-          {bio.split('\n\n').map((paragraph, index) => {
+          {bio.split(/\n{2,}/).map((paragraph, index) => {
             // Check if this paragraph contains special formatting for venue/date info
             const isHighlight = paragraph.includes('📍') || paragraph.includes('📅') || paragraph.includes('⏰');
-            
+
             if (isHighlight) {
               // Special formatting for ticket/venue info
               return (
@@ -42,15 +43,11 @@ export default function EventBio({ bio }: EventBioProps) {
                 </div>
               );
             }
-            
+
             return (
-              <p 
-                key={index} 
-                className={`font-neue-haas leading-relaxed text-[var(--white)]/80 ${
-                  index === 0 
-                    ? 'text-lg font-medium text-[var(--white)] lg:text-xl' 
-                    : 'text-base lg:text-lg'
-                }`}
+              <p
+                key={index}
+                className="whitespace-pre-line font-neue-haas font-light text-base leading-[1.9] text-[var(--white)]/75 lg:text-lg"
               >
                 {paragraph}
               </p>
