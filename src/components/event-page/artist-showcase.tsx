@@ -22,7 +22,7 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
   };
 
   return (
-    <section className="relative py-20 lg:py-24">
+    <section className="relative py-12 lg:py-24">
       {/* Geometric Pattern Background */}
       <div className="absolute inset-0 opacity-[0.02]">
         <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
@@ -38,7 +38,7 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
 
       <div className="relative container mx-auto px-4 md:px-6 lg:px-8">
         {/* Editorial Header - Similar to Venue Features */}
-        <div className="mb-24 lg:mb-32">
+        <div className="mb-10 lg:mb-16">
           <div className="grid lg:grid-cols-12 gap-8 items-end">
             <div className="lg:col-span-8">
               <div className="flex items-center gap-4 mb-8">
@@ -51,7 +51,7 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
                 Meet The Artists
               </h2>
               <div className="flex items-baseline gap-6">
-                <p className="text-xl lg:text-2xl font-neue-haas text-[var(--white)]/70">
+                <p className="text-base lg:text-2xl font-neue-haas text-[var(--white)]/70">
                   Live Performances & Special Guests
                 </p>
                 <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--gold)]/30 to-transparent" />
@@ -191,134 +191,95 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
           ))}
         </div>
 
-        {/* Mobile Layout - Alternating Rows */}
-        <div className="lg:hidden space-y-12">
-          {artists.map((artist, index) => {
-            const isEven = index % 2 === 0;
-            return (
-              <div 
-                key={index}
-                className="group relative"
-              >
-                <div className={`flex items-center gap-6 ${isEven ? '' : 'flex-row-reverse'}`}>
-                  {/* Artist Image - Smaller on mobile */}
-                  <div className="flex-shrink-0 relative w-32 h-32 sm:w-40 sm:h-40">
-                    <div className="relative w-full h-full overflow-hidden">
-                      {artist.image ? (
-                        <>
-                          <Image
-                            src={artist.image}
-                            alt={artist.name}
-                            fill
-                            className="object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[var(--maroon-red)]/40 to-transparent" />
-                        </>
-                      ) : (
-                        <div className="absolute inset-0" style={{ backgroundColor: 'var(--black-grey)' }}>
-                          <div 
-                            className="absolute inset-2 border"
-                            style={{ borderColor: 'var(--gold)', opacity: 0.1 }}
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <svg 
-                              className="w-12 h-12" 
-                              viewBox="0 0 24 24" 
-                              fill="none"
-                              style={{ color: 'var(--gold)', opacity: 0.15 }}
-                            >
-                              <circle cx="12" cy="8" r="3" stroke="currentColor" strokeWidth="1" />
-                              <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-                            </svg>
-                          </div>
-                        </div>
-                      )}
-                      {/* Corner accent */}
-                      <div 
-                        className={`absolute ${isEven ? '-bottom-2 -right-2' : '-bottom-2 -left-2'} w-6 h-6 border-b ${isEven ? 'border-r' : 'border-l'}`} 
-                        style={{ borderColor: 'var(--gold)', opacity: 0.4 }} 
-                      />
+        {/* Mobile Layout - Uniform rows, tight rhythm */}
+        <div className="lg:hidden">
+          {artists.map((artist, index) => (
+            <div
+              key={index}
+              className={`flex items-center gap-4 py-4 ${
+                index < artists.length - 1 ? "border-b border-[var(--gold)]/10" : ""
+              }`}
+            >
+              {/* Artist Image */}
+              <div className="flex-shrink-0 relative w-20 h-20 sm:w-24 sm:h-24 overflow-hidden">
+                {artist.image ? (
+                  <Image
+                    src={artist.image}
+                    alt={artist.name}
+                    fill
+                    sizes="96px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0" style={{ backgroundColor: 'var(--black-grey)' }}>
+                    <div className="absolute inset-2 border" style={{ borderColor: 'var(--gold)', opacity: 0.1 }} />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--gold)', opacity: 0.15 }}>
+                        <circle cx="12" cy="8" r="3" stroke="currentColor" strokeWidth="1" />
+                        <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+                      </svg>
                     </div>
-                  </div>
-
-                  {/* Artist Info */}
-                  <div className={`flex-1 ${isEven ? 'text-left' : 'text-right'}`}>
-                    <div className={`flex items-center gap-3 mb-3 ${isEven ? '' : 'flex-row-reverse'}`}>
-                      <div className="w-1.5 h-1.5 rotate-45" style={{ backgroundColor: 'var(--gold)' }} />
-                      <h3 className="text-3xl sm:text-4xl font-prettywise text-white">
-                        {artist.name}
-                      </h3>
-                    </div>
-                    
-                    {(artist.instagram || artist.soundcloud) && (
-                      <div className={`flex items-center gap-3 ${isEven ? '' : 'flex-row-reverse'}`}>
-                        <div className="flex-1 max-w-[80px] h-px" style={{ backgroundColor: 'var(--gold)', opacity: 0.2 }} />
-                        <div className={`flex items-center gap-2 ${isEven ? '' : 'flex-row-reverse'}`}>
-                          <div className="flex gap-2 text-[11px] uppercase tracking-[0.25em] text-white/50">
-                            {artist.instagram && (
-                              <span>@{artist.instagram.replace('@', '')}</span>
-                            )}
-                            {artist.soundcloud && (
-                              <span>SC</span>
-                            )}
-                          </div>
-                          <div className={`flex gap-1 ${isEven ? '' : 'flex-row-reverse'}`}>
-                            {artist.instagram && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleSocialClick('instagram', artist.instagram || "");
-                                }}
-                                className="w-6 h-6 flex items-center justify-center hover:scale-110 transition-transform duration-200 rounded-sm"
-                                style={{ backgroundColor: 'var(--gold)', opacity: 0.8 }}
-                              >
-                                <Image
-                                  src="/instagram-svgrepo-com.svg"
-                                  alt="Instagram"
-                                  width={12}
-                                  height={12}
-                                  style={{ filter: 'brightness(0) saturate(100%) invert(8%) sepia(46%) saturate(2916%) hue-rotate(316deg) brightness(94%) contrast(99%)' }}
-                                />
-                              </button>
-                            )}
-                            {artist.soundcloud && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleSocialClick('soundcloud', artist.soundcloud || "");
-                                }}
-                                className="w-6 h-6 flex items-center justify-center hover:scale-110 transition-transform duration-200 rounded-sm"
-                                style={{ backgroundColor: 'var(--gold)', opacity: 0.8 }}
-                              >
-                                <Image
-                                  src="/soundcloud-svgrepo-com.svg"
-                                  alt="SoundCloud"
-                                  width={12}
-                                  height={12}
-                                  style={{ filter: 'brightness(0) saturate(100%) invert(8%) sepia(46%) saturate(2916%) hue-rotate(316deg) brightness(94%) contrast(99%)' }}
-                                />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Divider line between artists */}
-                {index < artists.length - 1 && (
-                  <div className="mt-12 flex items-center justify-center">
-                    <div className="w-full max-w-[200px] h-px bg-gradient-to-r from-transparent via-[var(--gold)]/20 to-transparent" />
                   </div>
                 )}
               </div>
-            );
-          })}
+
+              {/* Artist Info */}
+              <div className="flex-1 min-w-0">
+                <h3 className="text-xl sm:text-2xl font-prettywise text-white truncate">
+                  {artist.name}
+                </h3>
+                {artist.instagram && (
+                  <p className="mt-1 text-[10px] uppercase tracking-[0.25em] text-white/40 truncate">
+                    @{artist.instagram.replace('@', '')}
+                  </p>
+                )}
+              </div>
+
+              {/* Social buttons */}
+              <div className="flex-shrink-0 flex gap-2">
+                {artist.instagram && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSocialClick('instagram', artist.instagram || "");
+                    }}
+                    className="w-8 h-8 flex items-center justify-center hover:scale-110 transition-transform duration-200 rounded-sm"
+                    style={{ backgroundColor: 'var(--gold)', opacity: 0.85 }}
+                  >
+                    <Image
+                      src="/instagram-svgrepo-com.svg"
+                      alt="Instagram"
+                      width={14}
+                      height={14}
+                      style={{ filter: 'brightness(0) saturate(100%) invert(8%) sepia(46%) saturate(2916%) hue-rotate(316deg) brightness(94%) contrast(99%)' }}
+                    />
+                  </button>
+                )}
+                {artist.soundcloud && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSocialClick('soundcloud', artist.soundcloud || "");
+                    }}
+                    className="w-8 h-8 flex items-center justify-center hover:scale-110 transition-transform duration-200 rounded-sm"
+                    style={{ backgroundColor: 'var(--gold)', opacity: 0.85 }}
+                  >
+                    <Image
+                      src="/soundcloud-svgrepo-com.svg"
+                      alt="SoundCloud"
+                      width={14}
+                      height={14}
+                      style={{ filter: 'brightness(0) saturate(100%) invert(8%) sepia(46%) saturate(2916%) hue-rotate(316deg) brightness(94%) contrast(99%)' }}
+                    />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Bottom Decorative Element */}
-        <div className="mt-16 flex justify-center">
+        <div className="mt-10 lg:mt-16 flex justify-center">
           <div className="flex items-center gap-4">
             <div className="w-12 h-px" style={{ backgroundColor: 'var(--gold)', opacity: 0.3 }} />
             <div className="w-2 h-2 rotate-45" style={{ backgroundColor: 'var(--gold)', opacity: 0.5 }} />

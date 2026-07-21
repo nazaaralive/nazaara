@@ -104,7 +104,7 @@ export default function BookingsPage() {
       </section>
 
       {/* Artist Roster — leads the page */}
-      <section className="relative py-24 bg-gradient-to-b from-[var(--black-grey)] via-[var(--black-grey)] to-[var(--maroon-red)]/10 overflow-hidden">
+      <section className="relative py-14 lg:py-24 bg-gradient-to-b from-[var(--black-grey)] via-[var(--black-grey)] to-[var(--maroon-red)]/10 overflow-hidden">
         {/* Art Deco inspired grid pattern */}
         <div className="absolute inset-0 opacity-[0.03]">
           <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
@@ -343,7 +343,7 @@ export default function BookingsPage() {
       </section>
 
       {/* Private Events Introduction */}
-      <section className="py-24 bg-gradient-to-b from-[var(--black-grey)] to-[var(--maroon-red)]/5 border-t border-[var(--gold)]/10">
+      <section className="py-14 lg:py-24 bg-gradient-to-b from-[var(--black-grey)] to-[var(--maroon-red)]/5 border-t border-[var(--gold)]/10">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="max-w-4xl mx-auto">
             <div className="text-center">
@@ -389,7 +389,7 @@ export default function BookingsPage() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact-form" className="py-24 border-t border-[var(--gold)]/10">
+      <section id="contact-form" className="py-14 lg:py-24 border-t border-[var(--gold)]/10">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 items-start">

@@ -23,7 +23,7 @@ export default async function GalleriesPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative py-24 md:py-40 overflow-hidden">
+      <section className="relative py-14 lg:py-24 md:py-40 overflow-hidden">
         {/* Background image with overlays */}
         <div className="absolute inset-0">
           <div 
