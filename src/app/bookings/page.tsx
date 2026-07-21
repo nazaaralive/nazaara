@@ -131,7 +131,7 @@ export default function BookingsPage() {
             <div className="text-center mb-16">
               <div className="flex items-center justify-center gap-4 mb-8">
                 <div className="w-16 h-px bg-[var(--gold)]/20" />
-                <span className="text-[10px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]/40">
+                <span className="text-[10px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">
                   {djRosterContent.sectionTitle}
                 </span>
                 <div className="w-16 h-px bg-[var(--gold)]/20" />
@@ -153,8 +153,18 @@ export default function BookingsPage() {
                       <div key={dj.id} className="group relative">
                         {/* Card */}
                         <div
-                          className="relative cursor-pointer transition-transform duration-300 hover:scale-[1.02]"
+                          role="button"
+                          tabIndex={0}
+                          aria-expanded={expandedDj === dj.id}
+                          aria-label={`${dj.name} — view bio`}
+                          className="relative cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]/60"
                           onClick={() => setExpandedDj(expandedDj === dj.id ? null : dj.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              setExpandedDj(expandedDj === dj.id ? null : dj.id);
+                            }
+                          }}
                         >
                           {/* Click indicator */}
                           <div className="absolute top-4 right-4 z-10 bg-[var(--black-grey)]/80 backdrop-blur-sm px-3 py-1.5 border border-[var(--gold)]/20">
@@ -222,6 +232,7 @@ export default function BookingsPage() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
+                          aria-label={`${dj.name} on Instagram`}
                           className="group flex items-center justify-center w-9 h-9 border border-[var(--gold)]/10 hover:border-[var(--gold)]/30 hover:bg-[var(--gold)]/5 transition-all duration-300"
                         >
                           <svg
@@ -239,7 +250,7 @@ export default function BookingsPage() {
                             e.stopPropagation();
                             inquireAbout(dj);
                           }}
-                          className="px-4 py-2 text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]/70 border border-[var(--gold)]/20 hover:border-[var(--gold)]/50 hover:text-[var(--gold)] hover:bg-[var(--gold)]/5 transition-all duration-300 cursor-pointer"
+                          className="px-4 py-2 text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)] border border-[var(--gold)]/20 hover:border-[var(--gold)]/50 hover:text-[var(--gold)] hover:bg-[var(--gold)]/5 transition-all duration-300 cursor-pointer"
                         >
                           Book
                         </button>
@@ -379,7 +390,7 @@ export default function BookingsPage() {
                       <IconComponent className="w-5 h-5 text-[var(--gold)] mt-1 flex-shrink-0" />
                       <div>
                         <h3 className="text-lg font-prettywise text-[var(--off-white)] mb-2">{service.title}</h3>
-                        <p className="text-sm font-neue-haas text-[var(--off-white)]/50">
+                        <p className="text-sm font-neue-haas text-[var(--off-white)]/70">
                           {service.description}
                         </p>
                       </div>
@@ -401,7 +412,7 @@ export default function BookingsPage() {
               <div>
                 <div className="flex items-center gap-4 mb-8">
                   <div className="w-16 h-px bg-[var(--gold)]/20" />
-                  <span className="text-[10px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]/40">
+                  <span className="text-[10px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">
                     {contactFormContent.sectionTitle}
                   </span>
                 </div>
@@ -419,7 +430,7 @@ export default function BookingsPage() {
                   {contactFormContent.contactInfo.map((info, index) => (
                     <div key={index}>
                       <h3 className="text-xl font-prettywise text-[var(--off-white)] mb-2">{info.title}</h3>
-                      <p className="text-sm font-neue-haas text-[var(--off-white)]/50">
+                      <p className="text-sm font-neue-haas text-[var(--off-white)]/70">
                         {info.description}
                       </p>
                     </div>
@@ -427,7 +438,7 @@ export default function BookingsPage() {
                 </div>
 
                 <div className="pt-8 border-t border-[var(--gold)]/10">
-                  <p className="text-sm font-neue-haas text-[var(--off-white)]/40 mb-4">
+                  <p className="text-sm font-neue-haas text-[var(--off-white)]/70 mb-4">
                     {contactFormContent.contactEmail.label}
                   </p>
                   <a
@@ -497,10 +508,11 @@ export default function BookingsPage() {
                     <div className="grid md:grid-cols-2 gap-8">
                       {contactFormContent.formFields.personalInfo.map((field, index) => (
                         <div key={index} className="relative">
-                          <label className="absolute -top-2 left-0 text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]/40">
+                          <label htmlFor={index === 0 ? "name" : "email"} className="absolute -top-2 left-0 text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]">
                             {field.label}
                           </label>
                           <input
+                            id={index === 0 ? "name" : "email"}
                             name={index === 0 ? "name" : "email"}
                             type={field.type}
                             required={index === 0 || index === 1}
@@ -515,10 +527,11 @@ export default function BookingsPage() {
                     <div className="grid md:grid-cols-2 gap-8">
                       {contactFormContent.formFields.eventDetails.map((field, index) => (
                         <div key={index} className="relative">
-                          <label className="absolute -top-2 left-0 text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]/40">
+                          <label htmlFor={index === 0 ? "event_type" : "event_date"} className="absolute -top-2 left-0 text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]">
                             {field.label}
                           </label>
                           <input
+                            id={index === 0 ? "event_type" : "event_date"}
                             name={index === 0 ? "event_type" : "event_date"}
                             type={field.type}
                             required
@@ -533,10 +546,11 @@ export default function BookingsPage() {
                     <div className="grid md:grid-cols-2 gap-8">
                       {contactFormContent.formFields.locationAndScale.map((field, index) => (
                         <div key={index} className="relative">
-                          <label className="absolute -top-2 left-0 text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]/40">
+                          <label htmlFor={index === 0 ? "event_location" : "expected_guests"} className="absolute -top-2 left-0 text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]">
                             {field.label}
                           </label>
                           <input
+                            id={index === 0 ? "event_location" : "expected_guests"}
                             name={index === 0 ? "event_location" : "expected_guests"}
                             type={field.type}
                             required
@@ -549,10 +563,11 @@ export default function BookingsPage() {
 
                     {/* Vision Section */}
                     <div className="relative">
-                      <label className="absolute -top-2 left-0 text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]/40">
+                      <label htmlFor="message" className="absolute -top-2 left-0 text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]">
                         {contactFormContent.formFields.vision.label}
                       </label>
                       <textarea
+                        id="message"
                         name="message"
                         rows={contactFormContent.formFields.vision.rows}
                         required
