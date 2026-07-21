@@ -150,10 +150,10 @@ const neueHaas = localFont({
 
 export const metadata: Metadata = {
   title: "Nazaara Live",
-  description: "Premium South Asian/Indian music events worldwide. Professional DJ services, celebrity bookings, and unforgettable live experiences.",
+  description: "South Asian nightlife and culture, worldwide. Artist tours, events, and activations by Nazaara Live.",
   openGraph: {
     title: "Nazaara Live",
-    description: "Premium South Asian/Indian music events worldwide. Professional DJ services, celebrity bookings, and unforgettable live experiences.",
+    description: "South Asian nightlife and culture, worldwide. Artist tours, events, and activations by Nazaara Live.",
     images: [
       {
         url: "/OG.png",
@@ -166,7 +166,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Nazaara Live",
-    description: "Premium South Asian/Indian music events worldwide. Professional DJ services, celebrity bookings, and unforgettable live experiences.",
+    description: "South Asian nightlife and culture, worldwide. Artist tours, events, and activations by Nazaara Live.",
     images: ["/OG.png"],
   },
 };
