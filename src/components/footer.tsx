@@ -47,14 +47,14 @@ export function Footer({ hideAbout = false, hideBookings = false, useExternalGal
                     Nazaara Live
                   </h2>
                   <p className="text-lg font-neue-haas text-[var(--gold)] font-light max-w-lg">
-                    The Premier Name in South Asian Entertainment Excellence
+                    Nazaara means spectacle. We build them.
                   </p>
                 </div>
-                
+
                 <div className="lg:col-span-6 lg:text-right">
                   <p className="text-sm font-neue-haas text-white/60 leading-relaxed max-w-md lg:ml-auto">
-                    Orchestrating unforgettable experiences across continents, 
-                    bringing the pulse of South Asian culture to global audiences.
+                    We create experiences the diaspora grew up dreaming about:
+                    events, tours, and activations worldwide.
                   </p>
                 </div>
               </div>
