@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 interface NavigationProps {
   hideAbout?: boolean;
   hideBookings?: boolean;
-  hideDjRoster?: boolean;
   useExternalGallery?: boolean;
   externalGalleryUrl?: string;
   instagramUrl?: string;
@@ -20,7 +19,6 @@ interface NavigationProps {
 export function Navigation({
   hideAbout = false,
   hideBookings = false,
-  hideDjRoster = false,
   useExternalGallery = false,
   externalGalleryUrl,
   instagramUrl = "https://www.instagram.com/nazaara.live/",
@@ -113,28 +111,6 @@ export function Navigation({
                   className={cn(
                     "pointer-events-none absolute -bottom-1 left-0 h-px bg-primary transition-all duration-300",
                     isCurrent("/bookings")
-                      ? "w-full opacity-90"
-                      : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"
-                  )}
-                />
-              </Link>
-            )}
-            {!hideDjRoster && (
-              <Link
-                href="/dj-roster"
-                aria-current={isCurrent("/dj-roster") ? "page" : undefined}
-                className={cn(
-                  "relative group text-sm uppercase tracking-[0.2em] font-light transition-colors",
-                  isCurrent("/dj-roster")
-                    ? "text-primary"
-                    : "text-foreground/80 hover:text-primary"
-                )}
-              >
-                <span>Artist Roster</span>
-                <span
-                  className={cn(
-                    "pointer-events-none absolute -bottom-1 left-0 h-px bg-primary transition-all duration-300",
-                    isCurrent("/dj-roster")
                       ? "w-full opacity-90"
                       : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"
                   )}
@@ -277,21 +253,6 @@ export function Navigation({
                 aria-current={isCurrent("/bookings") ? "page" : undefined}
               >
                 Bookings
-              </Link>
-            )}
-            {!hideDjRoster && (
-              <Link
-                href="/dj-roster"
-                onClick={() => setOpen(false)}
-                className={cn(
-                  "block rounded-md px-3 py-3 text-base uppercase tracking-[0.18em] transition-colors",
-                  isCurrent("/dj-roster")
-                    ? "text-primary bg-primary/10"
-                    : "text-foreground/90 hover:bg-muted/30 hover:text-primary"
-                )}
-                aria-current={isCurrent("/dj-roster") ? "page" : undefined}
-              >
-                Artist Roster
               </Link>
             )}
             {useExternalGallery ? (

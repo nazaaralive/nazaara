@@ -21,6 +21,17 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
+  // /dj-roster is merged into /bookings — permanent redirect keeps old
+  // links and search results working.
+  async redirects() {
+    return [
+      {
+        source: '/dj-roster',
+        destination: '/bookings',
+        permanent: true,
+      },
+    ];
+  },
   // Branded SMS click-tracker — /r/<token> on nazaara.live proxies through to
   // the redirect endpoint on the nazaara-sms app, which records the click in
   // its DB and 302-redirects to the destination URL. We use rewrites (not
