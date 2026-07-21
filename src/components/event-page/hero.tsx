@@ -96,15 +96,16 @@ export default async function EventHero({ event }: EventHeroProps) {
 
                 {/* Main Poster with enhanced presentation */}
                 <div className="relative w-full">
-                  <div className="relative aspect-[4/5] overflow-hidden bg-[var(--dark-green)]/20">
+                  <div className="relative overflow-hidden bg-[var(--dark-green)]/20">
                     {event.image && (
                       <Image
                         src={event.image}
                         alt={event.title}
-                        fill
-                        className="object-cover"
+                        width={840}
+                        height={1120}
+                        className="w-full h-auto object-contain"
                         priority
-                        sizes="(max-width: 640px) 320px, 380px"
+                        sizes="100vw"
                       />
                     )}
                     {/* Premium vignette effects */}
@@ -113,8 +114,8 @@ export default async function EventHero({ event }: EventHeroProps) {
                   </div>
 
                   {/* Floating gold accent date element - top right */}
-                  <div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-16 h-16 sm:w-18 sm:h-18 bg-[var(--gold)] flex flex-col items-center justify-center">
-                    <p className="text-xl sm:text-2xl font-prettywise text-[var(--maroon-red)]">{event.date.split(' ')[0]}</p>
+                  <div className="absolute -top-5 -right-4 sm:-top-6 sm:-right-5 w-14 h-14 sm:w-16 sm:h-16 bg-[var(--gold)] flex flex-col items-center justify-center z-10">
+                    <p className="text-lg sm:text-xl font-prettywise text-[var(--maroon-red)] leading-none">{event.date.split(' ')[0]}</p>
                     <p className="text-[8px] sm:text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--maroon-red)]">{event.date.split(' ')[1]}</p>
                   </div>
 
@@ -513,13 +514,14 @@ export default async function EventHero({ event }: EventHeroProps) {
 
                 {/* Main Poster with enhanced presentation */}
                 <div className="relative w-full">
-                  <div className="relative aspect-[4/5] overflow-hidden bg-[var(--dark-green)]/20">
+                  <div className="relative overflow-hidden bg-[var(--dark-green)]/20">
                     {event.image && (
                       <Image
                         src={event.image}
                         alt={event.title}
-                        fill
-                        className="object-cover"
+                        width={840}
+                        height={1120}
+                        className="w-full h-auto object-contain"
                         priority
                         sizes="500px"
                       />
@@ -530,7 +532,7 @@ export default async function EventHero({ event }: EventHeroProps) {
                   </div>
 
                   {/* Floating gold accent date element - top right */}
-                  <div className="absolute -top-5 -right-5 w-20 h-20 bg-[var(--gold)] flex flex-col items-center justify-center">
+                  <div className="absolute -top-6 -right-6 w-20 h-20 bg-[var(--gold)] flex flex-col items-center justify-center z-10">
                     <p className="text-2xl font-prettywise text-[var(--maroon-red)]">{event.date.split(' ')[0]}</p>
                     <p className="text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--maroon-red)]">{event.date.split(' ')[1]}</p>
                   </div>

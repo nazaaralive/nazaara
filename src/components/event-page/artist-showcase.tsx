@@ -85,7 +85,7 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
                 />
                 
                 {/* Artist Image or Placeholder - Square Aspect */}
-                <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-[var(--maroon-red)]/20 to-[var(--maroon-red)]/5">
+                <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-[var(--maroon-red)]/20 to-[var(--maroon-red)]/5">
                   {artist.image ? (
                     <>
                       <Image
@@ -189,13 +189,13 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
               }`}
             >
               {/* Artist Image */}
-              <div className="flex-shrink-0 relative w-[42vw] max-w-[190px] aspect-[3/4] overflow-hidden">
+              <div className="flex-shrink-0 relative w-[45vw] max-w-[200px] aspect-square overflow-hidden">
                 {artist.image ? (
                   <Image
                     src={artist.image}
                     alt={artist.name}
                     fill
-                    sizes="42vw"
+                    sizes="45vw"
                     className="object-cover"
                   />
                 ) : (
