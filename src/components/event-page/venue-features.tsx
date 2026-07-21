@@ -9,7 +9,7 @@ export default function VenueFeatures({ event }: VenueFeaturesProps) {
   // Intentionally simplified: feature details may be added later
 
   return (
-    <section className="relative py-16 sm:py-20 lg:py-32 overflow-hidden">
+    <section className="relative pt-6 pb-16 sm:pt-8 sm:pb-20 lg:pt-16 lg:pb-32 overflow-hidden">
       {/* Subtle Pattern Background */}
       <div className="absolute inset-0 opacity-[0.01]">
         <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">

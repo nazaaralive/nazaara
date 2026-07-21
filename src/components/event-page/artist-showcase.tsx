@@ -196,25 +196,25 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
           {artists.map((artist, index) => (
             <div
               key={index}
-              className={`flex items-center gap-4 py-4 ${
+              className={`flex items-center gap-5 py-5 ${
                 index < artists.length - 1 ? "border-b border-[var(--gold)]/10" : ""
               }`}
             >
               {/* Artist Image */}
-              <div className="flex-shrink-0 relative w-20 h-20 sm:w-24 sm:h-24 overflow-hidden">
+              <div className="flex-shrink-0 relative w-32 h-32 sm:w-36 sm:h-36 overflow-hidden">
                 {artist.image ? (
                   <Image
                     src={artist.image}
                     alt={artist.name}
                     fill
-                    sizes="96px"
+                    sizes="144px"
                     className="object-cover"
                   />
                 ) : (
                   <div className="absolute inset-0" style={{ backgroundColor: 'var(--black-grey)' }}>
                     <div className="absolute inset-2 border" style={{ borderColor: 'var(--gold)', opacity: 0.1 }} />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--gold)', opacity: 0.15 }}>
+                      <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--gold)', opacity: 0.15 }}>
                         <circle cx="12" cy="8" r="3" stroke="currentColor" strokeWidth="1" />
                         <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
                       </svg>
@@ -225,7 +225,7 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
 
               {/* Artist Info */}
               <div className="flex-1 min-w-0">
-                <h3 className="text-xl sm:text-2xl font-prettywise text-white truncate">
+                <h3 className="text-2xl sm:text-3xl font-prettywise text-white truncate">
                   {artist.name}
                 </h3>
                 {artist.instagram && (
@@ -279,7 +279,7 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
         </div>
 
         {/* Bottom Decorative Element */}
-        <div className="mt-10 lg:mt-16 flex justify-center">
+        <div className="mt-8 lg:mt-16 flex justify-center">
           <div className="flex items-center gap-4">
             <div className="w-12 h-px" style={{ backgroundColor: 'var(--gold)', opacity: 0.3 }} />
             <div className="w-2 h-2 rotate-45" style={{ backgroundColor: 'var(--gold)', opacity: 0.5 }} />
