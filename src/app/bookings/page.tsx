@@ -62,7 +62,7 @@ export default function BookingsPage() {
   return (
     <div className="min-h-screen bg-[var(--black-grey)]">
       {/* Hero Section */}
-      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[68vh] lg:min-h-[60vh] flex items-center overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
@@ -72,19 +72,22 @@ export default function BookingsPage() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-[var(--maroon-red)]/80 via-[var(--maroon-red)]/60 to-[var(--dark-green)]/70" />
+          {/* Brand wash + darkening so the photo never competes with the copy */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--maroon-red)]/85 via-[var(--maroon-red)]/70 to-[var(--dark-green)]/80" />
+          {/* Vertical anchor: solid at the edges, lighter in the middle */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[var(--maroon-red)]/70 via-transparent to-[var(--black-grey)]/80" />
         </div>
 
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           <div className="max-w-5xl">
 
             {/* Main Title */}
-            <h1 className="heading-display text-[var(--off-white)] mb-8">
+            <h1 className="heading-display text-[var(--off-white)] mb-6 lg:mb-8 [text-shadow:0_2px_20px_rgba(0,0,0,0.5)]">
               {heroContent.title}
               <span className="block text-[var(--gold)]">{heroContent.subtitle}</span>
             </h1>
 
-            <p className="text-lg font-neue-haas text-[var(--off-white)]/70 leading-relaxed max-w-2xl mb-12">
+            <p className="text-base lg:text-lg font-neue-haas text-[var(--off-white)]/85 leading-relaxed max-w-2xl mb-8 lg:mb-12 [text-shadow:0_1px_12px_rgba(0,0,0,0.5)]">
               {heroContent.description}
             </p>
 
