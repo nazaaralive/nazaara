@@ -99,8 +99,6 @@ export default async function HeroMobile() {
   
   const startTimeStr = formatTime(featuredEvent.startTime);
   
-  // All artists including the headliner
-  const featuringArtists = featuredEvent.artists || [];
   const [day, month] = featuredEvent.date.split(' ');
 
   return (
@@ -200,43 +198,6 @@ export default async function HeroMobile() {
                 </p>
               )}
             </div>
-            
-            {/* Artists showcase - asymmetric layout */}
-            {featuringArtists.length > 0 && (
-              <div className="relative pl-8">
-                <div className="absolute left-0 top-0 bottom-0 w-[1px]" style={{ backgroundColor: 'var(--gold)', opacity: 0.4 }} />
-                <span className="font-neue-haas text-[9px] uppercase tracking-[0.5em]" style={{ color: 'var(--gold)', opacity: 0.8 }}>
-                  Featuring
-                </span>
-                <div className="mt-3 space-y-1">
-                  {featuringArtists.map((artist, index) => {
-                    const ig = artist.instagram?.trim();
-                    const name = artist.name.trim();
-                    const href = ig ? `https://instagram.com/${ig}` : undefined;
-                    return href ? (
-                      <a
-                        key={index}
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block font-prettywise text-2xl hover:text-[var(--gold)] transition-colors"
-                        style={{ color: 'var(--white)', opacity: 0.9 - index * 0.1 }}
-                      >
-                        {name}
-                      </a>
-                    ) : (
-                      <p
-                        key={index}
-                        className="font-prettywise text-2xl"
-                        style={{ color: 'var(--white)', opacity: 0.9 - index * 0.1 }}
-                      >
-                        {name}
-                      </p>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
             
             {/* Venue & time - minimalist approach */}
             <div className="space-y-6">
