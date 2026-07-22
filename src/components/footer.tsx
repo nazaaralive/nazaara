@@ -11,7 +11,7 @@ export function Footer({ hideAbout = false, hideBookings = false, useExternalGal
   return (
     <footer className="relative overflow-hidden" style={{ backgroundColor: 'var(--black-grey)' }}>
       {/* Geometric Pattern Overlay */}
-      <div className="absolute inset-0 opacity-5">
+      <div className="absolute inset-0 opacity-5 pointer-events-none">
         <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
           <defs>
             <pattern id="footer-pattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
@@ -24,7 +24,7 @@ export function Footer({ hideAbout = false, hideBookings = false, useExternalGal
       </div>
 
       {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
 
       <div className="relative">
         {/* Main Footer Content */}
