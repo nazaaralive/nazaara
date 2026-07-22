@@ -277,22 +277,24 @@ export default function BookingsPage() {
                                     </p>
                                   </div>
 
-                                  {/* Highlights */}
-                                  <div>
-                                    <h4 className="text-sm font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]/60 mb-4">
-                                      Career Highlights
-                                    </h4>
-                                    <ul className="space-y-2">
-                                      {dj.highlights?.map((highlight, idx) => (
-                                        <li key={idx} className="flex items-start gap-3">
-                                          <div className="w-1 h-1 bg-[var(--gold)]/60 rounded-full mt-2" />
-                                          <span className="text-sm font-neue-haas text-[var(--off-white)]/60">
-                                            {highlight}
-                                          </span>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
+                                  {/* Highlights — only render when the DJ actually has some */}
+                                  {dj.highlights && dj.highlights.length > 0 && (
+                                    <div>
+                                      <h4 className="text-sm font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]/60 mb-4">
+                                        Career Highlights
+                                      </h4>
+                                      <ul className="space-y-2">
+                                        {dj.highlights.map((highlight, idx) => (
+                                          <li key={idx} className="flex items-start gap-3">
+                                            <div className="w-1 h-1 bg-[var(--gold)]/60 rounded-full mt-2" />
+                                            <span className="text-sm font-neue-haas text-[var(--off-white)]/60">
+                                              {highlight}
+                                            </span>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* Contact/Booking CTA */}
