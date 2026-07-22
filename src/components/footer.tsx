@@ -104,8 +104,8 @@ export function Footer({ hideAbout = false, hideBookings = false, useExternalGal
                         Gallery
                       </a>
                     ) : (
-                      <Link 
-                        href="/gallery" 
+                      <Link
+                        href="/galleries"
                         className="block text-white font-neue-haas font-light hover:text-[var(--gold)] transition-colors"
                       >
                         Gallery
