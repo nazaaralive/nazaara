@@ -168,10 +168,10 @@ export default async function Hero() {
                 
                 {/* Dynamic Title Composition */}
                 <div className="space-y-0">
-                  <div className="overflow-hidden">
-                    <h1 className={`font-serif font-thin leading-[0.85] text-white md:py-2 ${
-                      featuredEvent.tagline 
-                        ? 'text-[12vw] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl' 
+                  <div className="overflow-visible">
+                    <h1 className={`font-serif font-thin leading-[1.02] pb-[0.08em] text-white md:py-2 ${
+                      featuredEvent.tagline
+                        ? 'text-[12vw] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl'
                         : 'text-[14vw] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl'
                     }`}>
                       {featuredEvent.title}
