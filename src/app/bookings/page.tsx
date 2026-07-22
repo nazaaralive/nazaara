@@ -151,27 +151,20 @@ export default function BookingsPage() {
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {djRoster.slice(startIdx, startIdx + 3).map((dj) => (
                       <div key={dj.id} className="group relative">
-                        {/* Card */}
-                        <div
-                          role="button"
-                          tabIndex={0}
-                          aria-expanded={expandedDj === dj.id}
-                          aria-label={`${dj.name} — view bio`}
-                          className="relative cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]/60"
-                          onClick={() => setExpandedDj(expandedDj === dj.id ? null : dj.id)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              setExpandedDj(expandedDj === dj.id ? null : dj.id);
-                            }
-                          }}
-                        >
-                          {/* Click indicator */}
-                          <div className="absolute top-4 right-4 z-10 bg-[var(--black-grey)]/80 backdrop-blur-sm px-3 py-1.5 border border-[var(--gold)]/20">
-                            <span className="text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]/60">
+                        {/* Card — plain container so its interactive children don't nest inside a button */}
+                        <div className="relative transition-transform duration-300 group-hover:scale-[1.02]">
+                          {/* View Bio / Close toggle — the one real button for this card */}
+                          <button
+                            type="button"
+                            aria-expanded={expandedDj === dj.id}
+                            aria-label={`${expandedDj === dj.id ? 'Close bio for' : 'View bio for'} ${dj.name}`}
+                            onClick={() => setExpandedDj(expandedDj === dj.id ? null : dj.id)}
+                            className="absolute top-4 right-4 z-10 bg-[var(--black-grey)]/80 backdrop-blur-sm px-3 py-1.5 border border-[var(--gold)]/20 hover:border-[var(--gold)]/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]/60 transition-colors cursor-pointer"
+                          >
+                            <span className="text-[9px] font-neue-haas uppercase tracking-[0.3em] text-[var(--gold)]/80">
                               {expandedDj === dj.id ? 'Close' : 'View Bio'}
                             </span>
-                          </div>
+                          </button>
 
                     {/* Square Image Container */}
                     <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-[var(--maroon-red)]/5 to-[var(--black-grey)]">
