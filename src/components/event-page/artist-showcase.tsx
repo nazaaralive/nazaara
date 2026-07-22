@@ -47,7 +47,7 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
                   Artist Lineup
                 </span>
               </div>
-              <h2 className="heading-section font-prettywise leading-[0.85] text-[var(--white)] mb-6">
+              <h2 className="heading-section font-prettywise text-[var(--white)] mb-6 pb-[0.08em]">
                 Meet The Artists
               </h2>
               <div className="flex items-baseline gap-6">

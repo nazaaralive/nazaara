@@ -326,7 +326,7 @@ export default async function EventHero({ event }: EventHeroProps) {
                     <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">Nazaara Live Presents</p>
                   </div>
 
-                  <h1 className="heading-display font-prettywise leading-[0.85] text-[var(--white)] mb-3">
+                  <h1 className="heading-display font-prettywise text-[var(--white)] mb-3 pb-[0.08em]">
                     {event.title}
                   </h1>
                   {event.tagline && (

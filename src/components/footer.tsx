@@ -43,7 +43,7 @@ export function Footer({ hideAbout = false, hideBookings = false, useExternalGal
               
               <div className="grid lg:grid-cols-12 gap-8 items-end">
                 <div className="lg:col-span-6">
-                  <h2 className="heading-section font-prettywise leading-[0.8] text-white mb-4">
+                  <h2 className="heading-section font-prettywise text-white mb-4 pb-[0.08em]">
                     Nazaara Live
                   </h2>
                   <p className="text-lg font-neue-haas text-[var(--gold)] font-light max-w-lg">

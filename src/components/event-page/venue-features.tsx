@@ -32,7 +32,7 @@ export default function VenueFeatures({ event }: VenueFeaturesProps) {
               The Venue
             </span>
           </div>
-          <h2 className="text-[2rem] sm:heading-section font-serif font-thin leading-[0.95] sm:leading-[0.9] text-white mb-3 sm:mb-4">
+          <h2 className="text-[2rem] sm:heading-section font-serif font-thin leading-[1.05] text-white mb-3 sm:mb-4 pb-[0.08em]">
             {event.venue}
           </h2>
           {(() => {
