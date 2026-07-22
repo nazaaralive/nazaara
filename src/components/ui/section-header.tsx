@@ -27,7 +27,7 @@ export default function SectionHeader({
         <div className="flex-1 h-[1px] bg-gradient-to-r from-[var(--gold)]/20 to-transparent" />
       </div>
       <h2
-        className={`${titleSize} font-prettywise leading-[0.8] text-foreground`}
+        className={`${titleSize} font-prettywise leading-[1.05] pb-[0.12em] text-foreground`}
       >
         {title}
       </h2>
