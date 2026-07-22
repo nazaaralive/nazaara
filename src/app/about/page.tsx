@@ -144,7 +144,7 @@ export default function AboutPage() {
                         <div className="text-6xl sm:text-8xl md:text-9xl font-serif font-light text-[var(--gold)]/10 absolute -top-8 sm:-top-12 left-1/2 -translate-x-1/2">{brand.number}</div>
                         <h3 className="text-3xl sm:text-5xl md:text-6xl font-serif font-light text-foreground/30 mb-2 relative">{brand.name}</h3>
                         <div className="w-24 h-px bg-[var(--gold)]/30 mx-auto mb-6" />
-                        <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[var(--gold)]/50 mb-4 sm:mb-6">{brand.category}</p>
+                        <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[var(--gold)] mb-4 sm:mb-6">{brand.category}</p>
                         <p className="text-muted-foreground/50 font-light leading-relaxed max-w-md mx-auto">
                           {brand.description}
                         </p>

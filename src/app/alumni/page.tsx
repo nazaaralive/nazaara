@@ -20,7 +20,7 @@ export default async function AlumniPage() {
           <div className="max-w-7xl mx-auto text-center">
             <div className="flex items-center justify-center gap-4 mb-6">
               <div className="w-16 h-px bg-[var(--gold)]/20" />
-              <span className="text-[10px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]/40">
+              <span className="text-[10px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">
                 The Family
               </span>
               <div className="w-16 h-px bg-[var(--gold)]/20" />

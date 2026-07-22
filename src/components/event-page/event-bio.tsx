@@ -16,7 +16,7 @@ export default function EventBio({ bio }: EventBioProps) {
         {/* Section header with decorative elements */}
         <div className="mb-10 flex items-center justify-center gap-4">
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[var(--gold)]/20" />
-          <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]/40">
+          <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">
             About This Event
           </p>
           <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[var(--gold)]/20" />

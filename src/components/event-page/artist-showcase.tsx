@@ -43,7 +43,7 @@ export default function ArtistShowcase({ artists }: ArtistShowcaseProps) {
             <div className="lg:col-span-8">
               <div className="flex items-center gap-4 mb-8">
                 <div className="h-[1px] w-12 bg-[var(--gold)]/40" />
-                <span className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]/50">
+                <span className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">
                   Artist Lineup
                 </span>
               </div>

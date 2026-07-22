@@ -21,7 +21,7 @@ export default function SectionHeader({
   return (
     <div className={`mb-12 ${className}`}>
       <div className="flex items-baseline gap-8 mb-2">
-        <span className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]/40">
+        <span className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">
           {eyebrow}
         </span>
         <div className="flex-1 h-[1px] bg-gradient-to-r from-[var(--gold)]/20 to-transparent" />

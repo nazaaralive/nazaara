@@ -74,7 +74,7 @@ export default async function EventHero({ event }: EventHeroProps) {
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-3">
                 <div className="h-[1px] w-8 bg-[var(--gold)]/30" />
-                <p className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)]/50">Nazaara Live Presents</p>
+                <p className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)]">Nazaara Live Presents</p>
                 <div className="h-[1px] w-8 bg-[var(--gold)]/30" />
               </div>
               <h1 className="text-[clamp(2.5rem,10vw,3.5rem)] font-prettywise leading-[0.85] text-[var(--white)] mb-2">
@@ -131,7 +131,7 @@ export default async function EventHero({ event }: EventHeroProps) {
               {/* Supporting Artists */}
               {supportingArtists.length > 0 && (
                 <div className="text-center">
-                  <span className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)]/50 block mb-1">
+                  <span className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)] block mb-1">
                     Featuring
                   </span>
                   <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -169,12 +169,12 @@ export default async function EventHero({ event }: EventHeroProps) {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="h-[1px] flex-1 bg-[var(--gold)]/20" />
-                    <p className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)]/40">Event Details</p>
+                    <p className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)]">Event Details</p>
                     <div className="h-[1px] flex-1 bg-[var(--gold)]/20" />
                   </div>
                   <div className="grid grid-cols-2 gap-6">
                     <div className="text-center">
-                      <p className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)]/40 mb-1">Venue</p>
+                      <p className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)] mb-1">Venue</p>
                       {(() => {
                         const mapsHref = event.venueAddressUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                           event.venueAddress || `${event.venue}, ${event.city}, ${event.country}`
@@ -192,7 +192,7 @@ export default async function EventHero({ event }: EventHeroProps) {
                       })()}
                     </div>
                     <div className="text-center">
-                      <p className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)]/40 mb-1">Date & Time</p>
+                      <p className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)] mb-1">Date & Time</p>
                       <div className="space-y-0.5">
                         <p className="text-base font-prettywise text-[var(--white)]">{event.date}</p>
                         <p className="text-sm font-neue-haas text-[var(--white)]/80">{startTimeStr} - {endTimeStr}</p>
@@ -207,7 +207,7 @@ export default async function EventHero({ event }: EventHeroProps) {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="h-[1px] flex-1 bg-[var(--gold)]/20" />
-                    <p className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)]/40">Tour Stops</p>
+                    <p className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)]">Tour Stops</p>
                     <div className="h-[1px] flex-1 bg-[var(--gold)]/20" />
                   </div>
                   <ul className="space-y-3">
@@ -323,7 +323,7 @@ export default async function EventHero({ event }: EventHeroProps) {
                   {/* Nazaara Live Presents Label */}
                   <div className="flex items-center gap-3 mb-4">
                     <div className="h-[1px] w-8 bg-[var(--gold)]/30" />
-                    <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]/50">Nazaara Live Presents</p>
+                    <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">Nazaara Live Presents</p>
                   </div>
 
                   <h1 className="heading-display font-prettywise leading-[0.85] text-[var(--white)] mb-3">
@@ -339,7 +339,7 @@ export default async function EventHero({ event }: EventHeroProps) {
                 {/* Supporting Artists */}
                 {supportingArtists.length > 0 && (
                   <div className="space-y-3">
-                    <p className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)]/40">Featuring</p>
+                    <p className="text-[8px] font-neue-haas uppercase tracking-[0.4em] text-[var(--gold)]">Featuring</p>
                     <p className="text-base font-prettywise text-[var(--white)]">
                       {supportingArtists.map((artist, index) => {
                         const ig = artist.instagram?.trim();
@@ -375,12 +375,12 @@ export default async function EventHero({ event }: EventHeroProps) {
                     <>
                       <div className="flex items-center gap-3">
                         <div className="h-[1px] w-8 bg-[var(--gold)]/20" />
-                        <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]/40">Event Details</p>
+                        <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">Event Details</p>
                         <div className="h-[1px] flex-1 bg-[var(--gold)]/20" />
                       </div>
                       <div className="grid grid-cols-2 gap-6">
                         <div>
-                          <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]/40 mb-1.5">Venue</p>
+                          <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)] mb-1.5">Venue</p>
                           {(() => {
                             const mapsHref = event.venueAddressUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                               event.venueAddress || `${event.venue}, ${event.city}, ${event.country}`
@@ -398,7 +398,7 @@ export default async function EventHero({ event }: EventHeroProps) {
                           })()}
                         </div>
                         <div>
-                          <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]/40 mb-1.5">Date & Time</p>
+                          <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)] mb-1.5">Date & Time</p>
                           <div className="space-y-0.5">
                             <p className="text-lg font-prettywise text-[var(--white)]">{event.date}</p>
                             <p className="text-sm font-neue-haas text-[var(--white)]/80">{startTimeStr} - {endTimeStr}</p>
@@ -412,7 +412,7 @@ export default async function EventHero({ event }: EventHeroProps) {
                     <div className="mt-2">
                       <div className="flex items-center gap-3 mb-2">
                         <div className="h-[1px] w-8 bg-[var(--gold)]/20" />
-                        <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]/40">Tour Stops</p>
+                        <p className="text-[9px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">Tour Stops</p>
                         <div className="h-[1px] flex-1 bg-[var(--gold)]/20" />
                       </div>
                       <div className="divide-y divide-[var(--gold)]/10 border border-[var(--gold)]/10">
