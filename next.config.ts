@@ -22,7 +22,23 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   // /dj-roster is merged into /bookings — permanent redirect keeps old
-  // links and search results working.
+  // links and search results working. (Now handled in the redirects() block
+  // below, which also carries the incident override.)
+  //
+  // ── INCIDENT OVERRIDE 2026-08-04 ────────────────────────────────────────
+  // The click-tracker on nazaara-sms is NOT serving: both /r/<token> and
+  // /api/r/<token> fall through to that app's SPA catch-all and render its
+  // admin login page instead of redirecting. Every short link in the live
+  // Calgary blast was therefore landing customers on a sign-in screen.
+  //
+  // This sends every /r/<token> straight to the Calgary ticket page so the
+  // links already sitting in people's phones work right now. Click attribution
+  // is sacrificed for the duration — a working link beats a tracked dead one.
+  //
+  // TO REVERT once the nazaara-sms function is fixed: delete this redirects()
+  // entry for '/r/:token' and re-enable the rewrite block below it. Do NOT
+  // leave this in place for a future campaign — it hard-codes one event URL
+  // and would misroute every later blast.
   async redirects() {
     return [
       {
@@ -30,17 +46,10 @@ const nextConfig: NextConfig = {
         destination: '/bookings',
         permanent: true,
       },
-    ];
-  },
-  // Branded SMS click-tracker — /r/<token> on nazaara.live proxies through to
-  // the redirect endpoint on the nazaara-sms app, which records the click in
-  // its DB and 302-redirects to the destination URL. We use rewrites (not
-  // redirects) so the user-visible URL stays nazaara.live in the SMS body.
-  async rewrites() {
-    return [
       {
         source: '/r/:token',
-        destination: 'https://nazaara-sms.vercel.app/r/:token',
+        destination: 'https://www.showpass.com/tamasha-calgary-3/',
+        permanent: false, // 307 — must stay temporary so it can be undone
       },
     ];
   },
