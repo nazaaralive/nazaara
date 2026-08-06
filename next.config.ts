@@ -22,23 +22,7 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   // /dj-roster is merged into /bookings — permanent redirect keeps old
-  // links and search results working. (Now handled in the redirects() block
-  // below, which also carries the incident override.)
-  //
-  // ── INCIDENT OVERRIDE 2026-08-04 ────────────────────────────────────────
-  // The click-tracker on nazaara-sms is NOT serving: both /r/<token> and
-  // /api/r/<token> fall through to that app's SPA catch-all and render its
-  // admin login page instead of redirecting. Every short link in the live
-  // Calgary blast was therefore landing customers on a sign-in screen.
-  //
-  // This sends every /r/<token> straight to the Calgary ticket page so the
-  // links already sitting in people's phones work right now. Click attribution
-  // is sacrificed for the duration — a working link beats a tracked dead one.
-  //
-  // TO REVERT once the nazaara-sms function is fixed: delete this redirects()
-  // entry for '/r/:token' and re-enable the rewrite block below it. Do NOT
-  // leave this in place for a future campaign — it hard-codes one event URL
-  // and would misroute every later blast.
+  // links and search results working.
   async redirects() {
     return [
       {
@@ -46,10 +30,28 @@ const nextConfig: NextConfig = {
         destination: '/bookings',
         permanent: true,
       },
+    ];
+  },
+  // Branded SMS click-tracker — /r/<token> on nazaara.live proxies through to
+  // the redirect endpoint on the nazaara-sms app, which records the click and
+  // 302s to the destination stored for that token. A rewrite (not a redirect)
+  // keeps the user-visible URL on nazaara.live inside the SMS body.
+  //
+  // Points at /api/redirect?token= rather than /api/r/<token>: the dynamic
+  // [token].js route is not built as a function on that project and returned
+  // the SPA for every request, which on 2026-08-04 sent an entire live blast
+  // to the SMS admin login page. The static-named endpoint resolves correctly.
+  // See nazaara-sms/api/redirect.js for the full write-up.
+  //
+  // A blanket redirect to one event URL was used as a stopgap during that
+  // incident. It is deliberately gone: every recipient gets a unique token, so
+  // any hard-coded destination misroutes every other campaign — which is
+  // exactly what happened to the Edmonton blast while it was in place.
+  async rewrites() {
+    return [
       {
         source: '/r/:token',
-        destination: 'https://www.showpass.com/tamasha-calgary-3/',
-        permanent: false, // 307 — must stay temporary so it can be undone
+        destination: 'https://nazaara-sms.vercel.app/api/redirect?token=:token',
       },
     ];
   },
