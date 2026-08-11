@@ -73,6 +73,26 @@ export function Navigation({
 
           {/* Right Side Navigation (Desktop) */}
           <div className="hidden lg:flex items-center gap-8">
+            <Link
+              href="/vip"
+              aria-current={isCurrent("/vip") ? "page" : undefined}
+              className={cn(
+                "relative group text-sm uppercase tracking-[0.2em] font-light transition-colors",
+                isCurrent("/vip")
+                  ? "text-primary"
+                  : "text-foreground/80 hover:text-primary"
+              )}
+            >
+              <span>VIP</span>
+              <span
+                className={cn(
+                  "pointer-events-none absolute -bottom-1 left-0 h-px bg-primary transition-all duration-300",
+                  isCurrent("/vip")
+                    ? "w-full opacity-90"
+                    : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"
+                )}
+              />
+            </Link>
             {!hideAbout && (
               <Link
                 href="/about"
@@ -117,26 +137,6 @@ export function Navigation({
                 />
               </Link>
             )}
-            <Link
-              href="/vip"
-              aria-current={isCurrent("/vip") ? "page" : undefined}
-              className={cn(
-                "relative group text-sm uppercase tracking-[0.2em] font-light transition-colors",
-                isCurrent("/vip")
-                  ? "text-primary"
-                  : "text-foreground/80 hover:text-primary"
-              )}
-            >
-              <span>VIP</span>
-              <span
-                className={cn(
-                  "pointer-events-none absolute -bottom-1 left-0 h-px bg-primary transition-all duration-300",
-                  isCurrent("/vip")
-                    ? "w-full opacity-90"
-                    : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"
-                )}
-              />
-            </Link>
             <Link
               href="/alumni"
               aria-current={isCurrent("/alumni") ? "page" : undefined}
@@ -265,6 +265,19 @@ export function Navigation({
       >
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col gap-2 py-2">
+            <Link
+              href="/vip"
+              onClick={() => setOpen(false)}
+              className={cn(
+                "block rounded-md px-3 py-3 text-base uppercase tracking-[0.18em] transition-colors",
+                isCurrent("/vip")
+                  ? "text-primary bg-primary/10"
+                  : "text-foreground/90 hover:bg-muted/30 hover:text-primary"
+              )}
+              aria-current={isCurrent("/vip") ? "page" : undefined}
+            >
+              VIP
+            </Link>
             {!hideAbout && (
               <Link
                 href="/about"
@@ -295,19 +308,6 @@ export function Navigation({
                 Bookings
               </Link>
             )}
-            <Link
-              href="/vip"
-              onClick={() => setOpen(false)}
-              className={cn(
-                "block rounded-md px-3 py-3 text-base uppercase tracking-[0.18em] transition-colors",
-                isCurrent("/vip")
-                  ? "text-primary bg-primary/10"
-                  : "text-foreground/90 hover:bg-muted/30 hover:text-primary"
-              )}
-              aria-current={isCurrent("/vip") ? "page" : undefined}
-            >
-              VIP
-            </Link>
             <Link
               href="/alumni"
               onClick={() => setOpen(false)}
