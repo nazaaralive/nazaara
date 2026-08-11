@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { PublicEvent, getPublicEventStops } from "@/lib/public-actions";
 
 interface EventHeroProps {
@@ -252,7 +253,7 @@ export default async function EventHero({ event }: EventHeroProps) {
 
               {/* CTA Section (hidden for tours) */}
               {stops.length === 0 && (
-                <div className="flex justify-center">
+                <div className="flex flex-col gap-3">
                   {event.ticketUrl ? (
                     <a
                       href={event.ticketUrl}
@@ -289,6 +290,18 @@ export default async function EventHero({ event }: EventHeroProps) {
                       </div>
                     </button>
                   )}
+
+                  {/* Secondary CTA — VIP tables */}
+                  <Link
+                    href="/vip"
+                    className="relative w-full block border border-[var(--gold)]/40 hover:border-[var(--gold)] hover:bg-[var(--gold)]/5 transition-colors"
+                  >
+                    <div className="py-4 flex items-center justify-center">
+                      <span className="font-neue-haas text-[11px] uppercase tracking-[0.5em] font-medium text-[var(--gold)]">
+                        VIP Table
+                      </span>
+                    </div>
+                  </Link>
                 </div>
               )}
 
@@ -500,6 +513,18 @@ export default async function EventHero({ event }: EventHeroProps) {
                         </div>
                       </button>
                     )}
+
+                    {/* Secondary CTA — VIP tables */}
+                    <Link
+                      href="/vip"
+                      className="mt-3 w-full relative block border border-[var(--gold)]/40 hover:border-[var(--gold)] hover:bg-[var(--gold)]/5 transition-colors"
+                    >
+                      <div className="px-8 py-4 flex items-center justify-center">
+                        <p className="text-[11px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)] font-medium">
+                          VIP Table
+                        </p>
+                      </div>
+                    </Link>
                   </div>
                 )}
               </div>
