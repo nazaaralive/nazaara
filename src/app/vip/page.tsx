@@ -56,12 +56,13 @@ export default function VipPage() {
             src="/vip-bg.jpg"
             alt="Bottle service at a Nazaara event"
             fill
-            className="object-cover [filter:sepia(0.45)_saturate(1.15)_brightness(0.8)]"
+            className="object-cover object-[50%_28%] [filter:sepia(0.5)_saturate(1.1)_brightness(0.52)]"
             priority
           />
           <div className="absolute inset-0 bg-[var(--gold)]/15 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-br from-[var(--maroon-red)]/75 via-[var(--maroon-red)]/60 to-[var(--dark-green)]/70" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[var(--maroon-red)]/70 via-transparent to-[var(--black-grey)]/85" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--maroon-red)]/85 via-[var(--maroon-red)]/72 to-[var(--dark-green)]/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[var(--maroon-red)]/75 via-transparent to-[var(--black-grey)]/95" />
+          <div className="absolute inset-0 bg-black/25" />
         </div>
 
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
@@ -69,7 +70,7 @@ export default function VipPage() {
             <div className="flex items-center gap-4 mb-6">
               <div className="h-px w-12 bg-[var(--gold)]" />
               <span className="text-[10px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">
-                Nazaara Live Presents
+                Nazaara Live
               </span>
             </div>
 
@@ -95,65 +96,8 @@ export default function VipPage() {
         </div>
       </section>
 
-      {/* Typical Inclusions */}
-      <section className="relative py-14 lg:py-24 bg-gradient-to-b from-[var(--black-grey)] via-[var(--black-grey)] to-[var(--maroon-red)]/10 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03]">
-          <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-            <defs>
-              <pattern id="vip-grid" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
-                <rect x="0" y="0" width="80" height="80" fill="none" stroke="var(--gold)" strokeWidth="0.5" />
-                <rect x="10" y="10" width="60" height="60" fill="none" stroke="var(--gold)" strokeWidth="0.3" />
-                <line x1="0" y1="40" x2="80" y2="40" stroke="var(--gold)" strokeWidth="0.2" />
-                <line x1="40" y1="0" x2="40" y2="80" stroke="var(--gold)" strokeWidth="0.2" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#vip-grid)" />
-          </svg>
-        </div>
-
-        <div className="relative container mx-auto px-6 lg:px-12">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-4 mb-10">
-              <div className="h-px w-12 bg-[var(--gold)]" />
-              <span className="text-[10px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">
-                Typical Inclusions
-              </span>
-              <div className="h-px flex-1 bg-gradient-to-r from-[var(--gold)]/20 to-transparent" />
-            </div>
-
-            <ol className="space-y-0">
-              {inclusions.map((item, index) => (
-                <li
-                  key={item.title}
-                  className={`flex items-baseline gap-5 py-5 ${
-                    index < inclusions.length - 1 ? "border-b border-[var(--gold)]/10" : ""
-                  }`}
-                >
-                  <span className="font-prettywise text-lg text-[var(--gold)] shrink-0 w-8">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <div>
-                    <h3 className="heading-card text-[var(--off-white)] leading-snug">
-                      {item.title}
-                    </h3>
-                    <p className="mt-1 font-neue-haas text-sm text-[var(--off-white)]/70">
-                      {item.description}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-
-            <p className="mt-8 font-neue-haas text-xs text-[var(--off-white)]/60 leading-relaxed">
-              * Bottle show and marquee signage depend on the venue. We&apos;ll confirm
-              what&apos;s available for your event when we reply.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Request form */}
-      <section id="vip-form" className="py-14 lg:py-24 border-t border-[var(--gold)]/10">
+      <section id="vip-form" className="py-14 lg:py-24">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center gap-4 mb-8">
@@ -164,8 +108,7 @@ export default function VipPage() {
             </div>
 
             <h2 className="heading-section text-[var(--off-white)] mb-8 pb-[0.08em]">
-              Request a
-              <span className="block text-gold-metallic">Table</span>
+              Request a <span className="text-gold-metallic">Table</span>
             </h2>
 
             {/* Card flip: form on the front, confirmation on the back */}
@@ -242,7 +185,7 @@ export default function VipPage() {
                           name="event"
                           required
                           defaultValue=""
-                          className="w-full px-0 pt-6 pb-3 bg-transparent border-0 border-b border-[var(--gold)]/30 text-[var(--off-white)] focus:border-[var(--gold)]/60 focus:outline-none transition-all duration-300 font-neue-haas text-lg cursor-pointer [&>option]:bg-[var(--black-grey)] [&>option]:text-[var(--off-white)]"
+                          className="peer w-full appearance-none px-0 pr-8 pt-6 pb-3 bg-transparent border-0 border-b border-[var(--gold)]/30 text-[var(--off-white)] focus:border-[var(--gold)] focus:outline-none transition-all duration-300 font-neue-haas text-lg cursor-pointer invalid:text-[var(--off-white)]/40 [&>option]:bg-[var(--black-grey)] [&>option]:text-[var(--off-white)] [&>option]:py-3"
                         >
                           <option value="" disabled>
                             Select an event
@@ -256,6 +199,17 @@ export default function VipPage() {
                             Not listed / general inquiry
                           </option>
                         </select>
+                        {/* Custom gold chevron */}
+                        <svg
+                          aria-hidden="true"
+                          className="pointer-events-none absolute right-0 bottom-4 h-4 w-4 text-[var(--gold)]/70 peer-focus:text-[var(--gold)] transition-colors"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={1.5}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+                        </svg>
                       </div>
                     </div>
 
@@ -386,6 +340,63 @@ export default function VipPage() {
           </div>
         </div>
       </section>
+      {/* Typical Inclusions */}
+      <section className="relative py-14 lg:py-24 border-t border-[var(--gold)]/10 bg-gradient-to-b from-[var(--black-grey)] via-[var(--black-grey)] to-[var(--maroon-red)]/10 overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.03]">
+          <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+            <defs>
+              <pattern id="vip-grid" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+                <rect x="0" y="0" width="80" height="80" fill="none" stroke="var(--gold)" strokeWidth="0.5" />
+                <rect x="10" y="10" width="60" height="60" fill="none" stroke="var(--gold)" strokeWidth="0.3" />
+                <line x1="0" y1="40" x2="80" y2="40" stroke="var(--gold)" strokeWidth="0.2" />
+                <line x1="40" y1="0" x2="40" y2="80" stroke="var(--gold)" strokeWidth="0.2" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#vip-grid)" />
+          </svg>
+        </div>
+
+        <div className="relative container mx-auto px-6 lg:px-12">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center gap-4 mb-10">
+              <div className="h-px w-12 bg-[var(--gold)]" />
+              <span className="text-[10px] font-neue-haas uppercase tracking-[0.5em] text-[var(--gold)]">
+                Typical Inclusions
+              </span>
+              <div className="h-px flex-1 bg-gradient-to-r from-[var(--gold)]/20 to-transparent" />
+            </div>
+
+            <ol className="space-y-0">
+              {inclusions.map((item, index) => (
+                <li
+                  key={item.title}
+                  className={`flex items-baseline gap-5 py-5 ${
+                    index < inclusions.length - 1 ? "border-b border-[var(--gold)]/10" : ""
+                  }`}
+                >
+                  <span className="font-prettywise text-lg text-[var(--gold)] shrink-0 w-8">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h3 className="heading-card text-[var(--off-white)] leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="mt-1 font-neue-haas text-sm text-[var(--off-white)]/70">
+                      {item.description}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <p className="mt-8 font-neue-haas text-xs text-[var(--off-white)]/60 leading-relaxed">
+              * Bottle show and marquee signage depend on the venue. We&apos;ll confirm
+              what&apos;s available for your event when we reply.
+            </p>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }
