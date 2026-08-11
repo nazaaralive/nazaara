@@ -94,6 +94,12 @@ export function Footer({ hideAbout = false, hideBookings = false, useExternalGal
                       </Link>
                     )}
                    
+                    <Link
+                      href="/vip"
+                      className="block text-white font-neue-haas font-light hover:text-[var(--gold)] transition-colors"
+                    >
+                      VIP Tables
+                    </Link>
                     {useExternalGallery ? (
                       <a 
                         href={externalGalleryUrl || "https://tamasha.myportfolio.com/"}
