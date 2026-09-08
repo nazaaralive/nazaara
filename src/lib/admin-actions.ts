@@ -942,17 +942,79 @@ export async function getGalleryBySlug(slug: string) {
   }
 }
 
+// Fetch the slug itself plus every "-2"/"-3" variant in one query, so we can
+// answer availability and compute a free suggestion without a second round trip.
+// excludeId lets an edit form ignore the gallery own current slug.
+async function getTakenGallerySlugs(normalized: string, excludeId?: number): Promise<Set<string>> {
+  const rows = await db
+    .select({ id: galleries.id, slug: galleries.slug })
+    .from(galleries)
+    .where(sql`${galleries.slug} = ${normalized} OR ${galleries.slug} LIKE ${normalized + "-%"}`)
+
+  return new Set(
+    rows.filter(r => excludeId === undefined || r.id !== excludeId).map(r => r.slug)
+  )
+}
+
+// Live slug availability check for the gallery forms. Mirrors checkEventSlug.
+// Returns whether the normalized slug is free and, if taken, the first free
+// "-2"/"-3" variant. Pass the gallery id when editing so its own slug is not
+// reported as a conflict against itself.
+export async function checkGallerySlug(rawSlug: string, excludeId?: number): Promise<{
+  normalized: string
+  available: boolean
+  suggestion: string | null
+}> {
+  const normalized = generateSlug(rawSlug || "")
+  if (!normalized) return { normalized: "", available: false, suggestion: null }
+
+  const taken = await getTakenGallerySlugs(normalized, excludeId)
+  if (!taken.has(normalized)) {
+    return { normalized, available: true, suggestion: null }
+  }
+  for (let i = 2; i < 100; i++) {
+    const candidate = `${normalized}-${i}`
+    if (!taken.has(candidate)) {
+      return { normalized, available: false, suggestion: candidate }
+    }
+  }
+  return { normalized, available: false, suggestion: null }
+}
+
+// Server-side safety net: returns a slug guaranteed free in the galleries
+// table. The form checks live, but a race (or a stale client) must never trip
+// the DB unique constraint with a 500.
+async function ensureUniqueGallerySlug(desired: string, excludeId?: number): Promise<string> {
+  const normalized = generateSlug(desired || "")
+  if (!normalized) {
+    throw new Error("A valid URL slug is required")
+  }
+
+  const taken = await getTakenGallerySlugs(normalized, excludeId)
+  if (!taken.has(normalized)) return normalized
+
+  for (let i = 2; i < 1000; i++) {
+    const candidate = `${normalized}-${i}`
+    if (!taken.has(candidate)) return candidate
+  }
+  throw new Error("Could not generate a unique gallery slug")
+}
+
 export async function createGallery(formData: FormData) {
   const title = formData.get("title") as string
   const description = formData.get("description") as string
   const city = formData.get("city") as string
   const dateStr = formData.get("date") as string
+  const rawSlug = formData.get("slug") as string
 
   if (!title || !dateStr) {
     throw new Error("Required fields missing")
   }
 
-  const slug = generateSlug(title)
+  // Honour the slug typed in the form (falling back to the title) and make sure
+  // it is free. This used to be generateSlug(title), which both ignored a
+  // hand-edited slug and collided whenever two events shared a name.
+  const slug = await ensureUniqueGallerySlug(rawSlug || title)
   const date = new Date(dateStr)
 
   // Parse image data from form
@@ -1001,15 +1063,18 @@ export async function createGallery(formData: FormData) {
 export async function updateGallery(formData: FormData) {
   const galleryId = parseInt(formData.get("galleryId") as string)
   const title = formData.get("title") as string
-  const slug = formData.get("slug") as string
+  const rawSlug = formData.get("slug") as string
   const description = formData.get("description") as string
   const city = formData.get("city") as string
   const dateStr = formData.get("date") as string
 
-  if (!galleryId || !title || !slug || !dateStr) {
+  if (!galleryId || !title || !rawSlug || !dateStr) {
     throw new Error("Required fields missing")
   }
 
+  // Guard against collisions with OTHER galleries. This gallery own current
+  // slug is excluded, so re-saving without renaming leaves the slug untouched.
+  const slug = await ensureUniqueGallerySlug(rawSlug, galleryId)
   const date = new Date(dateStr)
 
   // Parse new image data from form
