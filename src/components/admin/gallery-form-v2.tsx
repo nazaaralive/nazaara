@@ -1,15 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type React from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, Save, Trash2, Image, Calendar } from "lucide-react"
+import { Loader2, Save, Trash2, Image, Calendar, CheckCircle2, XCircle } from "lucide-react"
 import { GalleryUploadThingUpload } from "@/components/admin/gallery-uploadthing-upload"
 import { GalleryDatePicker } from "@/components/admin/gallery-date-picker"
-import { createGallery, updateGallery, deleteGallery } from "@/lib/admin-actions"
+import { createGallery, updateGallery, deleteGallery, checkGallerySlug } from "@/lib/admin-actions"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,6 +52,45 @@ export function GalleryFormV2({ gallery, mode }: GalleryFormProps) {
   const [slug, setSlug] = useState(gallery?.slug || "")
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(mode === "edit")
 
+  // Live slug availability: idle | checking | available | taken
+  const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "available" | "taken">("idle")
+  const [slugSuggestion, setSlugSuggestion] = useState<string | null>(null)
+
+  // Debounced availability check against the DB whenever the slug changes.
+  // If the slug was AUTO-generated and is already taken, silently adopt the
+  // suggested free variant (e.g. "diwali-2") so the default is always usable.
+  // If the user typed it manually, show the conflict and a clickable suggestion.
+  // In edit mode the gallery id is excluded, so re-saving without renaming
+  // never reports a false conflict against itself.
+  useEffect(() => {
+    if (!slug.trim()) {
+      setSlugStatus("idle")
+      setSlugSuggestion(null)
+      return
+    }
+    let cancelled = false
+    setSlugStatus("checking")
+    const t = setTimeout(async () => {
+      try {
+        const result = await checkGallerySlug(slug, gallery?.id)
+        if (cancelled) return
+        if (result.available) {
+          setSlugStatus("available")
+          setSlugSuggestion(null)
+        } else if (!isSlugManuallyEdited && result.suggestion) {
+          // Auto-generated default collided - swap in the free variant.
+          setSlug(result.suggestion)
+        } else {
+          setSlugStatus("taken")
+          setSlugSuggestion(result.suggestion)
+        }
+      } catch {
+        if (!cancelled) setSlugStatus("idle") // never block the form on a failed check
+      }
+    }, 400)
+    return () => { cancelled = true; clearTimeout(t) }
+  }, [slug, isSlugManuallyEdited, gallery?.id])
+
   // Auto-generate slug from title
   const generateSlug = (text: string): string => {
     return text
@@ -84,6 +123,11 @@ export function GalleryFormV2({ gallery, mode }: GalleryFormProps) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    // Block save while the slug is known-taken. The server also guards this,
+    // but failing here is friendlier than a surprise rename on save.
+    if (slugStatus === "taken") return
+
     setIsSubmitting(true)
     
     const formData = new FormData(e.currentTarget)
@@ -198,6 +242,31 @@ export function GalleryFormV2({ gallery, mode }: GalleryFormProps) {
                   <p className="text-xs text-muted-foreground">
                     nazaara.live/galleries/{slug || "your-gallery-slug"}
                   </p>
+                  {/* Live availability indicator */}
+                  {slug && slugStatus === "checking" && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Loader2 className="h-3 w-3 animate-spin" /> Checking availability...
+                    </p>
+                  )}
+                  {slug && slugStatus === "available" && (
+                    <p className="text-xs text-green-500 flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" /> Slug is available
+                    </p>
+                  )}
+                  {slug && slugStatus === "taken" && (
+                    <p className="text-xs text-red-400 flex items-center gap-1 flex-wrap">
+                      <XCircle className="h-3 w-3" /> Already used by another gallery.
+                      {slugSuggestion && (
+                        <button
+                          type="button"
+                          className="underline underline-offset-2 text-[--gold] hover:opacity-80"
+                          onClick={() => { setSlug(slugSuggestion); setIsSlugManuallyEdited(true) }}
+                        >
+                          Use &ldquo;{slugSuggestion}&rdquo; instead
+                        </button>
+                      )}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -267,7 +336,7 @@ export function GalleryFormV2({ gallery, mode }: GalleryFormProps) {
             <div className="space-y-3">
               <Button
                 type="submit"
-                disabled={isSubmitting || isDeleting}
+                disabled={isSubmitting || isDeleting || slugStatus === "taken"}
                 className="w-full bg-[--gold] text-[--maroon-red] hover:bg-[--gold]/90"
               >
                 {isSubmitting ? (
