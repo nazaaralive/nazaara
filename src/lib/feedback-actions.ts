@@ -105,13 +105,15 @@ export async function submitEventFeedback(formData: FormData): Promise<SubmitFee
       eventSlug: event.slug,
       eventTitle: event.title,
 
+      attendeeName: parseText(formData.get("attendeeName"), 200),
+
       overallRating,
 
       musicRating: parseScore(formData.get("musicRating"), 1, 5),
       venueRating: parseScore(formData.get("venueRating"), 1, 5),
       soundRating: parseScore(formData.get("soundRating"), 1, 5),
       crowdRating: parseScore(formData.get("crowdRating"), 1, 5),
-      valueRating: parseScore(formData.get("valueRating"), 1, 5),
+      vibesRating: parseScore(formData.get("vibesRating"), 1, 5),
 
       npsScore: parseScore(formData.get("npsScore"), 0, 10),
       wouldReturn,
@@ -237,12 +239,13 @@ export async function getFeedbackHub(): Promise<FeedbackHubRow[]> {
 
 export interface FeedbackResponse {
   id: number
+  attendeeName: string | null
   overallRating: number
   musicRating: number | null
   venueRating: number | null
   soundRating: number | null
   crowdRating: number | null
-  valueRating: number | null
+  vibesRating: number | null
   npsScore: number | null
   wouldReturn: boolean | null
   highlight: string | null
@@ -262,7 +265,7 @@ export interface EventFeedbackDetail {
     venue: number | null
     sound: number | null
     crowd: number | null
-    value: number | null
+    vibes: number | null
     nps: number | null
   }
   wouldReturnYes: number
@@ -282,12 +285,13 @@ export async function getEventFeedbackDetail(slug: string): Promise<EventFeedbac
       id: eventFeedback.id,
       eventSlug: eventFeedback.eventSlug,
       eventTitle: eventFeedback.eventTitle,
+      attendeeName: eventFeedback.attendeeName,
       overallRating: eventFeedback.overallRating,
       musicRating: eventFeedback.musicRating,
       venueRating: eventFeedback.venueRating,
       soundRating: eventFeedback.soundRating,
       crowdRating: eventFeedback.crowdRating,
-      valueRating: eventFeedback.valueRating,
+      vibesRating: eventFeedback.vibesRating,
       npsScore: eventFeedback.npsScore,
       wouldReturn: eventFeedback.wouldReturn,
       highlight: eventFeedback.highlight,
@@ -314,7 +318,7 @@ export async function getEventFeedbackDetail(slug: string): Promise<EventFeedbac
       venue: average(responses.map((r) => r.venueRating)),
       sound: average(responses.map((r) => r.soundRating)),
       crowd: average(responses.map((r) => r.crowdRating)),
-      value: average(responses.map((r) => r.valueRating)),
+      vibes: average(responses.map((r) => r.vibesRating)),
       nps: average(responses.map((r) => r.npsScore)),
     },
     wouldReturnYes: responses.filter((r) => r.wouldReturn === true).length,
