@@ -72,12 +72,13 @@ const COLUMNS: {
   get: (r: FeedbackResponse) => string | number | boolean | null | Date
 }[] = [
   { header: "Submitted", get: (r) => r.createdAt },
+  { header: "Name", get: (r) => r.attendeeName },
   { header: "Overall", get: (r) => r.overallRating },
   { header: "Music", get: (r) => r.musicRating },
   { header: "Venue", get: (r) => r.venueRating },
   { header: "Sound", get: (r) => r.soundRating },
   { header: "Crowd", get: (r) => r.crowdRating },
-  { header: "Value", get: (r) => r.valueRating },
+  { header: "Vibes", get: (r) => r.vibesRating },
   { header: "NPS", get: (r) => r.npsScore },
   { header: "Would return", get: (r) => (r.wouldReturn === null ? null : r.wouldReturn ? "Yes" : "No") },
   { header: "Loved", get: (r) => r.highlight },
