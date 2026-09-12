@@ -473,7 +473,7 @@ export const eventFeedback = pgTable("event_feedback", {
   venueRating: integer("venue_rating"),
   soundRating: integer("sound_rating"),
   crowdRating: integer("crowd_rating"),
-  valueRating: integer("value_rating"),
+  vibesRating: integer("vibes_rating"),
 
   // Net Promoter Score, 0-10, plus a simpler yes/no return intent
   npsScore: integer("nps_score"),
@@ -482,6 +482,9 @@ export const eventFeedback = pgTable("event_feedback", {
   // Open-ended written feedback
   highlight: text("highlight"), // what they loved
   improvement: text("improvement"), // what could be better
+
+  // Optional identity - asked for at the top of the form, never required
+  attendeeName: varchar("attendee_name", { length: 200 }),
 
   // Optional marketing capture
   email: varchar("email", { length: 320 }), // for future event announcements
