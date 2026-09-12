@@ -442,3 +442,65 @@ export const siteSettings = pgTable("site_settings", {
   // Audit timestamps
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+/**
+ * EVENT_FEEDBACK TABLE
+ *
+ * Post-event attendee feedback, collected from the unlisted per-event form at
+ * /feedback/[slug]. One row per submission; no auth, no account required.
+ *
+ * IMPORTANT - why eventId is "set null" and not "cascade":
+ * cleanupExpiredEvents() in admin-actions.ts HARD-DELETES any event whose
+ * startTime is more than 100 days old. A cascading FK would silently take every
+ * feedback response with it. Instead the FK nulls out, and eventSlug/eventTitle
+ * are snapshotted at submission time so responses stay attributable forever.
+ */
+export const eventFeedback = pgTable("event_feedback", {
+  // Primary identifier
+  id: serial("id").primaryKey(),
+
+  // Event linkage - nullable on purpose (see note above)
+  eventId: integer("event_id").references(() => events.id, { onDelete: "set null" }),
+  eventSlug: varchar("event_slug", { length: 255 }).notNull(), // snapshot, survives purge
+  eventTitle: varchar("event_title", { length: 255 }).notNull(), // snapshot, survives purge
+
+  // Overall experience, 1-5. The only required rating.
+  overallRating: integer("overall_rating").notNull(),
+
+  // Category ratings, 1-5, all optional so attendees can skip what they have
+  // no opinion on rather than guessing.
+  musicRating: integer("music_rating"),
+  venueRating: integer("venue_rating"),
+  soundRating: integer("sound_rating"),
+  crowdRating: integer("crowd_rating"),
+  valueRating: integer("value_rating"),
+
+  // Net Promoter Score, 0-10, plus a simpler yes/no return intent
+  npsScore: integer("nps_score"),
+  wouldReturn: boolean("would_return"),
+
+  // Open-ended written feedback
+  highlight: text("highlight"), // what they loved
+  improvement: text("improvement"), // what could be better
+
+  // Optional marketing capture
+  email: varchar("email", { length: 320 }), // for future event announcements
+  heardFrom: varchar("heard_from", { length: 100 }), // instagram / friend / etc.
+
+  // Submission timestamp
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => {
+  return {
+    eventIdx: index("event_feedback_event_idx").on(table.eventId),
+    slugIdx: index("event_feedback_slug_idx").on(table.eventSlug),
+    createdAtIdx: index("event_feedback_created_at_idx").on(table.createdAt),
+  };
+});
+
+// Feedback belongs to (at most) one event
+export const eventFeedbackRelations = relations(eventFeedback, ({ one }) => ({
+  event: one(events, {
+    fields: [eventFeedback.eventId],
+    references: [events.id],
+  }),
+}));
