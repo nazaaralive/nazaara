@@ -12,11 +12,11 @@ interface FeedbackFormProps {
 }
 
 const CATEGORIES = [
-  { name: "musicRating", label: "Music & DJs" },
+  { name: "musicRating", label: "Music & DJ's" },
   { name: "venueRating", label: "Venue" },
-  { name: "soundRating", label: "Sound & production" },
-  { name: "crowdRating", label: "Crowd & atmosphere" },
-  { name: "valueRating", label: "Value for money" },
+  { name: "soundRating", label: "Sound and Production" },
+  { name: "crowdRating", label: "Crowd and Atmosphere" },
+  { name: "vibesRating", label: "Vibes" },
 ] as const
 
 const HEARD_FROM_OPTIONS = [
@@ -137,6 +137,21 @@ export function FeedbackForm({ slug, eventTitle }: FeedbackFormProps) {
         </label>
       </div>
 
+      {/* Optional name */}
+      <section className="space-y-2">
+        <label htmlFor="attendeeName" className="text-lg font-medium text-foreground block">
+          Your name <span className="text-sm text-muted-foreground font-normal">(optional)</span>
+        </label>
+        <input
+          id="attendeeName"
+          name="attendeeName"
+          type="text"
+          maxLength={200}
+          placeholder="So we know who to thank"
+          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-[color:var(--gold)]/60"
+        />
+      </section>
+
       {/* Overall */}
       <section className="space-y-4">
         <div>
@@ -256,31 +271,13 @@ export function FeedbackForm({ slug, eventTitle }: FeedbackFormProps) {
         </div>
       </section>
 
-      {/* Contact */}
+      {/* How they heard */}
       <section className="space-y-5">
-        <h2 className="text-lg font-medium text-foreground">Stay in the loop</h2>
+        <h2 className="text-lg font-medium text-foreground">
+          How did you hear about this event?
+        </h2>
 
         <div className="space-y-2">
-          <label htmlFor="email" className="text-sm text-foreground font-light">
-            Email <span className="text-muted-foreground">(optional)</span>
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            maxLength={320}
-            placeholder="you@example.com"
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-[color:var(--gold)]/60"
-          />
-          <p className="text-xs text-muted-foreground">
-            Only used to let you know about upcoming events. No spam, unsubscribe anytime.
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="heardFrom" className="text-sm text-foreground font-light">
-            How did you hear about this event?
-          </label>
           <select
             id="heardFrom"
             name="heardFrom"
