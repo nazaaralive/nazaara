@@ -108,7 +108,7 @@ export default async function FeedbackPage({ params }: PageProps) {
             <div className="mb-10 text-center">
               <p className="text-muted-foreground font-light leading-relaxed">
                 Thanks for coming out. Two minutes of honest feedback helps us make the
-                next one better - it is anonymous unless you leave your email.
+                next one better - it is anonymous unless you leave your name.
               </p>
             </div>
             <FeedbackForm slug={event.slug} eventTitle={event.title} />
