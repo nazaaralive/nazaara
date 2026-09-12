@@ -104,7 +104,7 @@ export default async function AdminFeedbackDetailPage({ params }: PageProps) {
           <Metric label="Venue" value={a.venue} suffix="/ 5" />
           <Metric label="Sound" value={a.sound} suffix="/ 5" />
           <Metric label="Crowd" value={a.crowd} suffix="/ 5" />
-          <Metric label="Value" value={a.value} suffix="/ 5" />
+          <Metric label="Vibes" value={a.vibes} suffix="/ 5" />
           <div className="border border-border rounded-lg p-4">
             <div className="text-xs uppercase tracking-wide text-muted-foreground">Would return</div>
             <div className="text-2xl font-light text-foreground mt-1 flex items-center gap-3">
@@ -127,6 +127,9 @@ export default async function AdminFeedbackDetailPage({ params }: PageProps) {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3 flex-wrap">
                   <Stars n={r.overallRating} />
+                  {r.attendeeName && (
+                    <span className="text-sm font-medium text-foreground">{r.attendeeName}</span>
+                  )}
                   {r.npsScore !== null && (
                     <span className="text-xs text-muted-foreground border border-border rounded px-2 py-0.5">
                       NPS {r.npsScore}
@@ -170,14 +173,14 @@ export default async function AdminFeedbackDetailPage({ params }: PageProps) {
               )}
 
               {/* Category detail, only when at least one was given */}
-              {(r.musicRating ?? r.venueRating ?? r.soundRating ?? r.crowdRating ?? r.valueRating) !==
+              {(r.musicRating ?? r.venueRating ?? r.soundRating ?? r.crowdRating ?? r.vibesRating) !==
                 null && (
                 <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted-foreground pt-1">
                   <span className="flex items-center gap-1.5">Music <Stars n={r.musicRating} /></span>
                   <span className="flex items-center gap-1.5">Venue <Stars n={r.venueRating} /></span>
                   <span className="flex items-center gap-1.5">Sound <Stars n={r.soundRating} /></span>
                   <span className="flex items-center gap-1.5">Crowd <Stars n={r.crowdRating} /></span>
-                  <span className="flex items-center gap-1.5">Value <Stars n={r.valueRating} /></span>
+                  <span className="flex items-center gap-1.5">Vibes <Stars n={r.vibesRating} /></span>
                 </div>
               )}
 
