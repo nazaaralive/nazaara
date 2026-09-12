@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar, Users, MapPin, Settings, Plus, UserCheck, Shield, Image as ImageIcon, Headphones } from "lucide-react"
+import { Calendar, Users, MapPin, Settings, Plus, UserCheck, Shield, Image as ImageIcon, Headphones, MessageSquare } from "lucide-react"
 import { getAdminEvents, getAdminArtists, getAdminVenues, getAdminGalleries, getAdminDJs } from "@/lib/admin-actions"
 import Link from "next/link"
 import { SuccessToast } from "@/components/admin/success-toast"
@@ -84,15 +84,26 @@ export default async function AdminPage() {
                             Welcome back, {session.user.name}
                         </p>
                     </div>
-                    <form action={signOutAction}>
-                        <Button 
-                            type="submit"
-                            variant="outline"
-                            className="border-border text-foreground hover:bg-accent/10"
-                        >
-                            Sign Out
-                        </Button>
-                    </form>
+                    <div className="flex items-center gap-3">
+                        <Link href="/admin/feedback">
+                            <Button
+                                variant="outline"
+                                className="border-border text-foreground hover:bg-accent/10"
+                            >
+                                <MessageSquare className="h-4 w-4 mr-2" />
+                                Feedback
+                            </Button>
+                        </Link>
+                        <form action={signOutAction}>
+                            <Button
+                                type="submit"
+                                variant="outline"
+                                className="border-border text-foreground hover:bg-accent/10"
+                            >
+                                Sign Out
+                            </Button>
+                        </form>
+                    </div>
                 </div>
                 
                 <Tabs defaultValue="events" className="w-full">
