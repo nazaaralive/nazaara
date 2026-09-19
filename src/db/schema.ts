@@ -507,3 +507,77 @@ export const eventFeedbackRelations = relations(eventFeedback, ({ one }) => ({
     references: [events.id],
   }),
 }));
+
+
+/**
+ * POSTER_LINKS TABLE
+ *
+ * Short branded QR targets for printed posters: nazaara.live/p/<code>.
+ *
+ * The destination lives here rather than in code so a printed poster can be
+ * repointed after it is on the wall - set destination_override to send scans
+ * straight to the ticket vendor, or flip is_active to retire a batch.
+ *
+ * event_slug is a plain string, not a foreign key, on purpose: events older
+ * than 100 days are hard-deleted by cleanupExpiredEvents() and a poster link
+ * must not vanish with them.
+ */
+export const posterLinks = pgTable("poster_links", {
+  id: serial("id").primaryKey(),
+
+  code: varchar("code", { length: 64 }).notNull().unique(), // e.g. "kt-street"
+  label: varchar("label", { length: 255 }).notNull(), // shown in admin
+  eventSlug: varchar("event_slug", { length: 255 }).notNull(),
+
+  city: varchar("city", { length: 100 }),
+  placement: varchar("placement", { length: 100 }), // street | campus | venue
+  campaign: varchar("campaign", { length: 100 }).default("king-tour-2026").notNull(),
+
+  // NULL = land on the event page. Set to override without reprinting.
+  destinationOverride: text("destination_override"),
+
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => {
+  return {
+    codeIdx: index("poster_links_code_idx").on(table.code),
+  };
+});
+
+/**
+ * POSTER_SCANS TABLE
+ *
+ * One row per human scan. Bots and link-preview fetchers are filtered out
+ * before insert (see isLikelyBot in lib/poster-links.ts) so counts stay real.
+ * Only coarse geo from Vercel edge headers is kept - no IP addresses.
+ */
+export const posterScans = pgTable("poster_scans", {
+  id: serial("id").primaryKey(),
+
+  linkId: integer("link_id").references(() => posterLinks.id, { onDelete: "cascade" }).notNull(),
+  scannedAt: timestamp("scanned_at").defaultNow().notNull(),
+
+  country: varchar("country", { length: 10 }),
+  region: varchar("region", { length: 100 }),
+  city: varchar("city", { length: 100 }),
+
+  referrer: text("referrer"),
+  userAgent: text("user_agent"),
+}, (table) => {
+  return {
+    linkIdx: index("poster_scans_link_idx").on(table.linkId),
+    timeIdx: index("poster_scans_time_idx").on(table.scannedAt),
+  };
+});
+
+// Each scan belongs to one poster link
+export const posterScansRelations = relations(posterScans, ({ one }) => ({
+  link: one(posterLinks, {
+    fields: [posterScans.linkId],
+    references: [posterLinks.id],
+  }),
+}));
+
+export const posterLinksRelations = relations(posterLinks, ({ many }) => ({
+  scans: many(posterScans),
+}));
