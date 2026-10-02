@@ -134,6 +134,52 @@ export async function updatePosterDestination(
   return { ok: true }
 }
 
+/**
+ * Flip a link between the event page and the ticket vendor.
+ *
+ * The ticket URL is resolved SERVER-SIDE from the event record rather than
+ * accepted from the client. That keeps this impossible to abuse as an open
+ * redirect, and means the destination always matches whatever is set on the
+ * event - change the ticket link once on the event and every poster follows.
+ */
+export async function setPosterDestinationMode(
+  id: number,
+  mode: "event" | "tickets"
+): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
+
+  if (mode === "event") {
+    await db
+      .update(posterLinks)
+      .set({ destinationOverride: null })
+      .where(eq(posterLinks.id, id))
+    revalidatePath("/admin/posters")
+    return { ok: true }
+  }
+
+  const rows = await db
+    .select({ ticketUrl: events.ticketUrl })
+    .from(posterLinks)
+    .leftJoin(events, eq(events.slug, posterLinks.eventSlug))
+    .where(eq(posterLinks.id, id))
+    .limit(1)
+
+  const ticketUrl = rows[0]?.ticketUrl?.trim()
+  if (!ticketUrl) {
+    return {
+      ok: false,
+      error: "That event has no ticket URL yet. Add one on the event, then try again.",
+    }
+  }
+
+  await db
+    .update(posterLinks)
+    .set({ destinationOverride: ticketUrl })
+    .where(eq(posterLinks.id, id))
+  revalidatePath("/admin/posters")
+  return { ok: true }
+}
+
 export async function deletePosterLink(id: number): Promise<void> {
   await requireAdmin()
   // poster_scans cascades - deleting a link intentionally discards its history.
