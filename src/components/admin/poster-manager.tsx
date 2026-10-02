@@ -13,10 +13,13 @@ import {
   EyeOff,
   Eye,
   AlertCircle,
+  Globe,
+  Ticket,
 } from "lucide-react"
 import {
   createPosterLink,
   setPosterLinkActive,
+  setPosterDestinationMode,
   deletePosterLink,
   type EventOption,
 } from "@/lib/poster-actions"
@@ -59,6 +62,7 @@ export interface PosterLinkRow {
   placement: string | null
   campaign: string
   destinationOverride: string | null
+  eventTicketUrl: string | null
   isActive: boolean
   totalScans: number
   scansLast7Days: number
@@ -322,7 +326,24 @@ function LinkRow({
 }) {
   const [isPending, startTransition] = useTransition()
   const [copied, setCopied] = useState(false)
+  const [destError, setDestError] = useState<string | null>(null)
   const url = `${origin}/p/${link.code}`
+
+  // "custom" covers a destination set by hand that is neither the event page
+  // nor the current ticket URL - surfaced rather than silently shown as one.
+  const mode: "event" | "tickets" | "custom" = !link.destinationOverride
+    ? "event"
+    : link.eventTicketUrl && link.destinationOverride === link.eventTicketUrl
+      ? "tickets"
+      : "custom"
+
+  const switchTo = (next: "event" | "tickets") => {
+    setDestError(null)
+    startTransition(async () => {
+      const result = await setPosterDestinationMode(link.id, next)
+      if (!result.ok) setDestError(result.error ?? "Could not change the destination.")
+    })
+  }
 
   const copy = async () => {
     try {
@@ -374,12 +395,12 @@ function LinkRow({
               Retired
             </span>
           )}
-          {link.destinationOverride && (
+          {mode === "custom" && (
             <span
               className="text-[10px] uppercase tracking-wide text-sky-400/90 border border-sky-400/40 rounded px-1.5 py-0.5"
-              title={link.destinationOverride}
+              title={link.destinationOverride ?? undefined}
             >
-              Redirected
+              Custom URL
             </span>
           )}
         </div>
@@ -387,6 +408,12 @@ function LinkRow({
         <div className="text-xs text-muted-foreground/70 mt-0.5">
           {link.eventSlug} · last scan {formatDate(link.lastScanAt)}
         </div>
+        {destError && (
+          <p className="text-xs text-red-400 mt-1 flex items-center gap-1.5">
+            <AlertCircle className="h-3 w-3 shrink-0" />
+            {destError}
+          </p>
+        )}
       </div>
 
       <div className="flex items-center gap-5 shrink-0">
@@ -401,6 +428,44 @@ function LinkRow({
       </div>
 
       <div className="flex items-center gap-2 flex-wrap shrink-0">
+        <span className="inline-flex rounded-md border border-border overflow-hidden">
+          <button
+            type="button"
+            onClick={() => switchTo("event")}
+            disabled={isPending || mode === "event"}
+            title="Send scans to the event page on nazaara.live"
+            className={cn(
+              "text-xs px-2.5 py-1.5 inline-flex items-center gap-1.5 transition-colors disabled:cursor-default",
+              mode === "event"
+                ? "bg-[--gold] text-[--maroon-red] font-medium"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Globe className="h-3.5 w-3.5" />
+            Website
+          </button>
+          <button
+            type="button"
+            onClick={() => switchTo("tickets")}
+            disabled={isPending || mode === "tickets" || !link.eventTicketUrl}
+            title={
+              link.eventTicketUrl
+                ? `Send scans straight to ${link.eventTicketUrl}`
+                : "This event has no ticket URL set yet"
+            }
+            className={cn(
+              "text-xs px-2.5 py-1.5 inline-flex items-center gap-1.5 transition-colors border-l border-border disabled:cursor-default",
+              mode === "tickets"
+                ? "bg-[--gold] text-[--maroon-red] font-medium"
+                : "text-muted-foreground hover:text-foreground",
+              !link.eventTicketUrl && mode !== "tickets" ? "opacity-40" : ""
+            )}
+          >
+            <Ticket className="h-3.5 w-3.5" />
+            Tickets
+          </button>
+        </span>
+
         <button
           type="button"
           onClick={copy}
