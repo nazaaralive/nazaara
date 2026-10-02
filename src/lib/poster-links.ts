@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle"
-import { posterLinks, posterScans } from "@/db/schema"
+import { posterLinks, posterScans, events } from "@/db/schema"
 import { eq, sql, desc } from "drizzle-orm"
 
 /**
@@ -119,6 +119,8 @@ export async function recordScan(input: {
  * ------------------------------------------------------------------------ */
 
 export interface PosterLinkStats extends PosterLink {
+  /** Ticket URL from the linked event, so the admin can offer a Tickets toggle. */
+  eventTicketUrl: string | null
   totalScans: number
   scansLast7Days: number
   lastScanAt: Date | null
@@ -136,6 +138,7 @@ export async function getPosterLinkStats(): Promise<PosterLinkStats[]> {
       campaign: posterLinks.campaign,
       destinationOverride: posterLinks.destinationOverride,
       isActive: posterLinks.isActive,
+      eventTicketUrl: events.ticketUrl,
       totalScans: sql<number>`COUNT(${posterScans.id})::int`.as("total_scans"),
       scansLast7Days: sql<number>`COUNT(${posterScans.id}) FILTER (WHERE ${posterScans.scannedAt} > NOW() - INTERVAL '7 days')::int`.as(
         "scans_last_7_days"
@@ -144,6 +147,9 @@ export async function getPosterLinkStats(): Promise<PosterLinkStats[]> {
     })
     .from(posterLinks)
     .leftJoin(posterScans, eq(posterScans.linkId, posterLinks.id))
+    // event_slug is a plain string, not an FK, so this join simply finds
+    // nothing once an event has been auto-purged. The link still works.
+    .leftJoin(events, eq(events.slug, posterLinks.eventSlug))
     .groupBy(
       posterLinks.id,
       posterLinks.code,
@@ -153,7 +159,8 @@ export async function getPosterLinkStats(): Promise<PosterLinkStats[]> {
       posterLinks.placement,
       posterLinks.campaign,
       posterLinks.destinationOverride,
-      posterLinks.isActive
+      posterLinks.isActive,
+      events.ticketUrl
     )
     .orderBy(posterLinks.code)
 
