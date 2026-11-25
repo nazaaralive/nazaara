@@ -1098,12 +1098,9 @@ export async function updateGallery(formData: FormData) {
   const existingKeys = new Set(existingImages.map(img => img.key))
   const newKeys = new Set(imageData.map(img => img.key))
 
-  // Find keys to delete from UploadThing
+  // Find keys to delete from UploadThing. The deletion itself happens AFTER the
+  // database writes below -- see the cleanup block at the end of this function.
   const keysToDelete = Array.from(existingKeys).filter(key => !newKeys.has(key))
-  if (keysToDelete.length > 0) {
-    const utapi = getUTApi()
-    await utapi.deleteFiles(keysToDelete)
-  }
 
   // Update gallery
   await db
@@ -1138,6 +1135,25 @@ export async function updateGallery(formData: FormData) {
       )
   }
 
+  // Best-effort cleanup, AFTER the save has committed. UploadThing being slow,
+  // rate-limited or down must never block the user's save: this call used to run
+  // BEFORE the database writes with no guard, which left the Save button
+  // spinning on "Saving..." indefinitely whenever photos had been removed.
+  if (keysToDelete.length > 0) {
+    try {
+      const utapi = getUTApi()
+      await Promise.race([
+        utapi.deleteFiles(keysToDelete),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("UploadThing cleanup timed out")), 8000)
+        ),
+      ])
+    } catch (error) {
+      // Orphaned files cost a little storage; a failed save costs the user work.
+      console.error("updateGallery: UploadThing cleanup failed for", keysToDelete, error)
+    }
+  }
+
   revalidatePath("/admin")
   revalidatePath(`/admin/galleries/${slug}`)
   redirect(`/admin/galleries/${slug}?success=gallery-updated`)
@@ -1157,8 +1173,18 @@ export async function deleteGallery(formData: FormData) {
     .where(eq(galleryImages.galleryId, galleryId))
 
   if (images.length > 0) {
-    const utapi = getUTApi()
-    await utapi.deleteFiles(images.map(img => img.key))
+    try {
+      const utapi = getUTApi()
+      await Promise.race([
+        utapi.deleteFiles(images.map(img => img.key)),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("UploadThing cleanup timed out")), 8000)
+        ),
+      ])
+    } catch (error) {
+      // Never block the gallery deletion on remote file cleanup.
+      console.error("deleteGallery: UploadThing cleanup failed:", error)
+    }
   }
 
   // Delete gallery - images will be cascade deleted
