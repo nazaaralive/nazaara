@@ -221,6 +221,15 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Site-wide all caps. Form fields are exempt below so people can see
+       exactly what they type (emails, names), and /admin opts out in
+       app/admin/layout.tsx. */
+    text-transform: uppercase;
+  }
+  input,
+  textarea,
+  [contenteditable] {
+    text-transform: none;
   }
 
   /* Brand-aligned text selection colors */
