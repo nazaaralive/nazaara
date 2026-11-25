@@ -59,7 +59,10 @@ export default function TermsPage() {
           {/* Footer Note */}
           <div className="mt-16 pt-12 border-t border-white/20">
             <p className="text-sm font-neue-haas text-center text-white">
-              For questions or concerns regarding these Terms, please contact us at contact@nazaara.live
+              For questions or concerns regarding these Terms, please contact us at contact@nazaara.live or on WhatsApp at{" "}
+              <a href="https://wa.me/16463912628" target="_blank" rel="noopener noreferrer" className="underline hover:text-[var(--gold)]">
+                +1 (646) 391-2628
+              </a>
             </p>
           </div>
         </div>
