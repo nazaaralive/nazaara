@@ -47,9 +47,16 @@
 
 :root {
   --radius: 0.625rem;
+
+  /* Display font: Satoshi Black (Fontshare, loaded in app/layout.tsx).
+     Replaces Prettywise. The variable name is kept so every existing
+     font-prettywise / font-serif class picks it up with no other edits. */
+  --font-prettywise: "Satoshi", "Helvetica Neue", Helvetica, Arial, sans-serif;
    
   /* Nazaara Live Brand Colors */
-  --maroon-red: oklch(0.2799 0.1066 16.78);
+  /* Base page colour. Was maroon, oklch(0.2799 0.1066 16.78); now black.
+     Name kept because ~46 components reference var(--maroon-red). */
+  --maroon-red: oklch(0 0 0);
   --turquoise: oklch(0.45 0.12 190);
   --gold: oklch(0.72 0.12 77);
   --dark-gold: oklch(0.4 0.12 75);
@@ -60,34 +67,34 @@
   /* System Colors */
   --background: var(--maroon-red);
   --foreground: var(--off-white);
-  --card: oklch(0.35 0.14 20);
+  --card: oklch(0.17 0 0);
   --card-foreground: var(--off-white);
-  --popover: oklch(0.35 0.14 20);
+  --popover: oklch(0.17 0 0);
   --popover-foreground: var(--off-white);
   --primary: var(--gold);
   --primary-foreground: var(--charcoal);
   --secondary: var(--turquoise);
   --secondary-foreground: var(--off-white);
-  --muted: oklch(0.4 0.08 20);
+  --muted: oklch(0.22 0 0);
   --muted-foreground: oklch(0.8 0.03 85);
   --accent: var(--gold);
   --accent-foreground: var(--charcoal);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.45 0.1 20);
-  --input: oklch(0.35 0.12 20);
+  --border: oklch(0.28 0 0);
+  --input: oklch(0.22 0 0);
   --ring: var(--gold);
   --chart-1: var(--gold);
   --chart-2: var(--turquoise);
   --chart-3: var(--dark-gold);
   --chart-4: var(--dark-green);
   --chart-5: oklch(0.75 0.08 20);
-  --sidebar: oklch(0.25 0.14 20);
+  --sidebar: oklch(0.12 0 0);
   --sidebar-foreground: var(--off-white);
   --sidebar-primary: var(--gold);
   --sidebar-primary-foreground: var(--charcoal);
   --sidebar-accent: var(--turquoise);
   --sidebar-accent-foreground: var(--off-white);
-  --sidebar-border: oklch(0.45 0.1 20);
+  --sidebar-border: oklch(0.28 0 0);
   --sidebar-ring: var(--gold);
 }
 
