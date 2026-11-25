@@ -60,7 +60,7 @@ export const privacyContent = {
     {
       title: "7. Your Rights & Choices",
       content: [
-        "You may unsubscribe from email marketing at any time by using the unsubscribe link provided in our emails. You may opt out of SMS/text communications by replying STOP to any message you receive from us. You may request access to, correction of, or deletion of your personal information by contacting us at contact@nazaara.live. Because we do not meet the applicability thresholds under the California Consumer Privacy Act (CCPA/CPRA), California-specific rights and opt-out controls are not required at this time. If our eligibility status changes, we will update this Policy.",
+        "You may unsubscribe from email marketing at any time by using the unsubscribe link provided in our emails. You may opt out of SMS/text communications by replying STOP to any message you receive from us. You may request access to, correction of, or deletion of your personal information by contacting us at contact@nazaara.live or on WhatsApp at +1 (646) 391-2628. Because we do not meet the applicability thresholds under the California Consumer Privacy Act (CCPA/CPRA), California-specific rights and opt-out controls are not required at this time. If our eligibility status changes, we will update this Policy.",
       ],
     },
     {
@@ -68,7 +68,7 @@ export const privacyContent = {
       content: [
         "Nazaara Live offers an SMS messaging program to deliver event announcements, presale access, ticket drops, and promotional communications directly to your mobile device. By opting in through our website at www.nazaara.live or by texting a keyword to our designated number, you consent to receive recurring automated marketing and informational text messages from Nazaara Live. Consent is not a condition of any purchase.",
         "Message frequency varies. Message and data rates may apply. Carriers are not liable for delayed or undelivered messages.",
-        "You may opt out at any time by replying STOP to any message. After opting out, you will receive a one-time confirmation message and no further messages will be sent unless you re-subscribe. For help or support, reply HELP to any message or email contact@nazaara.live.",
+        "You may opt out at any time by replying STOP to any message. After opting out, you will receive a one-time confirmation message and no further messages will be sent unless you re-subscribe. For help or support, reply HELP to any message or email contact@nazaara.live or on WhatsApp at +1 (646) 391-2628.",
         "No mobile information will be shared with third parties or affiliates for marketing or promotional purposes.",
         "Supported carriers include but are not limited to AT&T, T-Mobile, Verizon, and other major US carriers. Service may not be available on all carriers.",
       ],
@@ -76,7 +76,7 @@ export const privacyContent = {
     {
       title: "9. Photography & Media Consent",
       content: [
-        "By attending any NAZAARA or TAMASHA Worldwide event, you acknowledge that the event may be filmed or photographed and that you may appear in event footage or images. You agree that such media may be used in perpetuity for marketing, promotional, archival, and commercial purposes. Requests for accommodation must be made before the event by emailing contact@nazaara.live. Because event photography often includes crowd shots, complete removal cannot always be guaranteed.",
+        "By attending any NAZAARA or TAMASHA Worldwide event, you acknowledge that the event may be filmed or photographed and that you may appear in event footage or images. You agree that such media may be used in perpetuity for marketing, promotional, archival, and commercial purposes. Requests for accommodation must be made before the event by emailing contact@nazaara.live or on WhatsApp at +1 (646) 391-2628. Because event photography often includes crowd shots, complete removal cannot always be guaranteed.",
       ],
     },
     {
@@ -102,6 +102,7 @@ export const privacyContent = {
       content: [
         "For questions about this Privacy Policy, please contact:",
         "Email: contact@nazaara.live",
+        "WhatsApp: +1 (646) 391-2628",
         "Website: www.nazaara.live",
       ],
     },
