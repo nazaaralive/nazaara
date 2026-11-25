@@ -38,7 +38,7 @@ export default async function GalleriesPage() {
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <h1 className="heading-display font-light text-[color:var(--off-white)] tracking-tight leading-tight">
               Event
-              <span className="block text-[color:var(--gold)] font-medium">Galleries</span>
+              <span className="block text-gold-metallic font-medium">Galleries</span>
             </h1>
             <div className="w-24 h-px bg-[color:var(--gold)] mx-auto" />
             <p className="text-xl md:text-2xl text-[color:var(--off-white)]/80 font-light max-w-2xl mx-auto leading-relaxed">
