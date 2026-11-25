@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Mail, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getPublicUpcomingEvents, type PublicEvent } from "@/lib/public-actions";
 
@@ -332,17 +333,20 @@ export default function VipPage() {
               </p>
               <a
                 href="mailto:contact@nazaara.live"
-                className="text-xl font-prettywise text-[var(--gold)] hover:text-[var(--gold)]/80 transition-colors"
+                className="flex w-fit items-center gap-3 text-xl font-prettywise text-[var(--gold)] hover:text-[var(--gold)]/80 transition-colors"
               >
+                <Mail className="h-5 w-5 shrink-0" aria-hidden="true" />
                 contact@nazaara.live
               </a>
               <a
                 href="https://wa.me/16463912628"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block mt-2 text-xl font-prettywise text-[var(--gold)] hover:text-[var(--gold)]/80 transition-colors"
+                aria-label="WhatsApp or text +1 (646) 391-2628"
+                className="mt-3 flex w-fit items-center gap-3 text-xl font-prettywise text-[var(--gold)] hover:text-[var(--gold)]/80 transition-colors"
               >
-                WhatsApp +1 (646) 391-2628
+                <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
+                +1 (646) 391-2628
               </a>
             </div>
           </div>
