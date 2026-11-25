@@ -199,7 +199,7 @@ export default async function Home() {
         />
       )}
 
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-background text-foreground uppercase">
         <Hero />
 
         {/* Event Marquee - Animated Transition */}
