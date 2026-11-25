@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Calendar, Camera, MapPin } from "lucide-react"
+import { Calendar, Camera, ChevronDown, MapPin } from "lucide-react"
+import { useMemo, useState } from "react"
 import type { PublicGallery } from "@/lib/public-actions"
 
 interface GalleryGridProps {
@@ -10,6 +11,28 @@ interface GalleryGridProps {
 }
 
 export function GalleryGrid({ galleries }: GalleryGridProps) {
+  // City filter. Cities are typed by hand in the admin, so match them trimmed
+  // and case-insensitively ("Vancouver" and "vancouver " are the same city).
+  const [city, setCity] = useState("all")
+  const cityOptions = useMemo(() => {
+    const byKey = new Map<string, { label: string; count: number }>()
+    for (const g of galleries) {
+      const label = g.city?.trim()
+      if (!label) continue
+      const key = label.toLowerCase()
+      const existing = byKey.get(key)
+      if (existing) existing.count++
+      else byKey.set(key, { label, count: 1 })
+    }
+    return Array.from(byKey.entries())
+      .map(([key, v]) => ({ key, ...v }))
+      .sort((a, b) => a.label.localeCompare(b.label))
+  }, [galleries])
+  const visibleGalleries =
+    city === "all"
+      ? galleries
+      : galleries.filter((g) => g.city?.trim().toLowerCase() === city)
+
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("en-US", {
       month: "long",
@@ -36,8 +59,35 @@ export function GalleryGrid({ galleries }: GalleryGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-      {galleries.map((gallery) => {
+    <div>
+      {/* Only worth showing once there is more than one city to choose from */}
+      {cityOptions.length > 1 && (
+        <div className="flex justify-end mb-8">
+          <label className="relative inline-flex items-center gap-3">
+            <MapPin className="h-4 w-4 text-[color:var(--gold)]" aria-hidden="true" />
+            <span className="sr-only">Filter galleries by city</span>
+            <select
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className="appearance-none bg-black border border-[color:var(--gold)]/40 hover:border-[color:var(--gold)] focus:border-[color:var(--gold)] focus:outline-none text-foreground text-xs uppercase tracking-[0.2em] pl-4 pr-10 py-3 cursor-pointer transition-colors [&_option]:bg-black"
+            >
+              <option value="all">All cities ({galleries.length})</option>
+              {cityOptions.map((c) => (
+                <option key={c.key} value={c.key}>
+                  {c.label} ({c.count})
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              className="pointer-events-none absolute right-3 h-4 w-4 text-[color:var(--gold)]"
+              aria-hidden="true"
+            />
+          </label>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+      {visibleGalleries.map((gallery) => {
         const thumbnail = getThumbnail(gallery)
         
         return (
@@ -99,6 +149,7 @@ export function GalleryGrid({ galleries }: GalleryGridProps) {
           </Link>
         )
       })}
+      </div>
     </div>
   )
 }
