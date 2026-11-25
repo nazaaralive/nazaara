@@ -11,56 +11,8 @@ import { ourFileRouter } from "@/app/api/uploadthing/core";
 import { Toaster } from "@/components/ui/sonner";
 import { getSiteSettings } from "@/lib/site-settings";
 
-const prettywise = localFont({
-  src: [
-    {
-      path: "../../public/fonts/Prettywise/Prettywise-ExtraLight.ttf",
-      weight: "200",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Prettywise/Prettywise-Light.otf",
-      weight: "300",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Prettywise/Prettywise-Regular.ttf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Prettywise/Prettywise-Medium.ttf",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Prettywise/Prettywise-SemiBold.ttf",
-      weight: "600",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Prettywise/Prettywise-Bold.ttf",
-      weight: "700",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Prettywise/Prettywise-ExtraBold.ttf",
-      weight: "800",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Prettywise/Prettywise-Black.ttf",
-      weight: "900",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Prettywise/Prettywise-Heavy.ttf",
-      weight: "950",
-      style: "normal",
-    },
-  ],
-  variable: "--font-prettywise",
-});
+// Display font (headings) is Satoshi Black, loaded from Fontshare in <head>
+// below. Prettywise was removed: it shipped nine font files on every page.
 
 const neueHaas = localFont({
   src: [
@@ -179,7 +131,17 @@ export default async function RootLayout({
   const settings = await getSiteSettings();
   return (
     <html lang="en">
-      <body className={`${prettywise.variable} ${neueHaas.variable}`}>
+      <head>
+        {/* Satoshi Black: display font for every heading. Applied through
+            --font-prettywise in globals.css, which replaced Prettywise. */}
+        <link rel="preconnect" href="https://api.fontshare.com" />
+        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f[]=satoshi@900&display=swap"
+        />
+      </head>
+      <body className={neueHaas.variable}>
         <NextSSRPlugin
           /**
            * The `extractRouterConfig` will extract **only** the route configs
