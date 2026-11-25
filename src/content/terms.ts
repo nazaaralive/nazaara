@@ -54,7 +54,7 @@ export const termsContent = {
       title: "4. Media, Photography, and Promotional Use",
       content: [
         "By attending any NAZAARA or TAMASHA Worldwide event, you acknowledge that photography, video recording, and live media capture may take place. You may appear in photographs or recorded media that may be used for marketing, promotional, archival, or commercial purposes in perpetuity, in any media format now known or later developed, without compensation.",
-        "Because event environments may capture large groups, full removal of a guest's likeness from promotional media is not guaranteed. If you require accommodation, you must contact us before the event at contact@nazaara.live.",
+        "Because event environments may capture large groups, full removal of a guest's likeness from promotional media is not guaranteed. If you require accommodation, you must contact us before the event at contact@nazaara.live or on WhatsApp at +1 (646) 391-2628.",
       ],
     },
     {
@@ -68,7 +68,7 @@ export const termsContent = {
       content: [
         "Nazaara Live offers an SMS messaging program for event announcements, presale access, ticket drops, and promotional messages. By providing your phone number and opting in through our website at www.nazaara.live, you agree to receive recurring automated marketing and informational text messages from Nazaara Live. Consent to receive SMS messages is not a condition of any purchase.",
         "Message frequency varies. Message and data rates may apply. Carriers are not liable for delayed or undelivered messages.",
-        "You may opt out at any time by replying STOP to any message. You will receive a one-time confirmation and no further messages will be sent unless you re-subscribe. For help, reply HELP to any message or email contact@nazaara.live.",
+        "You may opt out at any time by replying STOP to any message. You will receive a one-time confirmation and no further messages will be sent unless you re-subscribe. For help, reply HELP to any message or email contact@nazaara.live or on WhatsApp at +1 (646) 391-2628.",
         "No mobile information will be shared with third parties or affiliates for marketing or promotional purposes.",
       ],
     },
@@ -119,6 +119,7 @@ export const termsContent = {
       content: [
         "For questions or concerns regarding these Terms, please contact:",
         "Email: contact@nazaara.live",
+        "WhatsApp: +1 (646) 391-2628",
         "Website: www.nazaara.live",
       ],
     },
