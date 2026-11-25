@@ -150,6 +150,17 @@ export function GalleryFormV2({ gallery, mode }: GalleryFormProps) {
     formData.set("title", title)
     formData.set("slug", slug)
     
+    // Safety net: a server action that never settles -- a hung upstream call, a
+    // dropped connection -- would otherwise leave this button stuck on
+    // "Saving..." forever, with no way out but reloading the page.
+    const watchdog = setTimeout(() => {
+      setIsSubmitting(false)
+      alert(
+        "Still waiting on the server. Your save may not have gone through -- " +
+          "reload the page to check before trying again."
+      )
+    }, 45000)
+
     try {
       if (mode === "create") {
         await createGallery(formData)
@@ -157,7 +168,9 @@ export function GalleryFormV2({ gallery, mode }: GalleryFormProps) {
         formData.append("galleryId", gallery.id.toString())
         await updateGallery(formData)
       }
+      clearTimeout(watchdog)
     } catch (error) {
+      clearTimeout(watchdog)
       // Check if this is a redirect error (expected behavior)
       if (error && typeof error === 'object' && 'digest' in error && 
           typeof error.digest === 'string' && error.digest.includes('NEXT_REDIRECT')) {
