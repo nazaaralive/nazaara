@@ -336,6 +336,14 @@ export default function VipPage() {
               >
                 contact@nazaara.live
               </a>
+              <a
+                href="https://wa.me/16463912628"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block mt-2 text-xl font-prettywise text-[var(--gold)] hover:text-[var(--gold)]/80 transition-colors"
+              >
+                WhatsApp +1 (646) 391-2628
+              </a>
             </div>
           </div>
         </div>
